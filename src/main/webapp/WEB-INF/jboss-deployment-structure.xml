@@ -1,0 +1,11 @@
+<jboss-deployment-structure>
+  <deployment>
+    <dependencies>
+      <module name="org.infinispan" services="export" />
+      <module name="org.apache.httpcomponents"/>
+      <module name="org.apache.commons.io"/>
+      <module name="org.slf4j"/>
+      <module name="org.wildfly.clustering.api" services="export" />
+    </dependencies>
+  </deployment>
+</jboss-deployment-structure>
