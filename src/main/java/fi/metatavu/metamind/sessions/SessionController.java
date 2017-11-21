@@ -22,8 +22,22 @@ public class SessionController {
    * @param data serialized session data
    * @return created session
    */
-  public Session createSession(String locale, String visitor, byte[] data) {
-    return sessionDAO.create(UUID.randomUUID().toString(), locale, visitor, data);
+  public Session createSession(String locale, String timeZone, String visitor, byte[] data) {
+    return sessionDAO.create(UUID.randomUUID().toString(), locale, timeZone, visitor, data);
+  }
+  
+  /**
+   * Finds a session by an external id
+   * 
+   * @param externalId 
+   * @return
+   */
+  public Session findSession(UUID externalId) {
+    if (externalId == null) {
+      return null;
+    }
+    
+    return sessionDAO.findByExternalId(externalId.toString());
   }
   
 }

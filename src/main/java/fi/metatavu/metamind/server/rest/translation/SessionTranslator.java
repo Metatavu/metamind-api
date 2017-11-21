@@ -30,6 +30,7 @@ public class SessionTranslator {
     result.setId(UUID.fromString(jpaSession.getExternalId()));
     result.setLocale(jpaSession.getLocale());
     result.setVisitor(jpaSession.getVisitor());
+    result.setTimeZone(jpaSession.getTimeZone());
     
     return result;
   }

@@ -63,5 +63,14 @@
     <addForeignKeyConstraint baseTableName="Message" baseColumnNames="session_id" constraintName="FK_MESSAGE_SESSION_ID" referencedColumnNames="id" referencedTableName="Session"/>
     <addForeignKeyConstraint baseTableName="QuickResponse" baseColumnNames="message_id" constraintName="FK_QUICK_RESPONSE_MESSAGE_ID" referencedColumnNames="id" referencedTableName="Message"/>
   </changeSet>
+  
+
+  <changeSet author="Antti Leppa" id="session-timezone">
+    <addColumn tableName="Session">
+      <column name="timeZone" type="VARCHAR(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
 
 </databaseChangeLog>

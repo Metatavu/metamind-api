@@ -47,7 +47,7 @@ public class SessionApiImpl extends AbstractRestApi implements SessionsApi {
       return respondInternalServerError("Failed to serialize bot session");
     }
     
-    fi.metatavu.metamind.persistence.models.Session session = sessionController.createSession(body.getLocale(), body.getVisitor(), sessionData);
+    fi.metatavu.metamind.persistence.models.Session session = sessionController.createSession(body.getLocale(), body.getTimeZone(), body.getVisitor(), sessionData);
     if (session == null) {
       return respondInternalServerError("Could not initialize session");
     }

@@ -32,6 +32,11 @@ public class Session {
   @NotEmpty
   @Column(nullable = false)
   private String locale;
+
+  @NotNull
+  @NotEmpty
+  @Column(nullable = false)
+  private String timeZone;
   
   private String visitor;
   
@@ -70,6 +75,14 @@ public class Session {
 
   public void setLocale(String locale) {
     this.locale = locale;
+  }
+  
+  public String getTimeZone() {
+    return timeZone;
+  }
+  
+  public void setTimeZone(String timeZone) {
+    this.timeZone = timeZone;
   }
   
   public byte[] getData() {
