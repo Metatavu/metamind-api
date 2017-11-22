@@ -72,5 +72,9 @@
       </column>
     </addColumn>
   </changeSet>
+  
+  <changeSet id="rename-quick-response-option-to-quick-response-text" author="Heikki Kurhinen">
+    <renameColumn tableName="QuickResponse" oldColumnName="option" newColumnName="quickResponseText" columnDataType="VARCHAR(191)"/>
+  </changeSet>
 
 </databaseChangeLog>
