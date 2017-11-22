@@ -60,4 +60,16 @@ public class SessionDAO extends AbstractDAO<Session> {
     return getSingleResult(query);
   }
   
+  /**
+   * Updates data
+   *
+   * @param session session to update
+   * @param data data
+   * @return updated session
+   */
+   public Session updateData(Session session, byte[] data) {
+     session.setData(data);
+     return persist(session);
+   }
+  
 }

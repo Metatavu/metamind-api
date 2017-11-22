@@ -52,7 +52,7 @@ public class MessageApiImpl extends AbstractRestApi implements MessagesApi {
   private MessageTranslator messageTranslator;
   
   @Override
-  public Response postMessage(Message body) throws Exception {
+  public Response createMessage(Message body) throws Exception {
     Session session = sessionController.findSession(body.getSessionId());
     if (session == null) {
       return respondBadRequest("Invalid session id");
@@ -81,6 +81,9 @@ public class MessageApiImpl extends AbstractRestApi implements MessagesApi {
     
     fi.metatavu.metamind.persistence.models.Message updatedMessage = messageController.updateMessage(message, botResponse.getHint(), botResponse.getResponse());
     List<QuickResponse> quickResponses = messageController.updateMessageQuickResponses(updatedMessage, botResponse.getQuickReplies());
+    
+    byte[] updatedBotSession = botController.serializeBotSession(botSession);
+    sessionController.updateSessionState(session, updatedBotSession);
     
     return respondOk(messageTranslator.translateMessage(updatedMessage, quickResponses));
   }
