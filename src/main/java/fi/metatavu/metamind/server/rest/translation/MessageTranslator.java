@@ -44,7 +44,7 @@ public class MessageTranslator {
 
     List<String> result = new ArrayList<>(quickResponses.size());
     for (QuickResponse quickResponse : quickResponses) {
-      result.add(quickResponse.getOption());
+      result.add(quickResponse.getQuickResponseText());
     }
     
     return result;
