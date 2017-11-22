@@ -40,4 +40,15 @@ public class SessionController {
     return sessionDAO.findByExternalId(externalId.toString());
   }
   
+  /**
+   * Updates session state
+   * 
+   * @param session session
+   * @param data new session state serialized
+   * @return updated session
+   */
+  public Session updateSessionState(Session session, byte[] data) {
+    return sessionDAO.updateData(session, data);
+  }
+  
 }
