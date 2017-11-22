@@ -14,13 +14,44 @@ import fi.metatavu.metamind.persistence.models.Session;
 @ApplicationScoped
 public class MessageDAO extends AbstractDAO<Message> {
 
-  public Message create(String content, String externalId, String hint, Session session) {
+  /**
+   * Creates new message
+   * 
+   * @param content user's message content
+   * @param externalId external id
+   * @param session session
+   * @return created message
+   */
+  public Message create(String content, String externalId, Session session) {
     Message message = new Message();
     message.setContent(content);
     message.setExternalId(externalId);
-    message.setHint(hint);
     message.setSession(session);
     return persist(message);
   }
-  
+
+  /**
+   * Updates response
+   *
+   * @param message message
+   * @param response response
+   * @return updated message
+   */
+  public Message updateResponse(Message message, String response) {
+    message.setResponse(response);
+    return persist(message);
+  }
+
+  /**
+   * Updates hint
+   *
+   * @param message message
+   * @param hint hint
+   * @return updated message
+   */
+  public Message updateHint(Message message, String hint) {
+    message.setHint(hint);
+    return persist(message);
+  }
+
 }

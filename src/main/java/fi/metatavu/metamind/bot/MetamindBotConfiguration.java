@@ -20,7 +20,8 @@ import com.rabidgremlin.mutters.slots.NumberSlot;
 
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 
-public class LummeInkBotConfiguration implements InkBotConfiguration {
+public class MetamindBotConfiguration implements InkBotConfiguration {
+  
   @Override
   public IntentMatcher getIntentMatcher() {
     // model was built with OpenNLP whitespace tokenizer

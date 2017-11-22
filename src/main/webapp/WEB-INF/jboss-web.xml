@@ -5,6 +5,6 @@
   version="6.0">
    
   <context-root></context-root>
-  <virtual-host>metamind</virtual-host>
+  <virtual-host>metamind-api</virtual-host>
   
 </jboss-web>

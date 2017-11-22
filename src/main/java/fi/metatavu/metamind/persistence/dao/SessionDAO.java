@@ -24,12 +24,18 @@ public class SessionDAO extends AbstractDAO<Session> {
    * 
    * @param externalId external id in uuid format
    * @param locale users locale
+   * @param timeZone users time zone
+   * @param visitor visitor details
+   * @param data serialized session data
    * @return new session
    */
-  public Session create(String externalId, String locale) {
+  public Session create(String externalId, String locale, String timeZone, String visitor, byte[] data) {
     Session session = new Session();
     session.setExternalId(externalId);
     session.setLocale(locale);
+    session.setTimeZone(timeZone);
+    session.setData(data);
+    session.setVisitor(visitor);
     return persist(session);
   }
   

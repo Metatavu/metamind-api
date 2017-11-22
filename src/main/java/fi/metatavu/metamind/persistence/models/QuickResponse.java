@@ -23,7 +23,7 @@ public class QuickResponse {
   @NotNull
   @NotEmpty
   @Column(nullable = false)
-  private String quickResponse;
+  private String option;
 
   public Long getId() {
     return id;
@@ -40,13 +40,13 @@ public class QuickResponse {
   public void setMessage(Message message) {
     this.message = message;
   }
-
-  public String getQuickResponse() {
-    return quickResponse;
+  
+  public String getOption() {
+    return option;
   }
-
-  public void setQuickResponse(String quickResponse) {
-    this.quickResponse = quickResponse;
+  
+  public void setOption(String option) {
+    this.option = option;
   }
 
 }
