@@ -33,6 +33,7 @@ public class MessageDAO extends AbstractDAO<Message> {
   /**
    * Updates response
    *
+   * @param message message
    * @param response response
    * @return updated message
    */
@@ -44,6 +45,7 @@ public class MessageDAO extends AbstractDAO<Message> {
   /**
    * Updates hint
    *
+   * @param message message
    * @param hint hint
    * @return updated message
    */
