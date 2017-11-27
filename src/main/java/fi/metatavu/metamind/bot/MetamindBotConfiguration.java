@@ -30,9 +30,12 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
     // use OpenNLP NER for slot matching
     OpenNLPSlotMatcher slotMatcher = new OpenNLPSlotMatcher(tokenizer);
     slotMatcher.addSlotModel("ElectricityConsumption", "models/fi-ner-elecricity-consumption.bin");
-
+    slotMatcher.addSlotModel("LivingSpaceSize", "models/fi-ner-living-space-size.bin");
+    slotMatcher.addSlotModel("ResidentCount", "models/fi-ner-resident-count.bin");
+    slotMatcher.addSlotModel("YearBuild", "models/fi-ner-year-build.bin");
+    
     // create intent matcher
-    OpenNLPIntentMatcher matcher = new OpenNLPIntentMatcher("models/fi-cat-lumme-intents.bin", tokenizer, slotMatcher);
+    OpenNLPIntentMatcher matcher = new OpenNLPIntentMatcher("models/fi-lumme-intents.bin", tokenizer, slotMatcher);
 
     Intent orderElectricityIntent = new Intent("OrderElectricity");
     matcher.addIntent(orderElectricityIntent);
@@ -46,7 +49,28 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
     Intent gaveElectricyComsumptionIntent = new Intent("GaveElectricityConsumption");
     gaveElectricyComsumptionIntent.addSlot(new NumberSlot("ElectricityConsumption"));
     matcher.addIntent(gaveElectricyComsumptionIntent);
-
+    
+    Intent houseIntent = new Intent("HouseIntent");
+    matcher.addIntent(houseIntent);
+    
+    Intent rowhouseIntent = new Intent("RowhouseIntent");
+    matcher.addIntent(rowhouseIntent);
+    
+    Intent apartmentHouseIntent = new Intent("ApartmentHouseIntent");
+    matcher.addIntent(apartmentHouseIntent);
+    
+    Intent gaveResidentCountIntent = new Intent("GaveResidentCount");
+    gaveResidentCountIntent.addSlot(new NumberSlot("ResidentCount"));
+    matcher.addIntent(gaveResidentCountIntent);
+    
+    Intent gaveLivingSpaceSizeIntent = new Intent("GaveLivingSpaceSize");
+    gaveLivingSpaceSizeIntent.addSlot(new NumberSlot("LivingSpaceSize"));
+    matcher.addIntent(gaveLivingSpaceSizeIntent);
+    
+    Intent gaveYearBuildIntent = new Intent("GaveYearBuild");
+    gaveYearBuildIntent.addSlot(new NumberSlot("YearBuild"));
+    matcher.addIntent(gaveYearBuildIntent);
+    
     return matcher;
   }
 
@@ -75,7 +99,7 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
             electricityPrice = 9.90d;
           }
           
-          story.getVariablesState().set("electricityPrice", String.format("%.2f", electricityPrice));
+          story.getVariablesState().set("electricityprice", String.format("%.2f", electricityPrice));
         } catch (Exception e) {
           throw new RuntimeException("Unable to set electricityPrice", e);
         }
