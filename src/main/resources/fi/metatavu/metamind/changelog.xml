@@ -76,5 +76,21 @@
   <changeSet id="rename-quick-response-option-to-quick-response-text" author="Heikki Kurhinen">
     <renameColumn tableName="QuickResponse" oldColumnName="option" newColumnName="quickResponseText" columnDataType="VARCHAR(191)"/>
   </changeSet>
+  
+  <changeSet id="system-settings" author="Heikki Kurhinen">
+    <createTable tableName="SystemSetting">
+      <column name="id" type="bigint(20)" autoIncrement="true">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="settingKey" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="value" type="longtext">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <addUniqueConstraint constraintName="UN-SYSTEM-SETTING-SETTING-KEY" columnNames="settingKey" tableName="SystemSetting"/>
+  </changeSet>
 
 </databaseChangeLog>
