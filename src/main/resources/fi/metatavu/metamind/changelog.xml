@@ -92,5 +92,25 @@
     
     <addUniqueConstraint constraintName="UN-SYSTEM-SETTING-SETTING-KEY" columnNames="settingKey" tableName="SystemSetting"/>
   </changeSet>
+  
+  <changeSet author="Antti Leppa" id="freemarker-template">
+    <createTable tableName="FreemarkerTemplate">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="VARCHAR(191)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UN_FREEMARKER_TEMPLATE_NAME"/>
+      </column>
+      <column name="data" type="LONGTEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="datetime(6)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modified" type="datetime(6)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
 
 </databaseChangeLog>
