@@ -11,6 +11,11 @@ import fi.metatavu.metamind.settings.SystemSettingController;
 import net.sargue.mailgun.Configuration;
 import net.sargue.mailgun.Mail;
 
+/**
+ * Mailgun email provider implementation
+ * 
+ * @author Heikki Kurhinen
+ */
 @ApplicationScoped
 public class MailgunEmailProviderImpl implements EmailProvider {
   
@@ -21,7 +26,7 @@ public class MailgunEmailProviderImpl implements EmailProvider {
   private Logger logger;
   
   @Override
-  public void sendMail(String from, String to, String title, String content) {
+  public void sendMail(String toEmail, String subject, String content) {
     String domain = systemSettingController.getSettingValue(MailgunConsts.DOMAIN_SETTING_KEY);
     if (StringUtils.isEmpty(domain)) {
       logger.error("Domain setting is missing");
@@ -34,20 +39,26 @@ public class MailgunEmailProviderImpl implements EmailProvider {
       return;
     }
 
-    String senderAddress = systemSettingController.getSettingValue(MailgunConsts.SENDER_SETTING_KEY);
-    if (StringUtils.isEmpty(senderAddress)) {
-      logger.error("Sender address setting is missing");
+    String senderName = systemSettingController.getSettingValue(MailgunConsts.SENDER_NAME_SETTING_KEY);
+    if (StringUtils.isEmpty(senderName)) {
+      logger.error("Sender name setting is missing");
+      return;
+    }
+
+    String senderEmail = systemSettingController.getSettingValue(MailgunConsts.SENDER_EMAIL_SETTING_KEY);
+    if (StringUtils.isEmpty(senderEmail)) {
+      logger.error("Sender emaili setting is missing");
       return;
     }
     
     Configuration configuration = new Configuration()
         .domain(domain)
         .apiKey(apiKey)
-        .from(from, senderAddress);
+        .from(senderName, senderEmail);
     
     Mail.using(configuration)
-      .to(to)
-      .subject(title)
+      .to(toEmail)
+      .subject(subject)
       .text(content)
       .build()
       .send();
