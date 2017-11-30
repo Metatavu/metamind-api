@@ -76,5 +76,41 @@
   <changeSet id="rename-quick-response-option-to-quick-response-text" author="Heikki Kurhinen">
     <renameColumn tableName="QuickResponse" oldColumnName="option" newColumnName="quickResponseText" columnDataType="VARCHAR(191)"/>
   </changeSet>
+  
+  <changeSet id="system-settings" author="Heikki Kurhinen">
+    <createTable tableName="SystemSetting">
+      <column name="id" type="bigint(20)" autoIncrement="true">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="settingKey" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="value" type="longtext">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <addUniqueConstraint constraintName="UN-SYSTEM-SETTING-SETTING-KEY" columnNames="settingKey" tableName="SystemSetting"/>
+  </changeSet>
+  
+  <changeSet author="Antti Leppa" id="freemarker-template">
+    <createTable tableName="FreemarkerTemplate">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="VARCHAR(191)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UN_FREEMARKER_TEMPLATE_NAME"/>
+      </column>
+      <column name="data" type="LONGTEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="datetime(6)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modified" type="datetime(6)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
 
 </databaseChangeLog>

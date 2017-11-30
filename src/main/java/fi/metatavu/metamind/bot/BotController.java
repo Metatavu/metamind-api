@@ -5,12 +5,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
+
+import fi.metatavu.metamind.bot.functions.MetaBotFunction;
 import fi.metatavu.metamind.persistence.models.Session;
 
 /**
@@ -20,6 +27,10 @@ import fi.metatavu.metamind.persistence.models.Session;
  */
 @ApplicationScoped
 public class BotController {
+  
+  @Any
+  @Inject
+  private Instance<MetaBotFunction> metabotFunctions;
 
   @Inject
   private Logger logger;
@@ -73,7 +84,9 @@ public class BotController {
    * @return new bot instance
    */
   public MetamindBot getBotInstance() {
-    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration();
+    List<InkBotFunction> functions = new ArrayList<>();
+    this.metabotFunctions.forEach(functions::add);
+    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(functions);
     return new MetamindBot(botConfiguration);
   }
   

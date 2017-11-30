@@ -72,6 +72,14 @@
     
     <mutter.version>4.1.2-SNAPSHOT</mutter.version>
     
+    <!-- Sargue mailgun -->
+    
+    <sargue-mailgun.version>1.5.0</sargue-mailgun.version>
+    
+    <!-- Freemarker -->
+    
+    <freemarker.version>2.3.23</freemarker.version>
+    
     <!-- Test -->
     
     <deltaspike.version>1.7.2</deltaspike.version>
@@ -297,6 +305,22 @@
       <groupId>com.rabidgremlin</groupId>
       <artifactId>mutters-templated-intent</artifactId>
       <version>${mutter.version}</version>
+    </dependency>
+    
+    <!-- Sargue mailgun -->
+
+    <dependency>
+      <groupId>net.sargue</groupId>
+      <artifactId>mailgun</artifactId>
+      <version>${sargue-mailgun.version}</version>
+    </dependency>
+
+    <!-- Freemarker -->
+    
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>${freemarker.version}</version>
     </dependency>
     
     <!-- Test -->
