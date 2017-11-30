@@ -308,13 +308,13 @@
     </dependency>
     
     <!-- Sargue mailgun -->
-    
+
     <dependency>
-	    <groupId>net.sargue</groupId>
-	    <artifactId>mailgun</artifactId>
-	    <version>${sargue-mailgun.version}</version>
-		</dependency>
-    
+      <groupId>net.sargue</groupId>
+      <artifactId>mailgun</artifactId>
+      <version>${sargue-mailgun.version}</version>
+    </dependency>
+
     <!-- Freemarker -->
     
     <dependency>
