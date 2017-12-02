@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import fi.metatavu.metamind.bot.BotController;
 import fi.metatavu.metamind.server.rest.model.Session;
 import fi.metatavu.metamind.server.rest.translation.SessionTranslator;
+import fi.metatavu.metamind.sessions.SessionConsts;
 import fi.metatavu.metamind.sessions.SessionController;
 
 /**
@@ -42,15 +43,19 @@ public class SessionApiImpl extends AbstractRestApi implements SessionsApi {
       return respondInternalServerError("Could not initialize bot session");
     }
     
+    fi.metatavu.metamind.persistence.models.Session session = sessionController.createSession(body.getLocale(), body.getTimeZone(), body.getVisitor(), new byte[0]);
+    if (session == null) {
+      return respondInternalServerError("Could not initialize session");
+    }
+    
+    botSession.setLongTermAttribute(SessionConsts.METAMIND_SESSION_ID_ATTRIBUTE, session.getId());
+    
     byte[] sessionData = botController.serializeBotSession(botSession);
     if (sessionData == null) {
       return respondInternalServerError("Failed to serialize bot session");
     }
     
-    fi.metatavu.metamind.persistence.models.Session session = sessionController.createSession(body.getLocale(), body.getTimeZone(), body.getVisitor(), sessionData);
-    if (session == null) {
-      return respondInternalServerError("Could not initialize session");
-    }
+    sessionController.updateSessionState(session, sessionData);
     
     return respondOk(sessionTranslator.translateSession(session));
   }
