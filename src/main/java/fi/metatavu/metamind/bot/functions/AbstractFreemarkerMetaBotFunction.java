@@ -1,6 +1,9 @@
 package fi.metatavu.metamind.bot.functions;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +53,7 @@ public abstract class AbstractFreemarkerMetaBotFunction extends AbstractMetaBotF
   private FreemarkerModel getModel(Session botSession, IntentMatch intentMatch, boolean includeSessionAttributes, boolean includeMessages) {
     fi.metatavu.metamind.persistence.models.Session metamindSession = sessionController.findSessionFromBotSession(botSession);
     Map<String, Object> sessionAttributes = includeSessionAttributes ? getSessionAttributes(botSession, intentMatch) : Collections.emptyMap();
-    List<Message> sessionMessages = includeMessages ? getSessionMessages(metamindSession) : Collections.emptyList();
+    List<FreemarkerMessageModel> sessionMessages = includeMessages ? getSessionMessages(metamindSession) : Collections.emptyList();
     return new FreemarkerModel(metamindSession, sessionAttributes, sessionMessages);
   }
 
@@ -67,17 +70,28 @@ public abstract class AbstractFreemarkerMetaBotFunction extends AbstractMetaBotF
     return result;
   }
   
-  private List<Message> getSessionMessages(fi.metatavu.metamind.persistence.models.Session metamindSession) {
-    return messageController.listSessionMessages(metamindSession);
+  private List<FreemarkerMessageModel> getSessionMessages(fi.metatavu.metamind.persistence.models.Session metamindSession) {
+    List<Message> sessionMessages = messageController.listSessionMessages(metamindSession);
+    
+    List<FreemarkerMessageModel> result = new ArrayList<>(sessionMessages.size());
+    for (Message sessionMessage : sessionMessages) {
+      result.add(new FreemarkerMessageModel(getDate(sessionMessage.getCreated()), sessionMessage.getContent(), sessionMessage.getResponse()));
+    }
+    
+    return result;
   }
   
+  private Date getDate(OffsetDateTime offsetDateTime) {
+    return Date.from(offsetDateTime.toInstant());
+  }
+
   public class FreemarkerModel {
     
     private Map<String, Object> sessionAttributes;
-    private List<Message> sessionMessages;
+    private List<FreemarkerMessageModel> sessionMessages;
     public fi.metatavu.metamind.persistence.models.Session metamindSession;
     
-    public FreemarkerModel(fi.metatavu.metamind.persistence.models.Session metamindSession, Map<String, Object> sessionAttributes, List<Message> sessionMessages) {
+    public FreemarkerModel(fi.metatavu.metamind.persistence.models.Session metamindSession, Map<String, Object> sessionAttributes, List<FreemarkerMessageModel> sessionMessages) {
       super();
       this.metamindSession = metamindSession;
       this.sessionAttributes = sessionAttributes;
@@ -92,8 +106,35 @@ public abstract class AbstractFreemarkerMetaBotFunction extends AbstractMetaBotF
       return sessionAttributes;
     }
     
-    public List<Message> getSessionMessages() {
+    public List<FreemarkerMessageModel> getSessionMessages() {
       return sessionMessages;
+    }
+    
+  }
+  
+  public class FreemarkerMessageModel {
+    
+    private Date created;
+    private String content;
+    private String response;
+    
+    public FreemarkerMessageModel(Date created, String content, String response) {
+      super();
+      this.created = created;
+      this.content = content;
+      this.response = response;
+    }
+
+    public String getContent() {
+      return content;
+    }
+    
+    public Date getCreated() {
+      return created;
+    }
+    
+    public String getResponse() {
+      return response;
     }
     
   }
