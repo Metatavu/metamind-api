@@ -70,7 +70,7 @@ public class EmailMetaBotFunction extends AbstractFreemarkerMetaBotFunction {
     }
     
     if (StringUtils.isNotBlank(template)) {
-      return getRenderedText(template, session, intentMatch);
+      return getRenderedText(template, session, intentMatch, true, true);
     }
     
     return null;

@@ -35,6 +35,16 @@ public class MessageController {
   }
 
   /**
+   * Lists all messages within a session
+   * 
+   * @param session session
+   * @return all messages within a session
+   */
+  public List<Message> listSessionMessages(fi.metatavu.metamind.persistence.models.Session session) {
+    return messageDAO.listByMessage(session); 
+  }
+  
+  /**
    * Updates message with bot's responses
    * 
    * @param message message
@@ -72,5 +82,5 @@ public class MessageController {
     
     return result;
   }
-  
+
 }
