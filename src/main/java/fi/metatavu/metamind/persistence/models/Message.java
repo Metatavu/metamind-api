@@ -44,6 +44,10 @@ public class Message {
   
   @Column(nullable = false)
   private OffsetDateTime created;
+
+  private String matchedIntent;
+  
+  private Double responseScore;
   
   public Long getId() {
     return id;
@@ -99,6 +103,22 @@ public class Message {
 
   public void setCreated(OffsetDateTime created) {
     this.created = created;
+  }
+  
+  public String getMatchedIntent() {
+    return matchedIntent;
+  }
+  
+  public void setMatchedIntent(String matchedIntent) {
+    this.matchedIntent = matchedIntent;
+  }
+  
+  public Double getResponseScore() {
+    return responseScore;
+  }
+  
+  public void setResponseScore(Double responseScore) {
+    this.responseScore = responseScore;
   }
 
   @PrePersist

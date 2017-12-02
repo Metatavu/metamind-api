@@ -112,5 +112,13 @@
       </column>
     </createTable>
   </changeSet>
+  
+  <changeSet author="Antti Leppa" id="message-score">
+    <addColumn tableName="Message">
+      <column name="matchedIntent" type="VARCHAR(191)"/>
+      <column name="responseScore" type="DOUBLE"/>
+    </addColumn>
+    
+  </changeSet>
 
 </databaseChangeLog>
