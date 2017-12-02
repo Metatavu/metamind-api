@@ -50,11 +50,15 @@ public class MessageController {
    * @param message message
    * @param hint hint
    * @param response response
+   * @param matchedIntent 
+   * @param responseScore 
    * @return updated message
    */
-  public Message updateMessage(fi.metatavu.metamind.persistence.models.Message message, String hint, String response) {
+  public Message updateMessage(fi.metatavu.metamind.persistence.models.Message message, String hint, String response, String matchedIntent, Double responseScore) {
     messageDAO.updateHint(message, hint);
     messageDAO.updateResponse(message, response);
+    messageDAO.updateMatchedIntent(message, matchedIntent);
+    messageDAO.updateResponseScore(message, responseScore);
     return message;
   }
   

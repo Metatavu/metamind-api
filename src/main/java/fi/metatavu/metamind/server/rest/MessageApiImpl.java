@@ -1,6 +1,9 @@
 package fi.metatavu.metamind.server.rest;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.ejb.Stateful;
@@ -78,14 +81,29 @@ public class MessageApiImpl extends AbstractRestApi implements MessagesApi {
     context.setTimeZone(TimeZone.getTimeZone(session.getTimeZone()));
     
     BotResponse botResponse = metamind.respond(botSession, context, message.getContent());
+    Map<String, Object> debugValues = botResponse.getDebugValues();
+    String matchedIntent = (String) debugValues.get(MetamindBot.DK_MATCHED_INTENT);
+    Double responseScore = getMatchingScore(debugValues);
     
-    fi.metatavu.metamind.persistence.models.Message updatedMessage = messageController.updateMessage(message, botResponse.getHint(), botResponse.getResponse());
+    fi.metatavu.metamind.persistence.models.Message updatedMessage = messageController.updateMessage(message, botResponse.getHint(), botResponse.getResponse(), matchedIntent, responseScore);
     List<QuickResponse> quickResponses = messageController.updateMessageQuickResponses(updatedMessage, botResponse.getQuickReplies());
     
     byte[] updatedBotSession = botController.serializeBotSession(botSession);
     sessionController.updateSessionState(session, updatedBotSession);
     
     return respondOk(messageTranslator.translateMessage(updatedMessage, quickResponses));
+  }
+  
+  @SuppressWarnings("unchecked")
+  private Double getMatchingScore(Map<String, Object> debugValues) {
+    Double result = 0d;
+    Map<Double, Set<String>> matchingScores = (Map<Double, Set<String>>) debugValues.get(MetamindBot.DK_INTENT_MATCHING_SCORES);
+    
+    for (Entry<Double, Set<String>> matchingScore : matchingScores.entrySet()) {
+      result = Math.max(result, matchingScore.getKey());
+    }
+    
+    return result;
   }
 
 }

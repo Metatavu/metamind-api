@@ -83,4 +83,26 @@ public class MessageDAO extends AbstractDAO<Message> {
     return persist(message);
   }
 
+  /**
+   * Updates matchedIntent
+   *
+   * @param matchedIntent matchedIntent
+   * @return updated message
+   */
+   public Message updateMatchedIntent(Message message, String matchedIntent) {
+     message.setMatchedIntent(matchedIntent);
+     return persist(message);
+   }
+
+  /**
+   * Updates responseScore
+   *
+   * @param responseScore responseScore
+   * @return updated message
+   */
+   public Message updateResponseScore(Message message, Double responseScore) {
+     message.setResponseScore(responseScore);
+     return persist(message);
+   }
+
 }
