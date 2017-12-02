@@ -89,7 +89,7 @@ public abstract class AbstractFreemarkerMetaBotFunction extends AbstractMetaBotF
     
     private Map<String, Object> sessionAttributes;
     private List<FreemarkerMessageModel> sessionMessages;
-    public fi.metatavu.metamind.persistence.models.Session metamindSession;
+    private fi.metatavu.metamind.persistence.models.Session metamindSession;
     
     public FreemarkerModel(fi.metatavu.metamind.persistence.models.Session metamindSession, Map<String, Object> sessionAttributes, List<FreemarkerMessageModel> sessionMessages) {
       super();
