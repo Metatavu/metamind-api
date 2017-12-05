@@ -120,5 +120,59 @@
     </addColumn>
     
   </changeSet>
+  
+  <changeSet author="Antti Leppa" id="models">
+    <createTable tableName="IntentModel">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="VARCHAR(191)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UN_INTENT_MODEL_NAME"/>
+      </column>
+      <column name="data" type="LONGBLOB">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <createTable tableName="SlotModel">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="VARCHAR(191)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UN_SLOT_MODEL_NAME"/>
+      </column>
+      <column name="data" type="LONGBLOB">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  
+  <changeSet author="Antti Leppa" id="story">
+    <createTable tableName="Story">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="VARCHAR(191)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UN_INTENT_MODEL_NAME"/>
+      </column>
+      <column name="storyJson" type="LONGTEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="configJson" type="LONGTEXT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  
+  <changeSet author="Antti Leppa" id="session-story">
+    <sql>DELETE FROM QuickResponse</sql>
+    <sql>DELETE FROM Message</sql>
+    <sql>DELETE FROM Session</sql>
+    
+    <addColumn tableName="Session">
+      <column name="story_id" type="BIGINT">
+        <constraints foreignKeyName="FK_SESSION_STORY_ID" referencedColumnNames="id" referencedTableName="Story" />
+      </column>
+    </addColumn>
+  </changeSet>
 
 </databaseChangeLog>

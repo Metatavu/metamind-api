@@ -75,7 +75,7 @@ public class MessageApiImpl extends AbstractRestApi implements MessagesApi {
       return respondInternalServerError("Could not create bot session");
     }
     
-    MetamindBot metamind = botController.getBotInstance();
+    MetamindBot metamind = botController.getBotInstance(session.getStory());
     Context context = new Context();
     context.setLocale(LocaleUtils.toLocale(session.getLocale()));
     context.setTimeZone(TimeZone.getTimeZone(session.getTimeZone()));
@@ -98,6 +98,9 @@ public class MessageApiImpl extends AbstractRestApi implements MessagesApi {
   private Double getMatchingScore(Map<String, Object> debugValues) {
     Double result = 0d;
     Map<Double, Set<String>> matchingScores = (Map<Double, Set<String>>) debugValues.get(MetamindBot.DK_INTENT_MATCHING_SCORES);
+    if (matchingScores == null) {
+      return debugValues.get(MetamindBot.DK_MATCHED_INTENT) == null ? 0d : 1d;
+    }
     
     for (Entry<Double, Set<String>> matchingScore : matchingScores.entrySet()) {
       result = Math.max(result, matchingScore.getKey());

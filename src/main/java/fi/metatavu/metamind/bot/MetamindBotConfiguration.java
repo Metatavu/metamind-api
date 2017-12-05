@@ -1,114 +1,131 @@
 package fi.metatavu.metamind.bot;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.rabidgremlin.mutters.bot.ink.InkBotConfiguration;
 import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
-import com.rabidgremlin.mutters.bot.ink.StoryUtils;
 import com.rabidgremlin.mutters.core.CompoundIntentMatcher;
 import com.rabidgremlin.mutters.core.Intent;
 import com.rabidgremlin.mutters.core.IntentMatcher;
 import com.rabidgremlin.mutters.opennlp.intent.OpenNLPIntentMatcher;
 import com.rabidgremlin.mutters.opennlp.intent.OpenNLPTokenizer;
-import com.rabidgremlin.mutters.opennlp.ner.OpenNLPSlotMatcher;
-import com.rabidgremlin.mutters.slots.LiteralSlot;
 import com.rabidgremlin.mutters.slots.NumberSlot;
 import com.rabidgremlin.mutters.templated.SimpleTokenizer;
 import com.rabidgremlin.mutters.templated.TemplatedIntent;
 import com.rabidgremlin.mutters.templated.TemplatedIntentMatcher;
 
+import fi.metatavu.metamind.bot.config.MachineLearningConfig;
+import fi.metatavu.metamind.bot.config.MachineLearningIntentConfig;
+import fi.metatavu.metamind.bot.config.StoryConfig;
+import fi.metatavu.metamind.bot.config.TemplateConfig;
+import fi.metatavu.metamind.bot.config.TemplatedIntentConfig;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 public class MetamindBotConfiguration implements InkBotConfiguration {
   
-  private List<InkBotFunction> functions;
+  private static final Logger logger = LoggerFactory.getLogger(MetamindBotConfiguration.class.getName());
   
-  public MetamindBotConfiguration(List<InkBotFunction> functions) {
+  private StoryConfig config;
+  private List<InkBotFunction> functions;
+  private String intentModelUrl;
+  private String slotModelUrl;
+  private String storyJson;
+  
+  public MetamindBotConfiguration(StoryConfig config, List<InkBotFunction> functions, String storyJson, String intentModelUrl, String slotModelUrl) {
+    this.config = config;
     this.functions = functions;
+    this.storyJson = storyJson;
+    this.intentModelUrl = intentModelUrl;
+    this.slotModelUrl = slotModelUrl;
   }
   
   @Override
   public IntentMatcher getIntentMatcher() {
-
+    MachineLearningConfig machineLearning = config.getMachineLearning();
+    TemplateConfig templateConfig = config.getTemplate();
+    
     TemplatedIntentMatcher templatedIntentMatcher = new TemplatedIntentMatcher(new SimpleTokenizer());
-
-    TemplatedIntent templatedElectricyComsumptionIntent = templatedIntentMatcher.addIntent("GaveElectricityConsumption");
-    templatedElectricyComsumptionIntent.addUtterance("{ElectricityConsumption}");
-    templatedElectricyComsumptionIntent.addUtterance("{ElectricityConsumption} kwh");
-    templatedElectricyComsumptionIntent.addUtterance("{ElectricityConsumption}kwh");
-    templatedElectricyComsumptionIntent.addUtterance("{ElectricityConsumption} kilowattituntia");
-    templatedElectricyComsumptionIntent.addSlot(new NumberSlot("ElectricityConsumption"));
-    
-    TemplatedIntent templatedResidentCountIntent = templatedIntentMatcher.addIntent("GaveResidentCount");
-    templatedResidentCountIntent.addUtterance("{ResidentCount}");
-    templatedResidentCountIntent.addUtterance("{ResidentCount} henkilöä");
-    templatedResidentCountIntent.addUtterance("{ResidentCount} hlö");
-    templatedResidentCountIntent.addUtterance("{ResidentCount} hlöä");
-    templatedResidentCountIntent.addSlot(new NumberSlot("ResidentCount"));
-    
-    TemplatedIntent templatedLivingSpaceIntent = templatedIntentMatcher.addIntent("GaveLivingSpaceSize");
-    templatedLivingSpaceIntent.addUtterance("{LivingSpaceSize}");
-    templatedLivingSpaceIntent.addUtterance("{LivingSpaceSize} neliö");
-    templatedLivingSpaceIntent.addUtterance("{LivingSpaceSize} neliömetriä");
-    templatedLivingSpaceIntent.addUtterance("{LivingSpaceSize} m2");
-    templatedLivingSpaceIntent.addSlot(new NumberSlot("LivingSpaceSize"));
-
     OpenNLPTokenizer tokenizer = new OpenNLPTokenizer(WhitespaceTokenizer.INSTANCE);
-
     OpenNLPSlotMatcher slotMatcher = new OpenNLPSlotMatcher(tokenizer);
-    slotMatcher.addSlotModel("ElectricityConsumption", "models/fi-ner-elecricity-consumption.bin");
-    slotMatcher.addSlotModel("LivingSpaceSize", "models/fi-ner-living-space-size.bin");
-    slotMatcher.addSlotModel("ResidentCount", "models/fi-ner-resident-count.bin");
-    slotMatcher.addSlotModel("YearBuild", "models/fi-ner-year-build.bin");
-    slotMatcher.addSlotModel("PhoneNumber", "models/fi-ner-phone-number.bin");
-    OpenNLPIntentMatcher machineLearningIntentMatcher = new OpenNLPIntentMatcher("models/fi-lumme-intents.bin", tokenizer, slotMatcher);
+    
+    for (Entry<String, String> slotModelEntry : machineLearning.getSlotModels().entrySet()) {
+      String slotName = slotModelEntry.getKey();
+      String nerModel = slotModelEntry.getValue();
+      try {
+        slotMatcher.addSlotModel(slotName, new URL(String.format(slotModelUrl,nerModel)));
+      } catch (MalformedURLException e) {
+        logger.error("Failed to construct slot model URL", e);
+      }
+    }
+    
+    OpenNLPIntentMatcher machineLearningIntentMatcher = getIntentMatcher(machineLearning.getIntentModel(), tokenizer, slotMatcher);
+    if (machineLearningIntentMatcher == null) {
+      logger.error("Failed to construct intent matcher");
+      return null;
+    }
+    
+    createTemplateIntents(templateConfig, templatedIntentMatcher);
+    createMachineLearningIntents(machineLearning, machineLearningIntentMatcher);
 
-    Intent orderElectricityIntent = new Intent("OrderElectricity");
-    machineLearningIntentMatcher.addIntent(orderElectricityIntent);
-
-    Intent yesIntent = new Intent("YesIntent");
-    machineLearningIntentMatcher.addIntent(yesIntent);
-    
-    Intent noIntent = new Intent("NoIntent");
-    machineLearningIntentMatcher.addIntent(noIntent);
-    
-    Intent gaveElectricyComsumptionIntent = new Intent("GaveElectricityConsumption");
-    gaveElectricyComsumptionIntent.addSlot(new NumberSlot("ElectricityConsumption"));
-    machineLearningIntentMatcher.addIntent(gaveElectricyComsumptionIntent);
-    
-    Intent houseIntent = new Intent("HouseIntent");
-    machineLearningIntentMatcher.addIntent(houseIntent);
-    
-    Intent rowhouseIntent = new Intent("RowhouseIntent");
-    machineLearningIntentMatcher.addIntent(rowhouseIntent);
-    
-    Intent apartmentHouseIntent = new Intent("ApartmentHouseIntent");
-    machineLearningIntentMatcher.addIntent(apartmentHouseIntent);
-    
-    Intent gaveResidentCountIntent = new Intent("GaveResidentCount");
-    gaveResidentCountIntent.addSlot(new NumberSlot("ResidentCount"));
-    machineLearningIntentMatcher.addIntent(gaveResidentCountIntent);
-    
-    Intent gaveLivingSpaceSizeIntent = new Intent("GaveLivingSpaceSize");
-    gaveLivingSpaceSizeIntent.addSlot(new NumberSlot("LivingSpaceSize"));
-    machineLearningIntentMatcher.addIntent(gaveLivingSpaceSizeIntent);
-    
-    Intent gaveYearBuildIntent = new Intent("GaveYearBuild");
-    gaveYearBuildIntent.addSlot(new NumberSlot("YearBuild"));
-    machineLearningIntentMatcher.addIntent(gaveYearBuildIntent);
-    
-    Intent gavePhoneNumberIntent = new Intent("GavePhoneNumber");
-    gavePhoneNumberIntent.addSlot(new LiteralSlot("PhoneNumber"));
-    machineLearningIntentMatcher.addIntent(gavePhoneNumberIntent);
-    
     return new CompoundIntentMatcher(templatedIntentMatcher, machineLearningIntentMatcher);
+  }
+
+  private void createTemplateIntents(TemplateConfig templateConfig, TemplatedIntentMatcher templatedIntentMatcher) {
+    for (Entry<String, TemplatedIntentConfig> templatedIntentEntry : templateConfig.getIntents().entrySet()) {
+      String intentName = templatedIntentEntry.getKey();
+      TemplatedIntentConfig intentConfig = templatedIntentEntry.getValue();
+      TemplatedIntent intent = templatedIntentMatcher.addIntent(intentName);
+      intent.addUtterances(intentConfig.getUtterances());
+      
+      if (intentConfig.getNumberSlots() != null) {
+        for (String numberSlot : intentConfig.getNumberSlots()) {
+          intent.addSlot(new NumberSlot(numberSlot));
+        }
+      }
+    }
+  }
+
+  private void createMachineLearningIntents(MachineLearningConfig machineLearning,
+      OpenNLPIntentMatcher machineLearningIntentMatcher) {
+    for (Entry<String, MachineLearningIntentConfig> machineLearningIntentEntry : machineLearning.getIntents().entrySet()) {
+      String intentName = machineLearningIntentEntry.getKey();
+      MachineLearningIntentConfig intentConfig = machineLearningIntentEntry.getValue();
+      
+      Intent intent = new Intent(intentName);
+      
+      if (intentConfig.getNumberSlots() != null) {
+        for (String numberSlot : intentConfig.getNumberSlots()) {
+          intent.addSlot(new NumberSlot(numberSlot));
+        }
+      }
+      
+      machineLearningIntentMatcher.addIntent(intent);
+    }
+  }
+  
+  private OpenNLPIntentMatcher getIntentMatcher(String intentModel, OpenNLPTokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
+    URL intentModelURL;
+    try {
+      intentModelURL = new URL(String.format(intentModelUrl, intentModel));
+    } catch (MalformedURLException e) {
+      logger.error("Failed to construct intent model URL", e);
+      return null;
+    }
+    
+    return new OpenNLPIntentMatcher(intentModelURL, tokenizer, slotMatcher, 0.75f, -1);
   }
 
   @Override
   public String getStoryJson() {
-    return StoryUtils.loadStoryJsonFromClassPath("electricity-order.ink.json");
+    return storyJson;
   }
 
   @Override
