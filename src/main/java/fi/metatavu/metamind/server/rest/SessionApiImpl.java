@@ -9,10 +9,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import fi.metatavu.metamind.bot.BotController;
+import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.server.rest.model.Session;
 import fi.metatavu.metamind.server.rest.translation.SessionTranslator;
 import fi.metatavu.metamind.sessions.SessionConsts;
 import fi.metatavu.metamind.sessions.SessionController;
+import fi.metatavu.metamind.story.StoryController;
 
 /**
  * REST - endpoints for sessions
@@ -34,8 +36,11 @@ public class SessionApiImpl extends AbstractRestApi implements SessionsApi {
   private BotController botController;
 
   @Inject
-  private SessionTranslator sessionTranslator;
+  private StoryController storyController;
 
+  @Inject
+  private SessionTranslator sessionTranslator;
+  
   @Override
   public Response createSession(Session body) throws Exception {
     com.rabidgremlin.mutters.core.session.Session botSession = botController.createBotSession();
@@ -43,7 +48,12 @@ public class SessionApiImpl extends AbstractRestApi implements SessionsApi {
       return respondInternalServerError("Could not initialize bot session");
     }
     
-    fi.metatavu.metamind.persistence.models.Session session = sessionController.createSession(body.getLocale(), body.getTimeZone(), body.getVisitor(), new byte[0]);
+    Story story = storyController.findStoryByName(body.getStory());
+    if (story == null) {
+      return respondBadRequest("Invalid story parameter");
+    }
+    
+    fi.metatavu.metamind.persistence.models.Session session = sessionController.createSession(story, body.getLocale(), body.getTimeZone(), body.getVisitor(), new byte[0]);
     if (session == null) {
       return respondInternalServerError("Could not initialize session");
     }

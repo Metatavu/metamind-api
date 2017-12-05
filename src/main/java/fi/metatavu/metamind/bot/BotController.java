@@ -15,10 +15,15 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
 
+import fi.metatavu.metamind.bot.config.StoryConfig;
 import fi.metatavu.metamind.bot.functions.MetaBotFunction;
 import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.settings.SystemConsts;
+import fi.metatavu.metamind.settings.SystemSettingController;
 
 /**
  * Controller for the bot
@@ -31,6 +36,9 @@ public class BotController {
   @Any
   @Inject
   private Instance<MetaBotFunction> metabotFunctions;
+
+  @Inject
+  private SystemSettingController systemSettingController;
 
   @Inject
   private Logger logger;
@@ -81,15 +89,35 @@ public class BotController {
   /**
    * Returns new bot instance
    * 
+   * @param story story
+   * 
    * @return new bot instance
    */
-  public MetamindBot getBotInstance() {
+  public MetamindBot getBotInstance(Story story) {
     List<InkBotFunction> functions = new ArrayList<>();
     this.metabotFunctions.forEach(functions::add);
-    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(functions);
+    
+    StoryConfig storyConfig = loadStoryConfig(story.getConfigJson());
+    String intentModelUrl = systemSettingController.getSettingValue(SystemConsts.INTENT_MODEL_URL);
+    String slotModelUrl = systemSettingController.getSettingValue(SystemConsts.SLOT_MODEL_URL);
+    String storyJson = story.getStoryJson();
+    
+    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(storyConfig, functions, storyJson, intentModelUrl, slotModelUrl);
+    
     return new MetamindBot(botConfiguration);
   }
-  
+
+  private StoryConfig loadStoryConfig(String configJson) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    try {
+      return objectMapper.readValue(configJson, StoryConfig.class);
+    } catch (IOException e) {
+      logger.error("Failed to read story config", e);
+    }
+    
+    return null;
+  }
+
   private com.rabidgremlin.mutters.core.session.Session deserializeBotSession(byte[] data) throws IOException, ClassNotFoundException {
     try (ByteArrayInputStream dataStream = new ByteArrayInputStream(data)) {
       try (ObjectInputStream objectStream = new ObjectInputStream(dataStream)) {

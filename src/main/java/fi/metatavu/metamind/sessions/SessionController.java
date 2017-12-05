@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import fi.metatavu.metamind.persistence.dao.SessionDAO;
 import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.Story;
 
 @ApplicationScoped
 public class SessionController {
@@ -22,8 +23,8 @@ public class SessionController {
    * @param data serialized session data
    * @return created session
    */
-  public Session createSession(String locale, String timeZone, String visitor, byte[] data) {
-    return sessionDAO.create(UUID.randomUUID().toString(), locale, timeZone, visitor, data);
+  public Session createSession(Story story, String locale, String timeZone, String visitor, byte[] data) {
+    return sessionDAO.create(story, UUID.randomUUID().toString(), locale, timeZone, visitor, data);
   }
   
   /**

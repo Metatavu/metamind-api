@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.validation.constraints.NotNull;
 
@@ -24,6 +25,9 @@ public class Session {
   @NotEmpty
   @Column(nullable = false)
   private String externalId;
+  
+  @ManyToOne(optional = false)
+  private Story story;
   
   @Column(nullable = false)
   private OffsetDateTime created;
@@ -59,6 +63,14 @@ public class Session {
 
   public void setExternalId(String externalId) {
     this.externalId = externalId;
+  }
+  
+  public Story getStory() {
+    return story;
+  }
+  
+  public void setStory(Story story) {
+    this.story = story;
   }
 
   public OffsetDateTime getCreated() {
