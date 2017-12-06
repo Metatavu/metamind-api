@@ -17,16 +17,19 @@ import com.rabidgremlin.mutters.core.Intent;
 import com.rabidgremlin.mutters.core.IntentMatcher;
 import com.rabidgremlin.mutters.opennlp.intent.OpenNLPIntentMatcher;
 import com.rabidgremlin.mutters.opennlp.intent.OpenNLPTokenizer;
+import com.rabidgremlin.mutters.slots.LiteralSlot;
 import com.rabidgremlin.mutters.slots.NumberSlot;
-import com.rabidgremlin.mutters.templated.SimpleTokenizer;
 import com.rabidgremlin.mutters.templated.TemplatedIntent;
 import com.rabidgremlin.mutters.templated.TemplatedIntentMatcher;
 
 import fi.metatavu.metamind.bot.config.MachineLearningConfig;
 import fi.metatavu.metamind.bot.config.MachineLearningIntentConfig;
+import fi.metatavu.metamind.bot.config.RegexSlot;
 import fi.metatavu.metamind.bot.config.StoryConfig;
 import fi.metatavu.metamind.bot.config.TemplateConfig;
 import fi.metatavu.metamind.bot.config.TemplatedIntentConfig;
+import fi.metatavu.metamind.bot.slots.RegExSlot;
+import fi.metatavu.metamind.bot.tokenizer.TemplateTokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 public class MetamindBotConfiguration implements InkBotConfiguration {
@@ -51,8 +54,8 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
   public IntentMatcher getIntentMatcher() {
     MachineLearningConfig machineLearning = config.getMachineLearning();
     TemplateConfig templateConfig = config.getTemplate();
+    TemplatedIntentMatcher templatedIntentMatcher = new TemplatedIntentMatcher(new TemplateTokenizer(templateConfig.getTokenization()));
     
-    TemplatedIntentMatcher templatedIntentMatcher = new TemplatedIntentMatcher(new SimpleTokenizer());
     OpenNLPTokenizer tokenizer = new OpenNLPTokenizer(WhitespaceTokenizer.INSTANCE);
     OpenNLPSlotMatcher slotMatcher = new OpenNLPSlotMatcher(tokenizer);
     
@@ -90,6 +93,18 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
           intent.addSlot(new NumberSlot(numberSlot));
         }
       }
+      
+      if (intentConfig.getRegExSlots() != null) {
+        for (RegexSlot regexSlot : intentConfig.getRegExSlots()) {
+          intent.addSlot(new RegExSlot(regexSlot.getName(), regexSlot.getPattern()));
+        }
+      }
+      
+      if (intentConfig.getTextSlots() != null) {
+        for (String textSlot : intentConfig.getTextSlots()) {
+          intent.addSlot(new LiteralSlot(textSlot));
+        }
+      }
     }
   }
 
@@ -104,6 +119,12 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
       if (intentConfig.getNumberSlots() != null) {
         for (String numberSlot : intentConfig.getNumberSlots()) {
           intent.addSlot(new NumberSlot(numberSlot));
+        }
+      }
+      
+      if (intentConfig.getTextSlots() != null) {
+        for (String textSlot : intentConfig.getTextSlots()) {
+          intent.addSlot(new LiteralSlot(textSlot));
         }
       }
       
