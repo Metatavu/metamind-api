@@ -22,6 +22,7 @@ import com.rabidgremlin.mutters.slots.NumberSlot;
 import com.rabidgremlin.mutters.templated.TemplatedIntent;
 import com.rabidgremlin.mutters.templated.TemplatedIntentMatcher;
 
+import fi.metatavu.metamind.bot.config.AbstractIntentConfig;
 import fi.metatavu.metamind.bot.config.MachineLearningConfig;
 import fi.metatavu.metamind.bot.config.MachineLearningIntentConfig;
 import fi.metatavu.metamind.bot.config.RegexSlot;
@@ -87,24 +88,7 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
       TemplatedIntentConfig intentConfig = templatedIntentEntry.getValue();
       TemplatedIntent intent = templatedIntentMatcher.addIntent(intentName);
       intent.addUtterances(intentConfig.getUtterances());
-      
-      if (intentConfig.getNumberSlots() != null) {
-        for (String numberSlot : intentConfig.getNumberSlots()) {
-          intent.addSlot(new NumberSlot(numberSlot));
-        }
-      }
-      
-      if (intentConfig.getRegExSlots() != null) {
-        for (RegexSlot regexSlot : intentConfig.getRegExSlots()) {
-          intent.addSlot(new RegExSlot(regexSlot.getName(), regexSlot.getPattern()));
-        }
-      }
-      
-      if (intentConfig.getTextSlots() != null) {
-        for (String textSlot : intentConfig.getTextSlots()) {
-          intent.addSlot(new LiteralSlot(textSlot));
-        }
-      }
+      addIntentSlots(intent, intentConfig);
     }
   }
 
@@ -115,21 +99,29 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
       MachineLearningIntentConfig intentConfig = machineLearningIntentEntry.getValue();
       
       Intent intent = new Intent(intentName);
-      
-      if (intentConfig.getNumberSlots() != null) {
-        for (String numberSlot : intentConfig.getNumberSlots()) {
-          intent.addSlot(new NumberSlot(numberSlot));
-        }
-      }
-      
-      if (intentConfig.getTextSlots() != null) {
-        for (String textSlot : intentConfig.getTextSlots()) {
-          intent.addSlot(new LiteralSlot(textSlot));
-        }
-      }
-      
+      addIntentSlots(intent, intentConfig);
       machineLearningIntentMatcher.addIntent(intent);
     }
+  }
+  
+  private void addIntentSlots(Intent intent, AbstractIntentConfig intentConfig) {
+    if (intentConfig.getNumberSlots() != null) {
+      for (String numberSlot : intentConfig.getNumberSlots()) {
+        intent.addSlot(new NumberSlot(numberSlot));
+      }
+    }
+    
+    if (intentConfig.getRegExSlots() != null) {
+      for (RegexSlot regexSlot : intentConfig.getRegExSlots()) {
+        intent.addSlot(new RegExSlot(regexSlot.getName(), regexSlot.getPattern()));
+      }
+    }
+    
+    if (intentConfig.getTextSlots() != null) {
+      for (String textSlot : intentConfig.getTextSlots()) {
+        intent.addSlot(new LiteralSlot(textSlot));
+      }
+    } 
   }
   
   private OpenNLPIntentMatcher getIntentMatcher(String intentModel, OpenNLPTokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
