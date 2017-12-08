@@ -86,7 +86,7 @@ public class SystemApi extends AbstractRestApi {
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
     
-    return Response.noContent().build();
+    return Response.ok().build();
   }
 
   @GET

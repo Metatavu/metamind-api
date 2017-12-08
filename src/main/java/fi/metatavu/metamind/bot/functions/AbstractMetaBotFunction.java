@@ -22,7 +22,7 @@ public abstract class AbstractMetaBotFunction implements MetaBotFunction {
     for (String param : params) {
       String[] parts = StringUtils.split(param, ":", 2);
       if (parts.length == 2) {
-        result.put(StringUtils.trim(parts[0]), StringUtils.trim(parts[1]));
+        result.put(StringUtils.trim(parts[0]), parts[1]);
       }
     }
     
