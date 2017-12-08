@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.validation.constraints.NotNull;
@@ -28,9 +29,11 @@ public class Message {
   @NotNull
   @NotEmpty
   @Column(nullable = false)
+  @Lob
   private String content;
   
   @Column(nullable = true)
+  @Lob
   private String response;
   
   @Column(nullable = true)
@@ -41,6 +44,10 @@ public class Message {
   
   @Column(nullable = false)
   private OffsetDateTime created;
+
+  private String matchedIntent;
+  
+  private Double responseScore;
   
   public Long getId() {
     return id;
@@ -96,6 +103,22 @@ public class Message {
 
   public void setCreated(OffsetDateTime created) {
     this.created = created;
+  }
+  
+  public String getMatchedIntent() {
+    return matchedIntent;
+  }
+  
+  public void setMatchedIntent(String matchedIntent) {
+    this.matchedIntent = matchedIntent;
+  }
+  
+  public Double getResponseScore() {
+    return responseScore;
+  }
+  
+  public void setResponseScore(Double responseScore) {
+    this.responseScore = responseScore;
   }
 
   @PrePersist

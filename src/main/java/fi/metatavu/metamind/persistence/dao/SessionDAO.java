@@ -9,6 +9,7 @@ import javax.persistence.criteria.Root;
 
 import fi.metatavu.metamind.persistence.models.Session;
 import fi.metatavu.metamind.persistence.models.Session_;
+import fi.metatavu.metamind.persistence.models.Story;
 
 /**
  * DAO for sessions
@@ -22,14 +23,22 @@ public class SessionDAO extends AbstractDAO<Session> {
   /**
    * Creates new session
    * 
+   * @param story session story
    * @param externalId external id in uuid format
    * @param locale users locale
+   * @param timeZone users time zone
+   * @param visitor visitor details
+   * @param data serialized session data
    * @return new session
    */
-  public Session create(String externalId, String locale) {
+  public Session create(Story story, String externalId, String locale, String timeZone, String visitor, byte[] data) {
     Session session = new Session();
+    session.setStory(story);
     session.setExternalId(externalId);
     session.setLocale(locale);
+    session.setTimeZone(timeZone);
+    session.setData(data);
+    session.setVisitor(visitor);
     return persist(session);
   }
   
@@ -53,5 +62,17 @@ public class SessionDAO extends AbstractDAO<Session> {
     
     return getSingleResult(query);
   }
+  
+  /**
+   * Updates data
+   *
+   * @param session session to update
+   * @param data data
+   * @return updated session
+   */
+   public Session updateData(Session session, byte[] data) {
+     session.setData(data);
+     return persist(session);
+   }
   
 }

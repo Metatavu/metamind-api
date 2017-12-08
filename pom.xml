@@ -49,7 +49,7 @@
     
     <!-- Spec -->
     
-    <metamind-spec.version>0.0.1</metamind-spec.version>
+    <metamind-spec.version>0.0.6</metamind-spec.version>
        
     <!-- Maven -->
 
@@ -70,7 +70,15 @@
     
     <!-- Mutter -->
     
-    <mutter.version>4.1.2-SNAPSHOT</mutter.version>
+    <mutter.version>4.1.2</mutter.version>
+    
+    <!-- Sargue mailgun -->
+    
+    <sargue-mailgun.version>1.5.0</sargue-mailgun.version>
+    
+    <!-- Freemarker -->
+    
+    <freemarker.version>2.3.23</freemarker.version>
     
     <!-- Test -->
     
@@ -297,6 +305,22 @@
       <groupId>com.rabidgremlin</groupId>
       <artifactId>mutters-templated-intent</artifactId>
       <version>${mutter.version}</version>
+    </dependency>
+    
+    <!-- Sargue mailgun -->
+
+    <dependency>
+      <groupId>net.sargue</groupId>
+      <artifactId>mailgun</artifactId>
+      <version>${sargue-mailgun.version}</version>
+    </dependency>
+
+    <!-- Freemarker -->
+    
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>${freemarker.version}</version>
     </dependency>
     
     <!-- Test -->

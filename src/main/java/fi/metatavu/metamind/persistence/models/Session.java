@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.validation.constraints.NotNull;
 
@@ -24,6 +26,9 @@ public class Session {
   @Column(nullable = false)
   private String externalId;
   
+  @ManyToOne(optional = false)
+  private Story story;
+  
   @Column(nullable = false)
   private OffsetDateTime created;
   
@@ -31,6 +36,18 @@ public class Session {
   @NotEmpty
   @Column(nullable = false)
   private String locale;
+
+  @NotNull
+  @NotEmpty
+  @Column(nullable = false)
+  private String timeZone;
+  
+  private String visitor;
+  
+  @Lob
+  @NotNull
+  @Column(nullable = false)
+  private byte[] data;
 
   public Long getId() {
     return id;
@@ -47,6 +64,14 @@ public class Session {
   public void setExternalId(String externalId) {
     this.externalId = externalId;
   }
+  
+  public Story getStory() {
+    return story;
+  }
+  
+  public void setStory(Story story) {
+    this.story = story;
+  }
 
   public OffsetDateTime getCreated() {
     return created;
@@ -62,6 +87,30 @@ public class Session {
 
   public void setLocale(String locale) {
     this.locale = locale;
+  }
+  
+  public String getTimeZone() {
+    return timeZone;
+  }
+  
+  public void setTimeZone(String timeZone) {
+    this.timeZone = timeZone;
+  }
+  
+  public byte[] getData() {
+    return data;
+  }
+  
+  public void setData(byte[] data) {
+    this.data = data;
+  }
+  
+  public String getVisitor() {
+    return visitor;
+  }
+  
+  public void setVisitor(String visitor) {
+    this.visitor = visitor;
   }
 
   @PrePersist
