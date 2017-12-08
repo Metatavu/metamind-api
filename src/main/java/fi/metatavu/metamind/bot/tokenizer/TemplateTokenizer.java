@@ -1,4 +1,4 @@
-package fi.metatavu.metamind.bot.tokenizer;
+  package fi.metatavu.metamind.bot.tokenizer;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.rabidgremlin.mutters.templated.SimpleTokenizer;
 
 import fi.metatavu.metamind.bot.config.TokenizationConfig;
 
