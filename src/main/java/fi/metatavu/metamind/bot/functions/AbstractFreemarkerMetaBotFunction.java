@@ -11,10 +11,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import com.rabidgremlin.mutters.bot.ink.SessionUtils;
-import com.rabidgremlin.mutters.core.IntentMatch;
-import com.rabidgremlin.mutters.core.Slot;
-import com.rabidgremlin.mutters.core.SlotMatch;
+import org.jsoup.Jsoup;
+import org.jsoup.examples.HtmlToPlainText;
+
+import com.bladecoder.ink.runtime.Story;
+import com.bladecoder.ink.runtime.VariablesState;
 import com.rabidgremlin.mutters.core.session.Session;
 
 import fi.metatavu.metamind.freemarker.FreemarkerRenderer;
@@ -43,30 +44,29 @@ public abstract class AbstractFreemarkerMetaBotFunction extends AbstractMetaBotF
    * 
    * @param templateName name of the template
    * @param session session
-   * @param intentMatch intent match
+   * @param story story
    * @return rendered template
    */
-  protected String getRenderedText(String templateName, Session session, IntentMatch intentMatch, boolean includeSessionAttributes, boolean includeMessages) {
-    return freemarkerRenderer.render(templateName, getModel(session, intentMatch, includeSessionAttributes, includeMessages), new Locale("fi"));
+  protected String getRenderedText(String templateName, Session session, Story story, boolean includeSessionAttributes, boolean includeMessages) {
+    return freemarkerRenderer.render(templateName, getModel(session, story, includeSessionAttributes, includeMessages), new Locale("fi"));
   }
 
-  private FreemarkerModel getModel(Session botSession, IntentMatch intentMatch, boolean includeSessionAttributes, boolean includeMessages) {
+  private FreemarkerModel getModel(Session botSession, Story story, boolean includeSessionAttributes, boolean includeMessages) {
     fi.metatavu.metamind.persistence.models.Session metamindSession = sessionController.findSessionFromBotSession(botSession);
-    Map<String, Object> sessionAttributes = includeSessionAttributes ? getSessionAttributes(botSession, intentMatch) : Collections.emptyMap();
+    Map<String, Object> sessionAttributes = includeSessionAttributes ? getSessionAttributes(story) : Collections.emptyMap();
     List<FreemarkerMessageModel> sessionMessages = includeMessages ? getSessionMessages(metamindSession) : Collections.emptyList();
     return new FreemarkerModel(metamindSession, sessionAttributes, sessionMessages);
   }
 
-  private Map<String, Object> getSessionAttributes(Session session, IntentMatch intentMatch) {
+  private Map<String, Object> getSessionAttributes(Story story) {
     Map<String, Object> result = new HashMap<>();
     
-    Map<Slot, SlotMatch> slotMatches = intentMatch.getSlotMatches();
-    for (Slot slot : slotMatches.keySet()) {
-      String slotName = slot.getName();
-      Object value = SessionUtils.getStringFromSlotOrSession(intentMatch, session, slotName, null);
-      result.put(slotName.toLowerCase(), value);
+    VariablesState variablesState = story.getVariablesState();
+    for (String variableName : variablesState) {
+      Object value = variablesState.get(variableName);
+      result.put(variableName.toLowerCase(), value);
     }
-    
+
     return result;
   }
   
@@ -75,12 +75,22 @@ public abstract class AbstractFreemarkerMetaBotFunction extends AbstractMetaBotF
     
     List<FreemarkerMessageModel> result = new ArrayList<>(sessionMessages.size());
     for (Message sessionMessage : sessionMessages) {
-      result.add(new FreemarkerMessageModel(getDate(sessionMessage.getCreated()), sessionMessage.getContent(), sessionMessage.getResponse()));
+      result.add(new FreemarkerMessageModel(getDate(sessionMessage.getCreated()), 
+        stripHtml(sessionMessage.getContent()), 
+        stripHtml(sessionMessage.getResponse())));
     }
     
     return result;
   }
   
+  private String stripHtml(String content) {
+    if (content == null) {
+      return null;
+    }
+    
+    return new HtmlToPlainText().getPlainText(Jsoup.parse(content));    
+  }
+
   private Date getDate(OffsetDateTime offsetDateTime) {
     return Date.from(offsetDateTime.toInstant());
   }

@@ -5,6 +5,7 @@
       <module name="org.apache.httpcomponents"/>
       <module name="org.apache.commons.io"/>
       <module name="org.slf4j"/>
+      <module name="org.jsoup"/>
       <module name="org.wildfly.clustering.api" services="export" />
     </dependencies>
   </deployment>
