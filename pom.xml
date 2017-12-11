@@ -323,6 +323,14 @@
       <version>${freemarker.version}</version>
     </dependency>
     
+    <!-- Jsoup -->
+    
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
     <!-- Test -->
 
     <dependency>

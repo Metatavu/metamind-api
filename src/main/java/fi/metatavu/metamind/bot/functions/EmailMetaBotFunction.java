@@ -43,8 +43,8 @@ public class EmailMetaBotFunction extends AbstractFreemarkerMetaBotFunction {
     String subjectString = params.get("subject");
     String subjectTemplate = params.get("subject-template");
     String toEmail = params.get("address");
-    String content = getOptionallyTemplatedString(contentString, contentTemplate, session, intentMatch);
-    String subject = getOptionallyTemplatedString(subjectString, subjectTemplate, session, intentMatch);
+    String content = getOptionallyTemplatedString(contentString, contentTemplate, session, story);
+    String subject = getOptionallyTemplatedString(subjectString, subjectTemplate, session, story);
     
     if (StringUtils.isBlank(toEmail)) {
       logger.error("Could not send mail without recipient email");
@@ -64,13 +64,13 @@ public class EmailMetaBotFunction extends AbstractFreemarkerMetaBotFunction {
     emailProvider.sendMail(toEmail, subject, content);
   }
 
-  private String getOptionallyTemplatedString(String string, String template, Session session, IntentMatch intentMatch) {
+  private String getOptionallyTemplatedString(String string, String template, Session session, Story story) {
     if (StringUtils.isNotBlank(string)) {
       return string;
     }
     
     if (StringUtils.isNotBlank(template)) {
-      return getRenderedText(template, session, intentMatch, true, true);
+      return getRenderedText(template, session, story, true, true);
     }
     
     return null;
