@@ -61,11 +61,12 @@ public class MessageApiImpl extends AbstractRestApi implements MessagesApi {
       return respondBadRequest("Invalid session id");
     }
     
-    if (StringUtils.isBlank(body.getContent())) {
+    String content = StringUtils.trim(body.getContent());
+    if (StringUtils.isBlank(content)) {
       return respondBadRequest("Missing content");
     }
     
-    fi.metatavu.metamind.persistence.models.Message message = messageController.createMessage(body.getContent(), session);
+    fi.metatavu.metamind.persistence.models.Message message = messageController.createMessage(content, session);
     if (message == null) {
       return respondInternalServerError("Could not create new message");
     }

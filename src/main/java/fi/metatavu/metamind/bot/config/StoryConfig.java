@@ -2,6 +2,8 @@ package fi.metatavu.metamind.bot.config;
 
 public class StoryConfig {
 
+  private Integer maxAttemptsBeforeConfused;
+  private String confusedKnotName;
   private MachineLearningConfig machineLearning;
   private TemplateConfig template;
  
@@ -19,6 +21,22 @@ public class StoryConfig {
   
   public void setMachineLearning(MachineLearningConfig machineLearning) {
     this.machineLearning = machineLearning;
+  }
+  
+  public String getConfusedKnotName() {
+    return confusedKnotName;
+  }
+  
+  public void setConfusedKnotName(String confusedKnotName) {
+    this.confusedKnotName = confusedKnotName;
+  }
+  
+  public Integer getMaxAttemptsBeforeConfused() {
+    return maxAttemptsBeforeConfused;
+  }
+  
+  public void setMaxAttemptsBeforeConfused(Integer maxAttemptsBeforeConfused) {
+    this.maxAttemptsBeforeConfused = maxAttemptsBeforeConfused;
   }
   
 }

@@ -153,7 +153,14 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
 
   @Override
   public ConfusedKnot getConfusedKnot() {
-    return new ConfusedKnot(3, "bail_out");
+    String confusedKnotName = config.getConfusedKnotName();
+    Integer maxAttemptsBeforeConfused = config.getMaxAttemptsBeforeConfused();
+    
+    if (confusedKnotName != null && maxAttemptsBeforeConfused != null) {
+      return new ConfusedKnot(maxAttemptsBeforeConfused, confusedKnotName);
+    }
+    
+    return null;
   }
 
   @Override
