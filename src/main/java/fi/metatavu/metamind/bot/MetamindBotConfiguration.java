@@ -5,7 +5,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,7 +150,17 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
 
   @Override
   public List<GlobalIntent> getGlobalIntents() {
-    return Collections.emptyList();
+    Map<String, String> globalIntentMap = config.getGlobalIntents();
+    if (globalIntentMap == null) {
+      return Collections.emptyList();
+    }
+    
+    List<GlobalIntent> globalIntents = globalIntentMap.entrySet()
+        .stream()
+        .map(entry -> new GlobalIntent(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList());
+
+    return globalIntents;
   }
 
   @Override

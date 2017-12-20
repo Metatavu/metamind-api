@@ -17,5 +17,5 @@ public class MetamindBot extends InkBot<MetamindBotConfiguration> {
   public MetamindBot(MetamindBotConfiguration config) {
     super(config);
   }
-
+  
 }
