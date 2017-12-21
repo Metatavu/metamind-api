@@ -155,12 +155,9 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
       return Collections.emptyList();
     }
     
-    List<GlobalIntent> globalIntents = globalIntentMap.entrySet()
-        .stream()
-        .map(entry -> new GlobalIntent(entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList());
-
-    return globalIntents;
+    return globalIntentMap.entrySet().stream()
+      .map(entry -> new GlobalIntent(entry.getKey(), entry.getValue()))
+      .collect(Collectors.toList());
   }
 
   @Override
