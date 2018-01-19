@@ -53,26 +53,23 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
     String route = "events";
     String routeId = "";
 
-    ArrayList<Events> events = new ArrayList<>();
-
-    StringBuilder content = null;
-    HttpURLConnection connection = null;
-
-    connection = createHttpConnection(authorizationToken, organizationId, route, routeId);
-    content = getContent(connection);
-    events = parseContent(content);
+    HttpURLConnection connection = createHttpConnection(authorizationToken, organizationId, route, routeId);
+    StringBuilder content = getContent(connection);
+    ArrayList<Events> events = parseContent(content);
     connection.disconnect();
 
     Random random = new Random();
     int rand = random.nextInt(events.size());
 
     try {
-      story.getVariablesState().set("eventName", events.get(rand).getName());
-      story.getVariablesState().set("eventDescription", events.get(rand).getDescription());
-      story.getVariablesState().set("eventLocation", events.get(rand).getPlace());
-      story.getVariablesState().set("eventAddress", events.get(rand).getAddress());
-      story.getVariablesState().set("eventZip", events.get(rand).getZip());
-      story.getVariablesState().set("eventCity", events.get(rand).getCity());
+      if(events != null) {
+        story.getVariablesState().set("eventName", events.get(rand).getName());
+        story.getVariablesState().set("eventDescription", events.get(rand).getDescription());
+        story.getVariablesState().set("eventLocation", events.get(rand).getPlace());
+        story.getVariablesState().set("eventAddress", events.get(rand).getAddress());
+        story.getVariablesState().set("eventZip", events.get(rand).getZip());
+        story.getVariablesState().set("eventCity", events.get(rand).getCity());
+      }
     } catch (Exception e) {
       logger.error("Error while setting variables at KUNTA_API_GET_EVENTS", e);
     }
@@ -99,17 +96,17 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
 
     HttpURLConnection connection = null;
 
-    try {
-      if (url != null) {
+    if (url != null) {
+      try {
         connection = (HttpURLConnection) url.openConnection();
+      } catch (NullPointerException | IOException e) {
+        logger.error("Failed to create connection at KUNTA_API_GET_EVENTS", e);
       }
-    } catch (NullPointerException | IOException e) {
-      logger.error("Failed to create connection at KUNTA_API_GET_EVENTS", e);
     }
 
     String redirect = connection.getHeaderField("Location");
 
-    if (redirect != null) {
+    if (redirect != null && connection != null) {
       try {
         connection = (HttpURLConnection) new URL(redirect).openConnection();
       } catch (NullPointerException | IOException e) {
@@ -148,8 +145,10 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
     StringBuilder content = new StringBuilder();
 
     try {
-      while ((inputLine = input.readLine()) != null) {
-        content.append(inputLine);
+      if (input != null) {
+        while ((inputLine = input.readLine()) != null) {
+          content.append(inputLine);
+        }
       }
     } catch (NullPointerException | IOException e) {
       logger.error("Failed to append data to StringBuffer at KUNTA_API_GET_EVENTS", e);
