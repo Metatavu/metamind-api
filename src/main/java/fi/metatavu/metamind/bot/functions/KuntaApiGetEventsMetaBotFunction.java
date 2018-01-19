@@ -100,7 +100,9 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
     HttpURLConnection connection = null;
 
     try {
-      connection = (HttpURLConnection) url.openConnection();
+      if (url != null) {
+        connection = (HttpURLConnection) url.openConnection();
+      }
     } catch (NullPointerException | IOException e) {
       logger.error("Failed to create connection at KUNTA_API_GET_EVENTS", e);
     }
