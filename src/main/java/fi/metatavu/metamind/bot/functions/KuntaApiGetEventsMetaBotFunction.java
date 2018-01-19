@@ -59,17 +59,18 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
     connection.disconnect();
 
     Random random = new Random();
-    int rand = random.nextInt(events.size());
+    int rand = 0;
+    
+    if(events != null) {
+      rand = random.nextInt(events.size());
+    }
 
     try {
-      if(events != null) {
-        story.getVariablesState().set("eventName", events.get(rand).getName());
-        story.getVariablesState().set("eventDescription", events.get(rand).getDescription());
-        story.getVariablesState().set("eventLocation", events.get(rand).getPlace());
-        story.getVariablesState().set("eventAddress", events.get(rand).getAddress());
-        story.getVariablesState().set("eventZip", events.get(rand).getZip());
-        story.getVariablesState().set("eventCity", events.get(rand).getCity());
-      }
+      story.getVariablesState().set("eventName", events.get(rand).getName());
+      story.getVariablesState().set("eventDescription", events.get(rand).getDescription());
+      story.getVariablesState().set("eventLocation", events.get(rand).getPlace());
+      story.getVariablesState().set("eventAddress", events.get(rand).getAddress());
+      story.getVariablesState().set("eventZip", events.get(rand).getZip());
     } catch (Exception e) {
       logger.error("Error while setting variables at KUNTA_API_GET_EVENTS", e);
     }
@@ -106,7 +107,7 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
 
     String redirect = connection.getHeaderField("Location");
 
-    if (redirect != null && connection != null) {
+    if (redirect != null) {
       try {
         connection = (HttpURLConnection) new URL(redirect).openConnection();
       } catch (NullPointerException | IOException e) {
