@@ -35,103 +35,106 @@ import fi.metatavu.metamind.kuntaapi.Events;
  */
 @ApplicationScoped
 public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
-	@Inject
+  @Inject
   private Logger logger;
-  
+
   @Override
   public String getFunctionName() {
     return "KUNTA_API_GET_EVENTS";
   }
-  
+
   @Override
-  public void execute(CurrentResponse currentResponse, Session session, IntentMatch intentMatch, Story story, String param) {
-  		FunctionDetails details = FunctionHelper.parseFunctionString(param);
-  		
-  		String authorizationToken = (String) session.getLongTermAttribute("authorizationToken");
-		String organizationId = details.getFunctionParams().get("organizationId");
-		String route = "events";
-		String routeId = "";
-		
-		ArrayList<Events> events = new ArrayList<Events>();
-		
-		StringBuffer content = null;
-		HttpURLConnection connection = null;
-		
-		if (!organizationId.isEmpty() || organizationId != null) {
-			connection = createHttpConnection(authorizationToken, organizationId, route, routeId);
-			content = getContent(connection);
-			events = parseContent(content);
-			connection.disconnect();
-		}
-		
-		Random random = new Random();
-		int rand = random.nextInt(events.size());
-		
-		try {
-			story.getVariablesState().set("eventName", events.get(rand).getName());
-			story.getVariablesState().set("eventDescription", events.get(rand).getDescription());
-			story.getVariablesState().set("eventLocation", events.get(rand).getPlace());
-			story.getVariablesState().set("eventAddress", events.get(rand).getAddress());
-			story.getVariablesState().set("eventZip", events.get(rand).getZip());
-			story.getVariablesState().set("eventCity", events.get(rand).getCity());
-		} catch (Exception e) {
-			logger.error("Error while setting variables at KUNTA_API_GET_EVENTS", e);
-		}
-  }	
-  
+  public void execute(CurrentResponse currentResponse, Session session, IntentMatch intentMatch, Story story,
+      String param) {
+    FunctionDetails details = FunctionHelper.parseFunctionString(param);
+
+    String authorizationToken = (String) session.getLongTermAttribute("authorizationToken");
+    String organizationId = details.getFunctionParams().get("organizationId");
+    String route = "events";
+    String routeId = "";
+
+    ArrayList<Events> events = new ArrayList<Events>();
+
+    StringBuffer content = null;
+    HttpURLConnection connection = null;
+
+    if (!organizationId.isEmpty() || organizationId != null) {
+      connection = createHttpConnection(authorizationToken, organizationId, route, routeId);
+      content = getContent(connection);
+      events = parseContent(content);
+      connection.disconnect();
+    }
+
+    Random random = new Random();
+    int rand = random.nextInt(events.size());
+
+    try {
+      story.getVariablesState().set("eventName", events.get(rand).getName());
+      story.getVariablesState().set("eventDescription", events.get(rand).getDescription());
+      story.getVariablesState().set("eventLocation", events.get(rand).getPlace());
+      story.getVariablesState().set("eventAddress", events.get(rand).getAddress());
+      story.getVariablesState().set("eventZip", events.get(rand).getZip());
+      story.getVariablesState().set("eventCity", events.get(rand).getCity());
+    } catch (Exception e) {
+      logger.error("Error while setting variables at KUNTA_API_GET_EVENTS", e);
+    }
+  }
+
   /**
-   * This method returns a HttpURLConnection based on organizationId, route and routeId.
+   * This method returns a HttpURLConnection based on organizationId, route and
+   * routeId.
    * 
    * @param organizationId Organization id of kunta-api oranization.
    * @param route String The route where to get data.
    * @param routeId (Id or blank String) Route id to get specific data by id.
    * @return A HttpURLConnection.
    */
-  private HttpURLConnection createHttpConnection(String authorizationToken, String organizationId, String route, String routeId) { 	
-  		URL url = null;
-  		
-		try {
-			url = new URL(String.format("http://api.kunta-api.fi/v1/organizations/%s/%s/%s", organizationId, route, routeId ));
-		} catch (MalformedURLException e) {
-			logger.error("Failed to create URL at KUNTA_API_GET_EVENTS");
-		}
-		
-		HttpURLConnection connection = null;
-		
-		try {
-			connection = (HttpURLConnection) url.openConnection();
-		} catch (IOException e) {
-			logger.error("Failed to create connection at KUNTA_API_GET_EVENTS", e);
-		}
-		
-		String redirect = connection.getHeaderField("Location");
-		
-		if (redirect != null) {
-	    try {
-	    	connection = (HttpURLConnection) new URL(redirect).openConnection();
-			} catch (IOException e) {
-				logger.error("Failed to set redirect URL at KUNTA_API_GET_EVENTS", e);
-			}
-		}
-		
-		try {
-			connection.setRequestMethod("GET");
-		} catch (ProtocolException e) {
-			logger.error("Failed to set request method GET at KUNTA_API_GET_EVENTS", e);
-		}
-		
-		connection.setRequestProperty("Content-Type", "application/json");
-		connection.setRequestProperty("Authorization", authorizationToken);
-		
-		try {
-			int status = connection.getResponseCode();
-		} catch (IOException e) {
-			logger.error("Failed get response code at KUNTA_API_GET_EVENTS", e);
-		}
-		
-		return connection;
+  private HttpURLConnection createHttpConnection(String authorizationToken, String organizationId, String route,
+      String routeId) {
+    URL url = null;
+
+    try {
+      url = new URL(String.format("http://api.kunta-api.fi/v1/organizations/%s/%s/%s", organizationId, route, routeId));
+    } catch (MalformedURLException e) {
+      logger.error("Failed to create URL at KUNTA_API_GET_EVENTS");
+    }
+
+    HttpURLConnection connection = null;
+
+    try {
+      connection = (HttpURLConnection) url.openConnection();
+    } catch (IOException e) {
+      logger.error("Failed to create connection at KUNTA_API_GET_EVENTS", e);
+    }
+
+    String redirect = connection.getHeaderField("Location");
+
+    if (redirect != null) {
+      try {
+        connection = (HttpURLConnection) new URL(redirect).openConnection();
+      } catch (IOException e) {
+        logger.error("Failed to set redirect URL at KUNTA_API_GET_EVENTS", e);
+      }
+    }
+
+    try {
+      connection.setRequestMethod("GET");
+    } catch (ProtocolException e) {
+      logger.error("Failed to set request method GET at KUNTA_API_GET_EVENTS", e);
+    }
+
+    connection.setRequestProperty("Content-Type", "application/json");
+    connection.setRequestProperty("Authorization", authorizationToken);
+
+    try {
+      int status = connection.getResponseCode();
+    } catch (IOException e) {
+      logger.error("Failed get response code at KUNTA_API_GET_EVENTS", e);
+    }
+
+    return connection;
   }
-  
+
   /**
    * This method returns a StringBuffer content from given connection.
    * 
@@ -139,33 +142,33 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
    * @return A StringBuffer content based on connection.
    */
   private StringBuffer getContent(HttpURLConnection connection) {
-  		BufferedReader input = null;
-		
-		try {
-			input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		} catch (IOException e) {
-			logger.error("Failed to create BufferReader at KUNTA_API_GET_EVENTS", e);
-		}
-		
-		String inputLine;
-		StringBuffer content = new StringBuffer();
-		
-		try {
-			while ((inputLine = input.readLine()) != null) {
-		    content.append(inputLine);
-			}
-		} catch (IOException e) {
-			logger.error("Failed to append data to StringBuffer at KUNTA_API_GET_EVENTS", e);
-		}
-		
-		try {
-			input.close();
-		} catch (IOException e) {
-			logger.error("Failed to close BufferReader at KUNTA_API_GET_EVENTS", e);
-		}
-		return content;
+    BufferedReader input = null;
+
+    try {
+      input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+    } catch (IOException e) {
+      logger.error("Failed to create BufferReader at KUNTA_API_GET_EVENTS", e);
+    }
+
+    String inputLine;
+    StringBuffer content = new StringBuffer();
+
+    try {
+      while ((inputLine = input.readLine()) != null) {
+        content.append(inputLine);
+      }
+    } catch (IOException e) {
+      logger.error("Failed to append data to StringBuffer at KUNTA_API_GET_EVENTS", e);
+    }
+
+    try {
+      input.close();
+    } catch (IOException e) {
+      logger.error("Failed to close BufferReader at KUNTA_API_GET_EVENTS", e);
+    }
+    return content;
   }
-  
+
   /**
    * This method returns an ArrayList of events.
    * 
@@ -173,15 +176,15 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
    * @return An ArrayList of events.
    */
   private ArrayList<Events> parseContent(StringBuffer content) {
-  		ObjectMapper objectMapper = new ObjectMapper();
-  		ArrayList<Events> events = null;
-  		
-  		try {
-  			events = objectMapper.readValue(content.toString(), new TypeReference<List<Events>>(){});
-  		} catch (IOException e) {
-  			logger.error("Failed to read JSON string at parseContent KUNTA_API_GET_EVENTS", e);
-  		}
-  		
-  		return events;
+    ObjectMapper objectMapper = new ObjectMapper();
+    ArrayList<Events> events = null;
+
+    try {
+      events = objectMapper.readValue(content.toString(), new TypeReference<List<Events>>(){});
+    } catch (IOException e) {
+      logger.error("Failed to read JSON string at parseContent KUNTA_API_GET_EVENTS", e);
+    }
+
+    return events;
   }
 }

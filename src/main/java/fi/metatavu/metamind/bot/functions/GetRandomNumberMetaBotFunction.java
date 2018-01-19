@@ -21,30 +21,31 @@ import com.rabidgremlin.mutters.core.session.Session;
  */
 @ApplicationScoped
 public class GetRandomNumberMetaBotFunction extends AbstractMetaBotFunction {
-	@Inject
+  @Inject
   private Logger logger;
-  
+
   @Override
   public String getFunctionName() {
     return "KUNTA_API_GET_RANDOM_NUMBER";
-  } 
-  
+  }
+
   @Override
-  public void execute(CurrentResponse currentResponse, Session session, IntentMatch intentMatch, Story story, String param) {
-  		FunctionDetails details = FunctionHelper.parseFunctionString(param);
-  		String scaleString = details.getFunctionParams().get("scale");
-  		String var = details.getFunctionParams().get("var");
-  		
-  		int scale = Integer.parseInt(scaleString);
-  		
-  		Random random = new Random();
-  		int rand = random.nextInt(scale);
-  		
-  		try {
-			story.getVariablesState().set(var, rand);
-		} catch (Exception e) {
-			logger.error("Failed to set variable at KUNTA_API_GET_RANDOM_NUMBER", e);
-		}
+  public void execute(CurrentResponse currentResponse, Session session, IntentMatch intentMatch, Story story,
+      String param) {
+    FunctionDetails details = FunctionHelper.parseFunctionString(param);
+    String scaleString = details.getFunctionParams().get("scale");
+    String var = details.getFunctionParams().get("var");
+
+    int scale = Integer.parseInt(scaleString);
+
+    Random random = new Random();
+    int rand = random.nextInt(scale);
+
+    try {
+      story.getVariablesState().set(var, rand);
+    } catch (Exception e) {
+      logger.error("Failed to set variable at KUNTA_API_GET_RANDOM_NUMBER", e);
+    }
   }
 
 }
