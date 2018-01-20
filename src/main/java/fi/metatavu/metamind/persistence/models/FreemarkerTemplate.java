@@ -2,6 +2,7 @@ package fi.metatavu.metamind.persistence.models;
 
 import java.time.OffsetDateTime;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -20,6 +23,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Antti Leppä
  */
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class FreemarkerTemplate {
 
   @Id
