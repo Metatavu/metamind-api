@@ -16,10 +16,16 @@ import com.bladecoder.ink.runtime.ValueType;
 import com.bladecoder.ink.runtime.VariableAssignment;
 import com.bladecoder.ink.runtime.VariablesState;
 
+import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.sessions.SessionController;
+
 public abstract class AbstractMetaBotFunction implements MetaBotFunction {
 
   @Inject
   private Logger logger;
+
+  @Inject
+  private SessionController sessionController;
 
   /**
    * Parses param string as map. 
@@ -140,6 +146,31 @@ public abstract class AbstractMetaBotFunction implements MetaBotFunction {
     } catch (Exception e) {
       logger.error("Failed to assign variable", e);
     }
+  }
+  
+  /**
+   * Returns Metamind session for bot session
+   * 
+   * @param botSession bot session
+   * @return Metamind session
+   */
+  protected Session getMetamindSession(com.rabidgremlin.mutters.core.session.Session botSession) {
+    return sessionController.findSessionFromBotSession(botSession);
+  }
+  
+  /**
+   * Returns Metamind story from bot session
+   * 
+   * @param botSession bot session
+   * @return Metamind story
+   */
+  protected fi.metatavu.metamind.persistence.models.Story getMetamindStory(com.rabidgremlin.mutters.core.session.Session botSession) {
+    Session metamindSession = getMetamindSession(botSession);
+    if (metamindSession == null) {
+      return null;
+    }
+    
+    return metamindSession.getStory();
   }
   
   private Value<?> getVariableValue(Story story, String variableName) {
