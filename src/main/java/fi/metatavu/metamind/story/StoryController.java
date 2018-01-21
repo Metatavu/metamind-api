@@ -4,7 +4,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import fi.metatavu.metamind.persistence.dao.StoryDAO;
+import fi.metatavu.metamind.persistence.dao.StoryGlobalVariableDAO;
 import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.StoryGlobalVariable;
 
 /**
  * Story controller
@@ -13,9 +15,12 @@ import fi.metatavu.metamind.persistence.models.Story;
  */
 @ApplicationScoped
 public class StoryController {
-  
+
   @Inject
   private StoryDAO storyDAO;
+
+  @Inject
+  private StoryGlobalVariableDAO storyGlobalVariableDAO;
 
   /**
    * Creates new story
@@ -70,6 +75,39 @@ public class StoryController {
     }
     
     return storyDAO.create(name, configJson, storyJson);
+  }
+  
+  /**
+   * Returns a global story variable
+   * 
+   * @param story story
+   * @param name variable name
+   * @return
+   */
+  public String getGlobalStoryVariable(Story story, String name) {
+    StoryGlobalVariable storyGlobalVariable = storyGlobalVariableDAO.findByStoryAndName(story, name);
+    if (storyGlobalVariable == null) {
+      return null;
+    }
+    
+    return storyGlobalVariable.getValue();
+  }
+
+  /**
+   * Updates a global story variable value
+   * 
+   * @param story story
+   * @param name variable name
+   * @param value variable value
+   * @return
+   */
+  public void setGlobalStoryVariable(Story story, String name, String value) {
+    StoryGlobalVariable storyGlobalVariable = storyGlobalVariableDAO.findByStoryAndName(story, name);
+    if (storyGlobalVariable == null) {
+      storyGlobalVariableDAO.create(story, name, value);
+    } else {
+      storyGlobalVariableDAO.updateValue(storyGlobalVariable, value);
+    }
   }
   
 }
