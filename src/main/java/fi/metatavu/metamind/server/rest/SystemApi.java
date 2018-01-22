@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -23,8 +22,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import fi.metatavu.metamind.models.ModelsContoller;
-import fi.metatavu.metamind.persistence.models.IntentModel;
-import fi.metatavu.metamind.persistence.models.SlotModel;
 import fi.metatavu.metamind.settings.SystemConsts;
 import fi.metatavu.metamind.settings.SystemSettingController;
 import fi.metatavu.metamind.story.StoryController;
@@ -89,30 +86,30 @@ public class SystemApi extends AbstractRestApi {
     return Response.ok().build();
   }
 
-  @GET
-  @Path ("/slotModel/{name}")
-  @Produces({ "application/octet-stream" })
-  public Response getSlotModelData(@PathParam ("name") String name) {
-    SlotModel slotModel = modelsContoller.findSlotModelByName(name);
-    if (slotModel == null) {
-      return respondNotFound();
-    }
-    
-    return streamResponse(slotModel.getData(), "application/octet-stream");
-  }
-  
-  @GET
-  @Path ("/intentModel/{name}")
-  @Produces({ "application/octet-stream" })
-  public Response getIntentModelData(@PathParam ("name") String name) {
-    IntentModel intentModel = modelsContoller.findIntentModelByName(name);
-    if (intentModel == null) {
-      return respondNotFound();
-    }
-    
-    return streamResponse(intentModel.getData(), "application/octet-stream");
-  }
-  
+//  @GET
+//  @Path ("/slotModel/{name}")
+//  @Produces({ "application/octet-stream" })
+//  public Response getSlotModelData(@PathParam ("name") String name) {
+//    SlotModel slotModel = modelsContoller.findSlotModelByName(name);
+//    if (slotModel == null) {
+//      return respondNotFound();
+//    }
+//    
+//    return streamResponse(slotModel.getData(), "application/octet-stream");
+//  }
+//  
+//  @GET
+//  @Path ("/intentModel/{name}")
+//  @Produces({ "application/octet-stream" })
+//  public Response getIntentModelData(@PathParam ("name") String name) {
+//    IntentModel intentModel = modelsContoller.findIntentModelByName(name);
+//    if (intentModel == null) {
+//      return respondNotFound();
+//    }
+//    
+//    return streamResponse(intentModel.getData(), "application/octet-stream");
+//  }
+//  
   private List<File> listStoryFiles(String[] paths) {
     List<File> result = new ArrayList<>();
     

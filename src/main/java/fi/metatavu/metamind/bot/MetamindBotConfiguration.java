@@ -1,7 +1,5 @@
 package fi.metatavu.metamind.bot;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +15,6 @@ import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
 import com.rabidgremlin.mutters.core.CompoundIntentMatcher;
 import com.rabidgremlin.mutters.core.Intent;
 import com.rabidgremlin.mutters.core.IntentMatcher;
-import com.rabidgremlin.mutters.opennlp.intent.OpenNLPIntentMatcher;
 import com.rabidgremlin.mutters.opennlp.intent.OpenNLPTokenizer;
 import com.rabidgremlin.mutters.slots.LiteralSlot;
 import com.rabidgremlin.mutters.slots.NumberSlot;
@@ -33,6 +30,8 @@ import fi.metatavu.metamind.bot.config.TemplateConfig;
 import fi.metatavu.metamind.bot.config.TemplatedIntentConfig;
 import fi.metatavu.metamind.bot.slots.RegExSlot;
 import fi.metatavu.metamind.bot.tokenizer.TemplateTokenizer;
+import fi.metatavu.metamind.persistence.models.IntentModel;
+import fi.metatavu.metamind.persistence.models.SlotModel;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 public class MetamindBotConfiguration implements InkBotConfiguration {
@@ -41,16 +40,16 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
   
   private StoryConfig config;
   private List<InkBotFunction> functions;
-  private String intentModelUrl;
-  private String slotModelUrl;
+  private IntentModel intentModel;
+  private Map<String, SlotModel> slotModels;
   private String storyJson;
   
-  public MetamindBotConfiguration(StoryConfig config, List<InkBotFunction> functions, String storyJson, String intentModelUrl, String slotModelUrl) {
+  public MetamindBotConfiguration(StoryConfig config, List<InkBotFunction> functions, String storyJson, IntentModel intentModel, Map<String, SlotModel> slotModels) {
     this.config = config;
     this.functions = functions;
     this.storyJson = storyJson;
-    this.intentModelUrl = intentModelUrl;
-    this.slotModelUrl = slotModelUrl;
+    this.intentModel = intentModel;
+    this.slotModels = slotModels;
   }
   
   @Override
@@ -65,19 +64,17 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
     for (Entry<String, String> slotModelEntry : machineLearning.getSlotModels().entrySet()) {
       String slotName = slotModelEntry.getKey();
       String nerModel = slotModelEntry.getValue();
-      try {
-        slotMatcher.addSlotModel(slotName, new URL(String.format(slotModelUrl,nerModel)));
-      } catch (MalformedURLException e) {
-        logger.error("Failed to construct slot model URL", e);
+      SlotModel slotModel = slotModels.get(nerModel);
+      if (slotModel != null) {
+        slotMatcher.addSlotModel(slotName, slotModel);
+      } else {
+        if (logger.isWarnEnabled()) {
+          logger.warn(String.format("Could not find slotModel %s", nerModel));
+        }
       }
     }
     
-    OpenNLPIntentMatcher machineLearningIntentMatcher = getIntentMatcher(machineLearning.getIntentModel(), tokenizer, slotMatcher);
-    if (machineLearningIntentMatcher == null) {
-      logger.error("Failed to construct intent matcher");
-      return null;
-    }
-    
+    OpenNLPIntentMatcher machineLearningIntentMatcher = getIntentMatcher(intentModel, tokenizer, slotMatcher);
     createTemplateIntents(templateConfig, templatedIntentMatcher);
     createMachineLearningIntents(machineLearning, machineLearningIntentMatcher);
 
@@ -126,16 +123,8 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
     } 
   }
   
-  private OpenNLPIntentMatcher getIntentMatcher(String intentModel, OpenNLPTokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
-    URL intentModelURL;
-    try {
-      intentModelURL = new URL(String.format(intentModelUrl, intentModel));
-    } catch (MalformedURLException e) {
-      logger.error("Failed to construct intent model URL", e);
-      return null;
-    }
-    
-    return new OpenNLPIntentMatcher(intentModelURL, tokenizer, slotMatcher, 0.75f, -1);
+  private OpenNLPIntentMatcher getIntentMatcher(IntentModel intentModel, OpenNLPTokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
+    return new OpenNLPIntentMatcher(intentModel, tokenizer, slotMatcher, 0.75f, -1);
   }
 
   @Override
