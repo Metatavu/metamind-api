@@ -200,4 +200,24 @@
     </delete>
   </changeSet>
   
+  <changeSet id="client" author="Antti Leppa">
+    <createTable tableName="Client">
+      <column name="id" type="bigint(20)" autoIncrement="true">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="clientId" type="varchar(191)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="clientSecret" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="accessType" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  
 </databaseChangeLog>
