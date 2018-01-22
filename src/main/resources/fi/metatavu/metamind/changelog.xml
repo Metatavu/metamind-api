@@ -193,5 +193,11 @@
     
     <addUniqueConstraint constraintName="UN_STORY_GLOBAL_VARIABLE_STORY_ID_NAME" columnNames="story_id,name" tableName="StoryGlobalVariable"/>
   </changeSet>
-
+  
+  <changeSet id="deprecated-settings" author="Antti Leppa">
+    <delete tableName="SystemSetting">
+      <where>settingKey in ("intent-model-url", "slot-model-url")</where>
+    </delete>
+  </changeSet>
+  
 </databaseChangeLog>
