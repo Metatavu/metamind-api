@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
@@ -20,10 +23,11 @@ import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
 
 import fi.metatavu.metamind.bot.config.StoryConfig;
 import fi.metatavu.metamind.bot.functions.MetaBotFunction;
+import fi.metatavu.metamind.models.ModelsContoller;
+import fi.metatavu.metamind.persistence.models.IntentModel;
 import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.SlotModel;
 import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.settings.SystemConsts;
-import fi.metatavu.metamind.settings.SystemSettingController;
 
 /**
  * Controller for the bot
@@ -38,7 +42,7 @@ public class BotController {
   private Instance<MetaBotFunction> metabotFunctions;
 
   @Inject
-  private SystemSettingController systemSettingController;
+  private ModelsContoller modelsContoller;
 
   @Inject
   private Logger logger;
@@ -98,13 +102,47 @@ public class BotController {
     this.metabotFunctions.forEach(functions::add);
     
     StoryConfig storyConfig = loadStoryConfig(story.getConfigJson());
-    String intentModelUrl = systemSettingController.getSettingValue(SystemConsts.INTENT_MODEL_URL);
-    String slotModelUrl = systemSettingController.getSettingValue(SystemConsts.SLOT_MODEL_URL);
+    if (storyConfig == null) {
+      logger.error("Story config is missing");
+      return null;
+    }
+    
     String storyJson = story.getStoryJson();
     
-    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(storyConfig, functions, storyJson, intentModelUrl, slotModelUrl);
+    Map<String, SlotModel> slotModels = new HashMap<>();
+    IntentModel intentModel = null;
+    
+    if (storyConfig.getMachineLearning() != null) {
+      loadSlotModels(storyConfig, slotModels);
+      
+      String intentModelName = storyConfig.getMachineLearning().getIntentModel();
+      if (intentModelName != null) {
+        intentModel = modelsContoller.findIntentModelByName(String.format("%s.bin", intentModelName));
+        if (intentModel == null && logger.isWarnEnabled()) {
+          logger.warn(String.format("Failed to load intent model %s", intentModelName));
+        }
+      }
+    }
+    
+    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(storyConfig, functions, storyJson, intentModel, slotModels);
     
     return new MetamindBot(botConfiguration);
+  }
+
+  protected void loadSlotModels(StoryConfig storyConfig, Map<String, SlotModel> slotModels) {
+    if (storyConfig.getMachineLearning().getSlotModels() != null) {
+      Collection<String> slotModelNames = storyConfig.getMachineLearning().getSlotModels().values();
+      for (String slotModelName : slotModelNames) {
+        SlotModel slotModel = modelsContoller.findSlotModelByName(String.format("%s.bin", slotModelName));
+        if (slotModel !=  null) {
+          slotModels.put(slotModelName, slotModel);
+        } else {
+          if (logger.isWarnEnabled()) {
+            logger.warn(String.format("Could not find slot model %s", slotModelName));
+          }
+        }
+      }
+    }
   }
 
   private StoryConfig loadStoryConfig(String configJson) {
