@@ -86,30 +86,6 @@ public class SystemApi extends AbstractRestApi {
     return Response.ok().build();
   }
 
-//  @GET
-//  @Path ("/slotModel/{name}")
-//  @Produces({ "application/octet-stream" })
-//  public Response getSlotModelData(@PathParam ("name") String name) {
-//    SlotModel slotModel = modelsContoller.findSlotModelByName(name);
-//    if (slotModel == null) {
-//      return respondNotFound();
-//    }
-//    
-//    return streamResponse(slotModel.getData(), "application/octet-stream");
-//  }
-//  
-//  @GET
-//  @Path ("/intentModel/{name}")
-//  @Produces({ "application/octet-stream" })
-//  public Response getIntentModelData(@PathParam ("name") String name) {
-//    IntentModel intentModel = modelsContoller.findIntentModelByName(name);
-//    if (intentModel == null) {
-//      return respondNotFound();
-//    }
-//    
-//    return streamResponse(intentModel.getData(), "application/octet-stream");
-//  }
-//  
   private List<File> listStoryFiles(String[] paths) {
     List<File> result = new ArrayList<>();
     
