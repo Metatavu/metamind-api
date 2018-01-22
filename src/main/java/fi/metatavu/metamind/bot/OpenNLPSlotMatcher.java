@@ -1,7 +1,9 @@
 package fi.metatavu.metamind.bot;
 
-import java.net.URL;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,33 +15,22 @@ import com.rabidgremlin.mutters.core.SlotMatch;
 import com.rabidgremlin.mutters.core.SlotMatcher;
 import com.rabidgremlin.mutters.core.Tokenizer;
 
+import fi.metatavu.metamind.persistence.models.SlotModel;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.util.Span;
 
 /**
- * THIS IS A COPY OF ORIGINAL CLASS. REMOVE WHEN MUTTERS SUPPORTS LOADING SLOTS FROM URL
- */
-
-/**
  * Implements a SlotMatcher that uses OpenNLP's NER framework.
  * 
- * @author rabidgremlin
- *
+ * @author Antti Leppä
  */
-public class OpenNLPSlotMatcher
-    implements SlotMatcher
-{
-  /** Logger. */
+public class OpenNLPSlotMatcher implements SlotMatcher {
+
   private Logger log = LoggerFactory.getLogger(OpenNLPSlotMatcher.class);
 
-  /** Map of NER models. */
-  private HashMap<String, TokenNameFinderModel> nerModels = new HashMap<String, TokenNameFinderModel>();
+  private Map<String, TokenNameFinderModel> slotModels = new HashMap<>();
 
-  /** Map of slot models. These share the NER models. */
-  private HashMap<String, TokenNameFinderModel> slotModels = new HashMap<String, TokenNameFinderModel>();
-
-  /** The tokenizer to use. */
   private Tokenizer tokenizer;
 
   /**
@@ -48,41 +39,31 @@ public class OpenNLPSlotMatcher
    * 
    * @param tokenizer The tokenizer to use on an utterance for NER.
    */
-  public OpenNLPSlotMatcher(Tokenizer tokenizer)
-  {
+  public OpenNLPSlotMatcher(Tokenizer tokenizer) {
     this.tokenizer = tokenizer;
   }
 
   /**
    * This set the NER model to use for a slot.
    * 
-   * @param slotName The name of the slot. Should match the name of slots on intents added to the matcher.
-   * @param nerModel The file name of the NER model. This file must be on the classpath.
+   * @param slotModel The slot model.
    */
-  public void addSlotModel(String slotName, URL modelUrl)
-  {
-    TokenNameFinderModel tnfModel = nerModels.get(modelUrl.toExternalForm());
-    if (tnfModel == null)
-    {
-      try
-      {
-        tnfModel = new TokenNameFinderModel(modelUrl);
-      }
-      catch (Exception e)
-      {
-        throw new IllegalArgumentException("Unable to load NER model", e);
-      }
+  public void addSlotModel(String slotName, SlotModel slotModel) {
+    try (InputStream inputStream = new ByteArrayInputStream(slotModel.getData())) {
+      slotModels.put(slotName.toLowerCase(), new TokenNameFinderModel(inputStream));
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Unable to load NER model", e);
     }
-
-    slotModels.put(slotName.toLowerCase(), tnfModel);
   }
 
+  @SuppressWarnings ("squid:S1319")
   @Override
-  public HashMap<Slot, SlotMatch> match(Context context, Intent intent, String utterance)
-  {
+  public HashMap<Slot, SlotMatch> match(Context context, Intent intent, String utterance) {
+    // This method is a direct copy from rabidgremlin's version of the OpenNLPSlotMatcher
+    
     String[] utteranceTokens = tokenizer.tokenize(utterance);
 
-    HashMap<Slot, SlotMatch> matchedSlots = new HashMap<Slot, SlotMatch>();
+    HashMap<Slot, SlotMatch> matchedSlots = new HashMap<>();
 
     for (Slot slot : intent.getSlots())
     {

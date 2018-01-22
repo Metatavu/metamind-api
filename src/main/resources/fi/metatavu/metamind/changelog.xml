@@ -174,5 +174,50 @@
       </column>
     </addColumn>
   </changeSet>
-
+  
+  <changeSet id="global-story-variable" author="Antti Leppa">
+    <createTable tableName="StoryGlobalVariable">
+      <column name="id" type="bigint(20)" autoIncrement="true">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="story_id" type="BIGINT">
+        <constraints foreignKeyName="FK_GLOBAL_STORY_VARIABLE_STORY_ID" referencedColumnNames="id" referencedTableName="Story" />
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="value" type="longtext">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <addUniqueConstraint constraintName="UN_STORY_GLOBAL_VARIABLE_STORY_ID_NAME" columnNames="story_id,name" tableName="StoryGlobalVariable"/>
+  </changeSet>
+  
+  <changeSet id="deprecated-settings" author="Antti Leppa">
+    <delete tableName="SystemSetting">
+      <where>settingKey in ("intent-model-url", "slot-model-url")</where>
+    </delete>
+  </changeSet>
+  
+  <changeSet id="client" author="Antti Leppa">
+    <createTable tableName="Client">
+      <column name="id" type="bigint(20)" autoIncrement="true">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="clientId" type="varchar(191)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="clientSecret" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="accessType" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  
 </databaseChangeLog>
