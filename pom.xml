@@ -138,6 +138,13 @@
   </build>
 
   <dependencies>
+  	<dependency>
+	    <groupId>fi.metatavu.kunta-api</groupId>
+	    <artifactId>kunta-api-client</artifactId>
+	    <version>0.0.2</version>
+	    <scope>compile</scope>
+	</dependency>
+	
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_3.1_spec</artifactId>
