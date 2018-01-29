@@ -17,8 +17,8 @@ public class KuntaApiClientProvider {
   @Produces
   public ApiClient produceApiClient () {
     String apiUrl = systemSettingController.getSettingValue(KuntaApiConsts.APIURL_SETTING_KEY);
-    String username = systemSettingController.getSettingValue(KuntaApiConsts.USERNAME);
-    String password = systemSettingController.getSettingValue(KuntaApiConsts.PASSWORD);
+    String username = systemSettingController.getSettingValue(KuntaApiConsts.APIUSER_SETTING_KEY);
+    String password = systemSettingController.getSettingValue(KuntaApiConsts.APIPASS_SETTING_KEY);
     
     ApiClient defaultClient = Configuration.getDefaultApiClient();
     defaultClient.setBasePath(apiUrl);

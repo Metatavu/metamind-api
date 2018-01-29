@@ -5,6 +5,7 @@ import java.util.Random;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 
 import com.bladecoder.ink.runtime.Story;
@@ -26,7 +27,7 @@ public class GetRandomNumberMetaBotFunction extends AbstractMetaBotFunction {
 
   @Override
   public String getFunctionName() {
-    return "KUNTA_API_GET_RANDOM_NUMBER";
+    return "GET_RANDOM_NUMBER";
   }
 
   @Override
@@ -36,7 +37,7 @@ public class GetRandomNumberMetaBotFunction extends AbstractMetaBotFunction {
     String scaleString = details.getFunctionParams().get("scale");
     String var = details.getFunctionParams().get("var");
 
-    int scale = Integer.parseInt(scaleString);
+    int scale = NumberUtils.toInt(scaleString);
 
     Random random = new Random();
     int rand = random.nextInt(scale);

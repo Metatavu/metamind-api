@@ -3,6 +3,7 @@ package fi.metatavu.metamind.bot.functions;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -59,17 +60,9 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
    String endAfter = details.getFunctionParams().get("endAfter"); 
    String orderBy = details.getFunctionParams().get("orderBy"); 
    String orderDir = details.getFunctionParams().get("orderDir");
-   Integer firstResult = null;
-   Integer maxResults = null;
+   Integer firstResult = NumberUtils.toInt(details.getFunctionParams().get("firstResult"));
+   Integer maxResults = NumberUtils.toInt(details.getFunctionParams().get("maxResults"));
    boolean randomResult = false;
-   
-   if (details.getFunctionParams().get("firstResult") != null) {
-     firstResult = Integer.parseInt(details.getFunctionParams().get("firstResult"));
-   }
-   
-   if (details.getFunctionParams().get("maxResults") != null) {
-     maxResults = Integer.parseInt(details.getFunctionParams().get("maxResults"));
-   }
    
    if (details.getFunctionParams().get("randomResult") != null) {
      randomResult = Boolean.parseBoolean(details.getFunctionParams().get("randomResult"));
@@ -81,7 +74,6 @@ public class KuntaApiGetEventsMetaBotFunction extends AbstractMetaBotFunction {
        result = apiInstance.listOrganizationEvents(organizationId, startBefore, startAfter, endBefore, endAfter, firstResult, maxResults, orderBy, orderDir);
    } catch (ApiException e) {
        logger.error("Exception when calling EventsApi#listOrganizationEvents", e);
-       e.printStackTrace();
    }
    
    if (result == null) {
