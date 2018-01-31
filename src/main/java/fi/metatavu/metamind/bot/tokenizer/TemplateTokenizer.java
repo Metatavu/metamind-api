@@ -7,12 +7,15 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fi.metatavu.metamind.bot.config.TokenizationConfig;
 
 /**
  * Configurable tokenizer for templates
  * 
  * @author Antti Leppä
+ * @author Heikki Kurhinen
  */
 public class TemplateTokenizer extends SimpleTokenizer {
 
@@ -33,6 +36,7 @@ public class TemplateTokenizer extends SimpleTokenizer {
     }
   }
 
+  @SuppressWarnings ("squid:S3776")
   @Override
   public String[] tokenize(String originalText) {
     String text = originalText;
@@ -40,16 +44,29 @@ public class TemplateTokenizer extends SimpleTokenizer {
     for (Entry<String, Pattern> entry : this.patterns.entrySet()) {
       Pattern pattern = entry.getValue();
       Matcher matcher = pattern.matcher(text);
+      TokenizationConfig tokenizationConfig = settings.get(entry.getKey());
+
       if (matcher.matches()) {
-        TokenizationConfig tokenizationConfig = settings.get(entry.getKey());
         if (tokenizationConfig != null) {
           if (Boolean.TRUE.equals(tokenizationConfig.getStripWhitespace())) {
-            text = text.replaceAll(" ", "");
+            text = StringUtils.deleteWhitespace(text);
           }
           
           if (Boolean.TRUE.equals(tokenizationConfig.getUntokenized())) {
             return new String[] { text };
           }
+        }
+      } else {
+        matcher = pattern.matcher(text);
+        if (matcher.find() && Boolean.TRUE.equals(tokenizationConfig.getStripWhitespace())) {
+          StringBuffer replacementBuffer = new StringBuffer(text.length());
+          matcher.appendReplacement(replacementBuffer, StringUtils.deleteWhitespace(matcher.group(0)));
+          while (matcher.find()) {
+            matcher.appendReplacement(replacementBuffer, StringUtils.deleteWhitespace(matcher.group(0)));
+          }
+  
+          matcher.appendTail(replacementBuffer);
+          text = replacementBuffer.toString();
         }
       }
     }
