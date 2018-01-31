@@ -36,6 +36,7 @@ public class TemplateTokenizer extends SimpleTokenizer {
     }
   }
 
+  @SuppressWarnings ("squid:S3776")
   @Override
   public String[] tokenize(String originalText) {
     String text = originalText;
