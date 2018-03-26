@@ -9,7 +9,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 import com.rabidgremlin.mutters.core.Tokenizer;
 
 /**
- * THIS IS A COPY OF ORIGINAL CLASS. REMOVE WHEN MUTTERS SUPPORTS FINNISH CHARACTERS ON TOKENIZATION
+ * THIS IS A COPY OF ORIGINAL CLASS. REMOVE WHEN MUTTERS SUPPORTS FINNISH CHARACTERS ON TOKENIZATION AND COMMA AS DECIMAL SEPARATOR
  */
 
 /**
@@ -57,10 +57,12 @@ public class SimpleTokenizer
     {
       boolean applyStriping = true;
       boolean applylowercasing = true;
-
+      String decimalToken = token.replaceAll(",",".");
+      
       // is it a decimal or negative number
-      if ((token.indexOf('.') != -1 || token.startsWith("-")) && isNumeric(token))
+      if ((decimalToken.indexOf('.') != -1 || decimalToken.startsWith("-")) && isNumeric(decimalToken))
       {
+        token = decimalToken;
         applyStriping = false;
       }
       else
