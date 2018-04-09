@@ -17,7 +17,6 @@ import com.rabidgremlin.mutters.core.Intent;
 import com.rabidgremlin.mutters.core.IntentMatcher;
 import com.rabidgremlin.mutters.opennlp.intent.OpenNLPTokenizer;
 import com.rabidgremlin.mutters.slots.LiteralSlot;
-import com.rabidgremlin.mutters.slots.NumberSlot;
 import com.rabidgremlin.mutters.templated.TemplatedIntent;
 import com.rabidgremlin.mutters.templated.TemplatedIntentMatcher;
 
@@ -28,6 +27,7 @@ import fi.metatavu.metamind.bot.config.RegexSlot;
 import fi.metatavu.metamind.bot.config.StoryConfig;
 import fi.metatavu.metamind.bot.config.TemplateConfig;
 import fi.metatavu.metamind.bot.config.TemplatedIntentConfig;
+import fi.metatavu.metamind.bot.slots.LocalizedNumberSlot;
 import fi.metatavu.metamind.bot.slots.RegExSlot;
 import fi.metatavu.metamind.bot.tokenizer.TemplateTokenizer;
 import fi.metatavu.metamind.persistence.models.IntentModel;
@@ -106,7 +106,7 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
   private void addIntentSlots(Intent intent, AbstractIntentConfig intentConfig) {
     if (intentConfig.getNumberSlots() != null) {
       for (String numberSlot : intentConfig.getNumberSlots()) {
-        intent.addSlot(new NumberSlot(numberSlot));
+        intent.addSlot(new LocalizedNumberSlot(numberSlot));
       }
     }
     
