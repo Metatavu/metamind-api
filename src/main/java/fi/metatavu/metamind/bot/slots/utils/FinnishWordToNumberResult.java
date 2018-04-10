@@ -14,10 +14,13 @@ public class FinnishWordToNumberResult {
   
   private String currentToken;
   
+  private boolean lastOperationWasMultiplier;
+  
   public FinnishWordToNumberResult() {
     this.temporaryResult = 0;
     this.finalResult = 0;
     this.currentToken = null;
+    this.lastOperationWasMultiplier = false;
   }
 
   /**
@@ -27,15 +30,9 @@ public class FinnishWordToNumberResult {
    * @param multiplier multiplier to multiply the result with
    */
   public void processMultiplierToken(String token, Long multiplier) {
-    if (this.temporaryResult > 0) {
-      this.temporaryResult *= multiplier;
-      this.finalResult += this.temporaryResult;
-    } else {
-      this.finalResult *= multiplier;
-    }
-
-    this.temporaryResult = 0;
-    this.currentToken = token;
+    temporaryResult *= multiplier;
+    currentToken = token;
+    lastOperationWasMultiplier = true;
   }
   
   /**
@@ -45,8 +42,13 @@ public class FinnishWordToNumberResult {
    * @param value value to add to the temporary value
    */
   public void processValueToken(String token, Long value) {
-    this.temporaryResult += value;
-    this.currentToken = token;
+    if (lastOperationWasMultiplier) {
+      finalResult += temporaryResult;
+      temporaryResult = 0;
+    }
+
+    temporaryResult += value;
+    currentToken = token;
   }
   
   /**
@@ -56,9 +58,10 @@ public class FinnishWordToNumberResult {
    * @param value value to add to the final result
    */
   public void processSingleValueToken(String token, Long value) {
-    this.finalResult += value;
-    this.temporaryResult = 0;
-    this.currentToken = token;
+    lastOperationWasMultiplier = false;
+    finalResult += value;
+    temporaryResult = 0;
+    currentToken = token;
   }
   
   /**
