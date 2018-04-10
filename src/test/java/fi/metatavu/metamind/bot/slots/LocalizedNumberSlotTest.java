@@ -21,7 +21,7 @@ public class LocalizedNumberSlotTest {
     NumberSlotTestModels testModels = objectMapper.readValue(getClass().getClassLoader().getResourceAsStream("fi/metatavu/metamind/bot/slots/number-slot-tests.json"), NumberSlotTestModels.class);
     LocalizedNumberSlot localizedNumberSlot = new LocalizedNumberSlot("test");
     
-    testModels.getFi().forEach((testModel) -> {
+    testModels.getFi().forEach(testModel -> {
       SlotMatch match = localizedNumberSlot.match(testModel.getInput(), null);
       assertNotNull(match);
       assertEquals(testModel.getExpect(), match.getValue());
@@ -34,7 +34,7 @@ public class LocalizedNumberSlotTest {
     NumberSlotTestModels testModels = objectMapper.readValue(getClass().getClassLoader().getResourceAsStream("fi/metatavu/metamind/bot/slots/number-slot-tests.json"), NumberSlotTestModels.class);
     LocalizedNumberSlot localizedNumberSlot = new LocalizedNumberSlot("test");
     
-    testModels.getEn().forEach((testModel) -> {
+    testModels.getEn().forEach(testModel -> {
       SlotMatch match = localizedNumberSlot.match(testModel.getInput(), null);
       assertNotNull(match);
       assertEquals(testModel.getExpect(), match.getValue());

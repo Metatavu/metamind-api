@@ -10,6 +10,10 @@ public class FinnishStringToNumberUtils {
 
   private static final int MAX_TOKENS = 100;
   
+  private FinnishStringToNumberUtils() {
+    // Private constructor
+  }
+  
   /**
    * Converts finnish word string to number
    * 
