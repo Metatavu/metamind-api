@@ -48,6 +48,7 @@ public class LocalizedNumberSlot extends NumberSlot {
     }
   }
   
+  @SuppressWarnings("squid:S1301")
   private Number localizedWordStringToNumber(String token) {
     for (String language : SUPPORTED_LANGUAGES) {
       Number result = null;
@@ -58,6 +59,8 @@ public class LocalizedNumberSlot extends NumberSlot {
         case "english":
           result = englishWordStringToNumber(token);
         break;
+        default:
+          return null;
       }
       
       if (result != null) {
