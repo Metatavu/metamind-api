@@ -1,5 +1,6 @@
 {
   "fi": [
+    {"input": "kolmemiljoonaa", "expect": 3000000},
     {"input": "kuusisataatuhatta", "expect": 600000},
     {"input": "neljätoista", "expect": 14},
     {"input": "miljoona neljäsataatuhatta", "expect": 1400000},
