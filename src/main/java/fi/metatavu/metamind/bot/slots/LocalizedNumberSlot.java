@@ -75,6 +75,7 @@ public class LocalizedNumberSlot extends NumberSlot {
     return wordStringToNumber(token);
   }
   
+  @SuppressWarnings("squid:S3776") //It is complex
   private Number finnishWordStringToNumber(String token) {
     if (token == null || token.length() < 1)
     {
@@ -165,7 +166,6 @@ public class LocalizedNumberSlot extends NumberSlot {
     }
     
     finalResult += result;
-    result = 0;
     return finalResult;
   }
 
