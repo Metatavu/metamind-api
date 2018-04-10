@@ -1,0 +1,12 @@
+{
+  "fi": [
+    {"input": "kuusisataatuhatta", "expect": 600000},
+    {"input": "neljätoista", "expect": 14},
+    {"input": "neljä tuhatta-viisikymmentäkaksi", "expect": 4052},
+    {"input": "miljoona neljätoistatuhattakolmesataakuusikymmentäyksi", "expect": 1014361},
+    {"input": "kaksi", "expect": 2}
+  ],
+  "en": [
+    {"input": "kuusisaataatuhatta", "expect": 600000}
+  ]
+}
