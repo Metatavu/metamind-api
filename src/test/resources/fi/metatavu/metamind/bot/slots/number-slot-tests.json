@@ -1,0 +1,37 @@
+{
+  "fi": [
+    {"input": "kolmemiljoonaa", "expect": 3000000},
+    {"input": "kuusisataatuhatta", "expect": 600000},
+    {"input": "neljätoista", "expect": 14},
+    {"input": "miljoona neljäsataatuhatta", "expect": 1400000},
+    {"input": "tuhatkahdeksansataa", "expect": 1800},
+    {"input": "neljä tuhatta-viisikymmentäkaksi", "expect": 4052},
+    {"input": "miljoona neljätoistatuhattakolmesataakuusikymmentäyksi", "expect": 1014361},
+    {"input": "kaksi", "expect": 2},
+    {"input": "yhdeksän", "expect": 9},
+    {"input": "kahdeksankymmentäyksi", "expect": 81},
+    {"input": "seitsemänsataaneljäkymmentäkolme", "expect": 743},
+    {"input": "nolla", "expect": 0},
+    {"input": "satakuusikymmentä", "expect": 160},
+    {"input": "satatuhatta", "expect": 100000},
+    {"input": "satayhdeksänkymmentäkolme", "expect": 193},
+    {"input": "satakahdeksankymmentä", "expect": 180},
+    {"input": "sataseitsemänkymmentätuhatta", "expect": 170000},
+    {"input": "sataviisikymmentäyksituhatta", "expect": 151000},
+    {"input": "sataneljäkymmentä", "expect": 140},
+    {"input": "satakolmekymmentä", "expect": 130},
+    {"input": "satakaksikymmentä", "expect": 120},
+    {"input": "satakymmenen", "expect": 110},
+    {"input": "satakuusi", "expect": 106},
+    {"input": "sataneljätoista tuhatta", "expect": 114000}
+  ],
+  "en": [
+    {"input": "one hundred and fifty two", "expect": 152},
+    {"input": "one", "expect": 1},
+    {"input": "two", "expect": 2},
+    {"input": "sixteen", "expect": 16},
+    {"input": "sixteen hundred", "expect": 1600},
+    {"input": "ten", "expect": 10},
+    {"input": "twenty", "expect": 20}
+  ]
+}

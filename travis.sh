@@ -2,7 +2,7 @@
 
 if [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ $TRAVIS_BRANCH != "master" ] && [ -n "${GITHUB_TOKEN}" ] && [ -n "${SONAR_TOKEN}" ]; then
   echo "Pull request"
-  mvn clean install
+  mvn clean test -DrepoToken=$COVERALLS_TOKEN -DskipCoverage=false
   TEST_STATUS=$?
   PROJECT_VERSION=`cat pom.xml|grep version -m 1|sed -e 's/.*<version>//'|sed -e 's/<.*//'`
     
