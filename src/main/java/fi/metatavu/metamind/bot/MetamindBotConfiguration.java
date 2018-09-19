@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.bot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ import com.rabidgremlin.mutters.slots.LiteralSlot;
 import com.rabidgremlin.mutters.templated.TemplatedIntent;
 import com.rabidgremlin.mutters.templated.TemplatedIntentMatcher;
 
+import fi.metatavu.metamind.bot.MultiIntentMatcher;
 import fi.metatavu.metamind.bot.config.AbstractIntentConfig;
 import fi.metatavu.metamind.bot.config.MachineLearningConfig;
 import fi.metatavu.metamind.bot.config.MachineLearningIntentConfig;
@@ -40,45 +42,47 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
   
   private StoryConfig config;
   private List<InkBotFunction> functions;
-  private IntentModel intentModel;
+  private List<IntentModel> intentModels;
   private Map<String, SlotModel> slotModels;
   private String storyJson;
   
-  public MetamindBotConfiguration(StoryConfig config, List<InkBotFunction> functions, String storyJson, IntentModel intentModel, Map<String, SlotModel> slotModels) {
+  public MetamindBotConfiguration(StoryConfig config, List<InkBotFunction> functions, String storyJson, List<IntentModel> intentModels, Map<String, SlotModel> slotModels) {
     this.config = config;
     this.functions = functions;
     this.storyJson = storyJson;
-    this.intentModel = intentModel;
+    this.intentModels = intentModels;
     this.slotModels = slotModels;
   }
   
   @Override
   public IntentMatcher getIntentMatcher() {
-    MachineLearningConfig machineLearning = config.getMachineLearning();
+    List<MachineLearningConfig> machineLearnings = config.getMachineLearning();
     TemplateConfig templateConfig = config.getTemplate();
     TemplatedIntentMatcher templatedIntentMatcher = new TemplatedIntentMatcher(new TemplateTokenizer(templateConfig.getTokenization()));
     
     OpenNLPTokenizer tokenizer = new OpenNLPTokenizer(WhitespaceTokenizer.INSTANCE);
     OpenNLPSlotMatcher slotMatcher = new OpenNLPSlotMatcher(tokenizer);
     
-    for (Entry<String, String> slotModelEntry : machineLearning.getSlotModels().entrySet()) {
-      String slotName = slotModelEntry.getKey();
-      String nerModel = slotModelEntry.getValue();
-      SlotModel slotModel = slotModels.get(nerModel);
-      if (slotModel != null) {
-        slotMatcher.addSlotModel(slotName, slotModel);
-      } else {
-        if (logger.isWarnEnabled()) {
-          logger.warn(String.format("Could not find slotModel %s", nerModel));
+    for (MachineLearningConfig machineLearning : machineLearnings) {
+      for (Entry<String, String> slotModelEntry : machineLearning.getSlotModels().entrySet()) {
+        String slotName = slotModelEntry.getKey();
+        String nerModel = slotModelEntry.getValue();
+        SlotModel slotModel = slotModels.get(nerModel);
+        if (slotModel != null) {
+          slotMatcher.addSlotModel(slotName, slotModel);
+        } else {
+          if (logger.isWarnEnabled()) {
+            logger.warn(String.format("Could not find slotModel %s", nerModel));
+          }
         }
-      }
+      } 
     }
     
-    OpenNLPIntentMatcher machineLearningIntentMatcher = getIntentMatcher(intentModel, tokenizer, slotMatcher);
+    List<OpenNLPIntentMatcher> matchers = getIntentMatchers(intentModels, tokenizer, slotMatcher);
     createTemplateIntents(templateConfig, templatedIntentMatcher);
-    createMachineLearningIntents(machineLearning, machineLearningIntentMatcher);
+    createMachineLearningIntents(machineLearnings, matchers);
 
-    return new CompoundIntentMatcher(templatedIntentMatcher, machineLearningIntentMatcher);
+    return new MultiIntentMatcher(matchers, templatedIntentMatcher);
   }
 
   private void createTemplateIntents(TemplateConfig templateConfig, TemplatedIntentMatcher templatedIntentMatcher) {
@@ -91,15 +95,19 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
     }
   }
 
-  private void createMachineLearningIntents(MachineLearningConfig machineLearning,
-      OpenNLPIntentMatcher machineLearningIntentMatcher) {
-    for (Entry<String, MachineLearningIntentConfig> machineLearningIntentEntry : machineLearning.getIntents().entrySet()) {
-      String intentName = machineLearningIntentEntry.getKey();
-      MachineLearningIntentConfig intentConfig = machineLearningIntentEntry.getValue();
-      
-      Intent intent = new Intent(intentName);
-      addIntentSlots(intent, intentConfig);
-      machineLearningIntentMatcher.addIntent(intent);
+  private void createMachineLearningIntents(List<MachineLearningConfig> machineLearnings,
+      List<OpenNLPIntentMatcher> machineLearningIntentMatchers) {
+    for (MachineLearningConfig machineLearning : machineLearnings) {
+      for (OpenNLPIntentMatcher machineLearningIntentMatcher : machineLearningIntentMatchers) {
+        for (Entry<String, MachineLearningIntentConfig> machineLearningIntentEntry : machineLearning.getIntents().entrySet()) {
+          String intentName = machineLearningIntentEntry.getKey();
+          MachineLearningIntentConfig intentConfig = machineLearningIntentEntry.getValue();
+          
+          Intent intent = new Intent(intentName);
+          addIntentSlots(intent, intentConfig);
+          machineLearningIntentMatcher.addIntent(intent);
+        }
+      }
     }
   }
   
@@ -123,8 +131,14 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
     } 
   }
   
-  private OpenNLPIntentMatcher getIntentMatcher(IntentModel intentModel, OpenNLPTokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
-    return new OpenNLPIntentMatcher(intentModel, tokenizer, slotMatcher, 0.75f, -1);
+  private List<OpenNLPIntentMatcher> getIntentMatchers(List<IntentModel> intentModels, OpenNLPTokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
+    List<OpenNLPIntentMatcher> openNLPIntentMatchers = new ArrayList<OpenNLPIntentMatcher>();
+    
+    for (IntentModel intentModel : intentModels) {
+      openNLPIntentMatchers.add(new OpenNLPIntentMatcher(intentModel, tokenizer, slotMatcher, 0.75f, -1));
+    }
+    
+    return openNLPIntentMatchers;
   }
 
   @Override

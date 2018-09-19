@@ -1,12 +1,13 @@
 package fi.metatavu.metamind.bot.config;
 
+import java.util.List;
 import java.util.Map;
 
 public class StoryConfig {
 
   private Integer maxAttemptsBeforeConfused;
   private String confusedKnotName;
-  private MachineLearningConfig machineLearning;
+  private List<MachineLearningConfig> machineLearnings;
   private TemplateConfig template;
   private Map<String, String> globalIntents;
  
@@ -18,12 +19,12 @@ public class StoryConfig {
     this.template = template;
   }
   
-  public MachineLearningConfig getMachineLearning() {
-    return machineLearning;
+  public List<MachineLearningConfig> getMachineLearning() {
+    return machineLearnings;
   }
   
-  public void setMachineLearning(MachineLearningConfig machineLearning) {
-    this.machineLearning = machineLearning;
+  public void setMachineLearning(List<MachineLearningConfig> machineLearnings) {
+    this.machineLearnings = machineLearnings;
   }
   
   public String getConfusedKnotName() {
