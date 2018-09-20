@@ -111,13 +111,13 @@ public class BotController {
     String storyJson = story.getStoryJson();
     
     Map<String, SlotModel> slotModels = new HashMap<>();
-    List<IntentModel> intentModels = new ArrayList<IntentModel>();
+    List<IntentModel> intentModels = new ArrayList<>();
     List<MachineLearningConfig> machineLearningConfigs = storyConfig.getMachineLearning();
     
     if (storyConfig.getMachineLearning() != null) {
       loadSlotModels(storyConfig, slotModels);
       
-      List<String> intentModelNames = new ArrayList<String>();
+      List<String> intentModelNames = new ArrayList<>();
       
       for (MachineLearningConfig machineLearningConfig : machineLearningConfigs) {
         intentModelNames.add(machineLearningConfig.getIntentModel());

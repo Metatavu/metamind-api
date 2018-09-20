@@ -132,7 +132,7 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
   }
   
   private List<OpenNLPIntentMatcher> getIntentMatchers(List<IntentModel> intentModels, OpenNLPTokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
-    List<OpenNLPIntentMatcher> openNLPIntentMatchers = new ArrayList<OpenNLPIntentMatcher>();
+    List<OpenNLPIntentMatcher> openNLPIntentMatchers = new ArrayList<>();
     
     for (IntentModel intentModel : intentModels) {
       openNLPIntentMatchers.add(new OpenNLPIntentMatcher(intentModel, tokenizer, slotMatcher, 0.75f, -1));

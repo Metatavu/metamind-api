@@ -36,9 +36,7 @@ public class MultiIntentMatcher implements IntentMatcher {
       }
     }
     
-    if (match == null) {
-      match = templateMatcher.match(utterance, context, expectedIntents, debugValues);
-    }
+    match = templateMatcher.match(utterance, context, expectedIntents, debugValues);
     
     return match;
   }
