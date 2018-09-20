@@ -16,7 +16,8 @@ public class MultiIntentMatcher implements IntentMatcher {
   /**
    * Constructor for the class.
    * 
-   * @param matchers List of matchers.
+   * @param matchers List of intent matchers.
+   * @param templateMatcher templated intent matcher
    */
   public MultiIntentMatcher(List<OpenNLPIntentMatcher> matchers, IntentMatcher templateMatcher) {
     this.matchers = matchers;
