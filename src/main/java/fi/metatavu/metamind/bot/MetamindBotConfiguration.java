@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.rabidgremlin.mutters.bot.ink.InkBotConfiguration;
 import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
-import com.rabidgremlin.mutters.core.CompoundIntentMatcher;
 import com.rabidgremlin.mutters.core.Intent;
 import com.rabidgremlin.mutters.core.IntentMatcher;
 import com.rabidgremlin.mutters.opennlp.intent.OpenNLPTokenizer;
