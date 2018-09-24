@@ -7,7 +7,7 @@ public class StoryConfig {
 
   private Integer maxAttemptsBeforeConfused;
   private String confusedKnotName;
-  private List<MachineLearningConfig> machineLearnings;
+  private List<MachineLearningConfig> machineLearningConfigs;
   private TemplateConfig template;
   private Map<String, String> globalIntents;
  
@@ -20,11 +20,11 @@ public class StoryConfig {
   }
   
   public List<MachineLearningConfig> getMachineLearning() {
-    return machineLearnings;
+    return machineLearningConfigs;
   }
   
-  public void setMachineLearning(List<MachineLearningConfig> machineLearnings) {
-    this.machineLearnings = machineLearnings;
+  public void setMachineLearning(List<MachineLearningConfig> machineLearningConfigs) {
+    this.machineLearningConfigs = machineLearningConfigs;
   }
   
   public String getConfusedKnotName() {

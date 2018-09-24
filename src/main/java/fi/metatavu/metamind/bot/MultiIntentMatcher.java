@@ -8,6 +8,12 @@ import com.rabidgremlin.mutters.core.Context;
 import com.rabidgremlin.mutters.core.IntentMatch;
 import com.rabidgremlin.mutters.core.IntentMatcher;
 
+/**
+ * Class for intent matching with support of multiple binary files.
+ * 
+ * @author villekoivukangas
+ *
+ */
 public class MultiIntentMatcher implements IntentMatcher {
 
   private List<OpenNLPIntentMatcher> matchers;
