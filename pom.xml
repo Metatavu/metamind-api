@@ -79,6 +79,10 @@
     <!-- Freemarker -->
     
     <freemarker.version>2.3.23</freemarker.version>
+
+    <!-- Beer API -->    
+    
+    <beer-api-client.version>0.0.5</beer-api-client.version>
     
     <!-- Test -->
     
@@ -360,7 +364,15 @@
       <artifactId>mailgun</artifactId>
       <version>${sargue-mailgun.version}</version>
     </dependency>
-
+    
+    <!-- Beer API -->
+    
+    <dependency>
+      <groupId>fi.metatavu.beer</groupId>
+      <artifactId>beer-api-client</artifactId>
+      <version>${beer-api-client.version}</version>
+    </dependency>
+    
     <!-- Freemarker -->
     
     <dependency>
