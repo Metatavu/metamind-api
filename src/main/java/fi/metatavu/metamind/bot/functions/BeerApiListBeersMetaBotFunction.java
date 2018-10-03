@@ -1,20 +1,19 @@
 package fi.metatavu.metamind.bot.functions;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-
-import java.util.List;
-import java.util.Map;
-
 import com.bladecoder.ink.runtime.Story;
 import com.rabidgremlin.mutters.bot.ink.CurrentResponse;
-import com.rabidgremlin.mutters.bot.ink.functions.FunctionDetails;
-import com.rabidgremlin.mutters.bot.ink.functions.FunctionHelper;
 import com.rabidgremlin.mutters.core.IntentMatch;
 import com.rabidgremlin.mutters.core.session.Session;
+
+import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
 
 import fi.metatavu.beer.ApiClient;
 import fi.metatavu.beer.client.BarBeersApi;
@@ -42,14 +41,7 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
 
   @Override
   public void execute(CurrentResponse currentResponse, Session session, IntentMatch intentMatch, Story story, String param) {
-    FunctionDetails details = FunctionHelper.parseFunctionString(param);
-
-    if (details == null) {
-      logger.error("Function parameters is null at BEER_API_LIST_BEERS");
-      return;
-    }
-    
-    Map<String, String> functionParams = details.getFunctionParams();
+    Map<String, String> functionParams = getParsedParam(param);
     String variableName = functionParams.get("variable");
     String barId = functionParams.get("barId");
     String searchFlavors = functionParams.get("searchFlavors");
@@ -62,7 +54,7 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
     List<Beer> beers = barBeersApi.listBeers(barId, searchFlavors, sort, firstResult, maxResults);
     
     try {
-      story.getVariablesState().set(variableName, beers);
+      story.getVariablesState().set(variableName, beers.stream().map(beer -> String.valueOf(beer.getId())).collect(Collectors.joining("|")));
     } catch (Exception e) {
       logger.error("Could not set variable state", e);
       return;
@@ -81,7 +73,7 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
     String host = storyController.getGlobalStoryVariable(metamindStory, "beer-api-host");
     Integer port = NumberUtils.createInteger(storyController.getGlobalStoryVariable(metamindStory, "beer-api-port"));
 
-    String basePath = String.format("http://%s:%d/v1", host, port);
+    String basePath = String.format("%s:%d/rest/v1", host, port);
     apiClient.setBasePath(basePath);
     return apiClient;
   }
