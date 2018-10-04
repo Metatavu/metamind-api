@@ -12,12 +12,14 @@ import com.rabidgremlin.mutters.bot.ink.CurrentResponse;
 import com.rabidgremlin.mutters.core.IntentMatch;
 import com.rabidgremlin.mutters.core.session.Session;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 
 import fi.metatavu.beer.ApiClient;
 import fi.metatavu.beer.client.BarBeersApi;
 import fi.metatavu.beer.client.Beer;
+import fi.metatavu.beer.client.BarBeersApi.ListBeersQueryParams;
 import fi.metatavu.metamind.story.StoryController;
 
 /**
@@ -44,13 +46,18 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
     Map<String, String> functionParams = getParsedParam(param);
     String variableName = functionParams.get("variable");
     String barId = functionParams.get("barId");
-    String searchFlavors = functionParams.get("searchFlavors");
+    String preferFlavorsVariable = functionParams.get("preferFlavors");
+    String preferFlavors = getVariableString(story, preferFlavorsVariable);
+    Float minAbv = getVariableFloat(story, "minAbv");
+    Float maxAbv = getVariableFloat(story, "maxAbv");
     List<String> sort = null;
     Long firstResult = NumberUtils.createLong(functionParams.get("firstResult"));
     Long maxResults = NumberUtils.createLong(functionParams.get("maxResults"));
     
     ApiClient apiClient = getApiClient(getMetamindStory(session));
     BarBeersApi barBeersApi = apiClient.buildClient(BarBeersApi.class);
+    ListBeersQueryParams params = new ListBeersQueryParams();
+    params.preferFlavors(StringUtils.stripStart(preferFlavors, ",").str)
     List<Beer> beers = barBeersApi.listBeers(barId, searchFlavors, sort, firstResult, maxResults);
     
     try {
@@ -76,5 +83,9 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
     String basePath = String.format("%s:%d/rest/v1", host, port);
     apiClient.setBasePath(basePath);
     return apiClient;
+  }
+
+  private String getCommaDelimetedVariable(String variableName) {
+
   }
 }

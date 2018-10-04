@@ -82,7 +82,7 @@
 
     <!-- Beer API -->    
     
-    <beer-api-client.version>0.0.5</beer-api-client.version>
+    <beer-api-client.version>0.0.11</beer-api-client.version>
 
     <!-- Optimaize language detector -->
 
