@@ -65,6 +65,13 @@ public class BeerApiBeerInfoMetaBotFunction extends AbstractMetaBotFunction {
     String rateBeerOverallScoreVariable = functionParams.get("rateBeerOverallScore");
     String rateBeerStyleScoreVariable = functionParams.get("rateBeerStyleScore");
 
+    getBeerInfo(session, story, barId, beerId, nameVariable, descriptionVariable, abvVariable, ibuVariable, styleVariable, breweryVariable, caloriesVariable,
+        flavorsVariable, imagesVariable, untappdRatingVariable, rateBeerOverallScoreVariable, rateBeerStyleScoreVariable);
+  }
+
+  private void getBeerInfo(Session session, Story story, String barId, String beerId, String nameVariable, String descriptionVariable, String abvVariable,
+      String ibuVariable, String styleVariable, String breweryVariable, String caloriesVariable, String flavorsVariable, String imagesVariable,
+      String untappdRatingVariable, String rateBeerOverallScoreVariable, String rateBeerStyleScoreVariable) {
     try {
       ApiClient apiClient = getApiClient(getMetamindStory(session));
       BarBeersApi barBeersApi = apiClient.buildClient(BarBeersApi.class);
@@ -74,57 +81,62 @@ public class BeerApiBeerInfoMetaBotFunction extends AbstractMetaBotFunction {
         return;
       }
 
-      if (nameVariable != null && beer.getName() != null) {
-        story.getVariablesState().set(nameVariable, beer.getName());
-      }
-
-      if (descriptionVariable != null && beer.getDescription() != null) {
-        story.getVariablesState().set(descriptionVariable, beer.getDescription());
-      }
-
-      if (abvVariable != null && beer.getAbv() != null) {
-        story.getVariablesState().set(abvVariable, beer.getAbv());
-      }
-
-      if (ibuVariable != null && beer.getIbu() != null) {
-        story.getVariablesState().set(ibuVariable, formatDouble(beer.getIbu()));
-      }
-
-      if (styleVariable != null && beer.getStyle() != null) {
-        story.getVariablesState().set(styleVariable, beer.getStyle());
-      }
-
-      if (breweryVariable != null && beer.getBrewery() != null) {
-        story.getVariablesState().set(breweryVariable, beer.getBrewery());
-      }
-
-      if (caloriesVariable != null && beer.getCalories() != null) {
-        story.getVariablesState().set(caloriesVariable, beer.getCalories());
-      }
-
-      if (flavorsVariable != null && beer.getFlavors() != null && !beer.getFlavors().isEmpty()) {
-        story.getVariablesState().set(flavorsVariable, String.join(", ", beer.getFlavors()));
-      }
-
-      if (imagesVariable != null && beer.getImages() != null && !beer.getImages().isEmpty()) {
-        story.getVariablesState().set(imagesVariable, beer.getImages().stream().map(BeerImage::getMedium).collect(Collectors.joining("|")));
-      }
-
-      if (untappdRatingVariable != null && beer.getUntappdRating() != null) {
-        story.getVariablesState().set(untappdRatingVariable, formatBeerRating(beer.getUntappdRating()));
-      }
-
-      if (rateBeerOverallScoreVariable != null && beer.getRateBeerOverallScore() != null) {
-        story.getVariablesState().set(rateBeerOverallScoreVariable, formatBeerRating(beer.getRateBeerOverallScore()));
-      }
-
-      if (rateBeerStyleScoreVariable != null && beer.getRateBeerStyleScore() != null) {
-        story.getVariablesState().set(rateBeerStyleScoreVariable, formatBeerRating(beer.getRateBeerStyleScore()));
-      }
-
+      printBeerInfo(story, nameVariable, descriptionVariable, abvVariable, ibuVariable, styleVariable, breweryVariable, caloriesVariable, flavorsVariable,
+          imagesVariable, untappdRatingVariable, rateBeerOverallScoreVariable, rateBeerStyleScoreVariable, beer);
     } catch (Exception e) {
       logger.error("Could not set variable states", e);
-      return;
+    }
+  }
+
+  private void printBeerInfo(Story story, String nameVariable, String descriptionVariable, String abvVariable, String ibuVariable, String styleVariable,
+      String breweryVariable, String caloriesVariable, String flavorsVariable, String imagesVariable, String untappdRatingVariable,
+      String rateBeerOverallScoreVariable, String rateBeerStyleScoreVariable, Beer beer) throws Exception {
+    if (nameVariable != null && beer.getName() != null) {
+      story.getVariablesState().set(nameVariable, beer.getName());
+    }
+
+    if (descriptionVariable != null && beer.getDescription() != null) {
+      story.getVariablesState().set(descriptionVariable, beer.getDescription());
+    }
+
+    if (abvVariable != null && beer.getAbv() != null) {
+      story.getVariablesState().set(abvVariable, beer.getAbv());
+    }
+
+    if (ibuVariable != null && beer.getIbu() != null) {
+      story.getVariablesState().set(ibuVariable, formatDouble(beer.getIbu()));
+    }
+
+    if (styleVariable != null && beer.getStyle() != null) {
+      story.getVariablesState().set(styleVariable, beer.getStyle());
+    }
+
+    if (breweryVariable != null && beer.getBrewery() != null) {
+      story.getVariablesState().set(breweryVariable, beer.getBrewery());
+    }
+
+    if (caloriesVariable != null && beer.getCalories() != null) {
+      story.getVariablesState().set(caloriesVariable, beer.getCalories());
+    }
+
+    if (flavorsVariable != null && beer.getFlavors() != null && !beer.getFlavors().isEmpty()) {
+      story.getVariablesState().set(flavorsVariable, String.join(", ", beer.getFlavors()));
+    }
+
+    if (imagesVariable != null && beer.getImages() != null && !beer.getImages().isEmpty()) {
+      story.getVariablesState().set(imagesVariable, beer.getImages().stream().map(BeerImage::getMedium).collect(Collectors.joining("|")));
+    }
+
+    if (untappdRatingVariable != null && beer.getUntappdRating() != null) {
+      story.getVariablesState().set(untappdRatingVariable, formatBeerRating(beer.getUntappdRating()));
+    }
+
+    if (rateBeerOverallScoreVariable != null && beer.getRateBeerOverallScore() != null) {
+      story.getVariablesState().set(rateBeerOverallScoreVariable, formatBeerRating(beer.getRateBeerOverallScore()));
+    }
+
+    if (rateBeerStyleScoreVariable != null && beer.getRateBeerStyleScore() != null) {
+      story.getVariablesState().set(rateBeerStyleScoreVariable, formatBeerRating(beer.getRateBeerStyleScore()));
     }
   }
   
@@ -155,6 +167,12 @@ public class BeerApiBeerInfoMetaBotFunction extends AbstractMetaBotFunction {
     return String.format("%d / %d", Math.round(rating.getRate()), Math.round(rating.getScale()));
   }
 
+  /**
+   * Formats double as string
+   * 
+   * @param value value
+   * @return formatted value
+   */
   private String formatDouble(Double value) {
     if (value == null) {
       return "";

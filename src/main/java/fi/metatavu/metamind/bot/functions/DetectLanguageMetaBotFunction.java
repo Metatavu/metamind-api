@@ -5,21 +5,21 @@ import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
-
-import fi.metatavu.metamind.bot.utils.TextLanguageDetector;
 
 import com.bladecoder.ink.runtime.Story;
 import com.rabidgremlin.mutters.bot.ink.CurrentResponse;
 import com.rabidgremlin.mutters.core.IntentMatch;
 import com.rabidgremlin.mutters.core.session.Session;
 
+import fi.metatavu.metamind.bot.utils.TextLanguageDetector;
+
 /**
  * Metabot function for detecting language from text
  * 
  * @author Heikki Kurhinen
  */
+@SuppressWarnings ("squid:S2245")
 @ApplicationScoped
 public class DetectLanguageMetaBotFunction extends AbstractMetaBotFunction {
 
@@ -49,7 +49,6 @@ public class DetectLanguageMetaBotFunction extends AbstractMetaBotFunction {
         setVariable(story, targetVariableName, language != null ? language : "");
       } catch (Exception e) {
         logger.error("Could not set variable state", e);
-        return;
       }
     }
   }

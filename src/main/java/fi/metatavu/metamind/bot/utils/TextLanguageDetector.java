@@ -19,6 +19,7 @@ import com.optimaize.langdetect.text.TextObjectFactory;
 * @author Ville Koivukangas
 * @author Heikki Kurhinen
 */
+@SuppressWarnings ("squid:S3008")
 public class TextLanguageDetector {
 	
   private static TextLanguageDetector INSTANCE = null;
