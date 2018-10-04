@@ -111,7 +111,8 @@ public class BotController {
     String storyJson = story.getStoryJson();
     
     Map<String, SlotModel> slotModels = new HashMap<>();
-    List<IntentModel> intentModels = new ArrayList<>();
+    Map<String, IntentModel> intentModels = new HashMap<>();
+    
     List<MachineLearningConfig> machineLearningConfigs = storyConfig.getMachineLearning();
     
     if (storyConfig.getMachineLearning() != null) {
@@ -124,13 +125,13 @@ public class BotController {
       }
       
       for (String intentModelName : intentModelNames) {
-        if (intentModelName != null) {
+        if (intentModelName != null && !intentModels.containsKey(intentModelName)) {
           IntentModel intentModel = modelsContoller.findIntentModelByName(String.format("%s.bin", intentModelName));
           
           if (intentModel == null && logger.isWarnEnabled()) {
             logger.warn(String.format("Failed to load intent model %s", intentModelName));
           } else {
-            intentModels.add(intentModel);
+            intentModels.put(intentModelName, intentModel);
           }
         }
       }

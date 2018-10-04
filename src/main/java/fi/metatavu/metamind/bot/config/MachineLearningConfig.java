@@ -4,6 +4,7 @@ import java.util.Map;
 
 public class MachineLearningConfig {
 
+  private Boolean ignoreIntentCase;
   private String intentModel;
   private Map<String, MachineLearningIntentConfig> intents;
   private Map<String, String> slotModels;
@@ -30,6 +31,14 @@ public class MachineLearningConfig {
   
   public void setIntentModel(String intentModel) {
     this.intentModel = intentModel;
+  }
+  
+  public Boolean getIgnoreIntentCase() {
+    return ignoreIntentCase;
+  }
+  
+  public void setIgnoreIntentCase(Boolean ignoreIntentCase) {
+    this.ignoreIntentCase = ignoreIntentCase;
   }
   
 }
