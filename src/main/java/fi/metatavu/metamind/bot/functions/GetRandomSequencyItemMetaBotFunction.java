@@ -29,6 +29,7 @@ public class GetRandomSequencyItemMetaBotFunction extends AbstractMetaBotFunctio
   }
 
   @Override
+  @SuppressWarnings ("squid:S2245")
   public void execute(CurrentResponse currentResponse, Session session, IntentMatch intentMatch, Story story,
       String paramString) {
 

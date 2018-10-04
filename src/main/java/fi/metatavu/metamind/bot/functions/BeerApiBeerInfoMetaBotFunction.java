@@ -89,6 +89,7 @@ public class BeerApiBeerInfoMetaBotFunction extends AbstractMetaBotFunction {
     }
   }
 
+  @SuppressWarnings ({"squid:S3776", "squid:S00112"})
   private void printBeerInfo(Story story, String nameVariable, String descriptionVariable, String abvVariable, String ibuVariable, String styleVariable,
       String breweryVariable, String caloriesVariable, String flavorsVariable, String imagesVariable, String untappdRatingVariable,
       String rateBeerOverallScoreVariable, String rateBeerStyleScoreVariable, Beer beer) throws Exception {
