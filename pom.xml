@@ -83,6 +83,10 @@
     <!-- Beer API -->    
     
     <beer-api-client.version>0.0.5</beer-api-client.version>
+
+    <!-- Optimaize language detector -->
+
+    <optimaize-languagedetector.version>0.6</optimaize-languagedetector.version>
     
     <!-- Test -->
     
@@ -389,6 +393,14 @@
       <scope>provided</scope>
     </dependency>
     
+    <!-- Optimaize language detector -->
+
+    <dependency>
+      <groupId>com.optimaize.languagedetector</groupId>
+      <artifactId>language-detector</artifactId>
+      <version>${optimaize-languagedetector.version}</version>
+    </dependency>
+
     <!-- Test -->
 
     <dependency>
