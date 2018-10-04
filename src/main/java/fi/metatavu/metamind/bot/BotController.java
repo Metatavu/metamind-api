@@ -114,32 +114,34 @@ public class BotController {
     Map<String, IntentModel> intentModels = new HashMap<>();
     
     List<MachineLearningConfig> machineLearningConfigs = storyConfig.getMachineLearning();
-    
     if (storyConfig.getMachineLearning() != null) {
-      loadSlotModels(storyConfig, slotModels);
-      
-      List<String> intentModelNames = new ArrayList<>();
-      
-      for (MachineLearningConfig machineLearningConfig : machineLearningConfigs) {
-        intentModelNames.add(machineLearningConfig.getIntentModel());
-      }
-      
-      for (String intentModelName : intentModelNames) {
-        if (intentModelName != null && !intentModels.containsKey(intentModelName)) {
-          IntentModel intentModel = modelsContoller.findIntentModelByName(String.format("%s.bin", intentModelName));
-          
-          if (intentModel == null && logger.isWarnEnabled()) {
-            logger.warn(String.format("Failed to load intent model %s", intentModelName));
-          } else {
-            intentModels.put(intentModelName, intentModel);
-          }
-        }
-      }
+      loadSlotModels(storyConfig, slotModels);  
+      loadIntentModels(machineLearningConfigs, intentModels);
     }
     
     MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(storyConfig, functions, storyJson, intentModels, slotModels);
     
     return new MetamindBot(botConfiguration);
+  }
+
+  private void loadIntentModels(List<MachineLearningConfig> machineLearningConfigs, Map<String, IntentModel> intentModels) {
+    List<String> intentModelNames = new ArrayList<>();
+    
+    for (MachineLearningConfig machineLearningConfig : machineLearningConfigs) {
+      intentModelNames.add(machineLearningConfig.getIntentModel());
+    }
+    
+    for (String intentModelName : intentModelNames) {
+      if (intentModelName != null && !intentModels.containsKey(intentModelName)) {
+        IntentModel intentModel = modelsContoller.findIntentModelByName(String.format("%s.bin", intentModelName));
+        
+        if (intentModel == null && logger.isWarnEnabled()) {
+          logger.warn(String.format("Failed to load intent model %s", intentModelName));
+        } else {
+          intentModels.put(intentModelName, intentModel);
+        }
+      }
+    }
   }
 
   protected void loadSlotModels(StoryConfig storyConfig, Map<String, SlotModel> slotModels) {
