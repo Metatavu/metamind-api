@@ -28,6 +28,7 @@ import fi.metatavu.metamind.story.StoryController;
  * @author Heikki Kurhinen
  */
 @ApplicationScoped
+@SuppressWarnings ("squid:S00107")
 public class BeerApiBeerInfoMetaBotFunction extends AbstractMetaBotFunction {
 
   @Inject
