@@ -15,6 +15,7 @@ import com.rabidgremlin.mutters.bot.ink.InkBotConfiguration;
 import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
 import com.rabidgremlin.mutters.core.Intent;
 import com.rabidgremlin.mutters.core.IntentMatcher;
+import com.rabidgremlin.mutters.core.Tokenizer;
 import com.rabidgremlin.mutters.opennlp.intent.OpenNLPTokenizer;
 import com.rabidgremlin.mutters.slots.LiteralSlot;
 import com.rabidgremlin.mutters.templated.TemplatedIntent;
@@ -41,11 +42,11 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
   
   private StoryConfig config;
   private List<InkBotFunction> functions;
-  private List<IntentModel> intentModels;
+  private Map<String, IntentModel> intentModels;
   private Map<String, SlotModel> slotModels;
   private String storyJson;
   
-  public MetamindBotConfiguration(StoryConfig config, List<InkBotFunction> functions, String storyJson, List<IntentModel> intentModels, Map<String, SlotModel> slotModels) {
+  public MetamindBotConfiguration(StoryConfig config, List<InkBotFunction> functions, String storyJson, Map<String, IntentModel> intentModels, Map<String, SlotModel> slotModels) {
     this.config = config;
     this.functions = functions;
     this.storyJson = storyJson;
@@ -59,8 +60,9 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
     TemplateConfig templateConfig = config.getTemplate();
     TemplatedIntentMatcher templatedIntentMatcher = new TemplatedIntentMatcher(new TemplateTokenizer(templateConfig.getTokenization()));
     
-    OpenNLPTokenizer tokenizer = new OpenNLPTokenizer(WhitespaceTokenizer.INSTANCE);
-    OpenNLPSlotMatcher slotMatcher = new OpenNLPSlotMatcher(tokenizer);
+    OpenNLPTokenizer openNLPTokenizer = new OpenNLPTokenizer(WhitespaceTokenizer.INSTANCE);
+    OpenNLPSlotMatcher slotMatcher = new OpenNLPSlotMatcher(openNLPTokenizer);
+    List<OpenNLPIntentMatcher> matchers = new ArrayList<>();
     
     for (MachineLearningConfig machineLearning : machineLearnings) {
       for (Entry<String, String> slotModelEntry : machineLearning.getSlotModels().entrySet()) {
@@ -74,10 +76,12 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
             logger.warn(String.format("Could not find slotModel %s", nerModel));
           }
         }
-      } 
+      }
+      
+      Tokenizer tokenizer = Boolean.TRUE.equals(machineLearning.getIgnoreIntentCase()) ? new IgnoreCaseTokenizerWrapper(openNLPTokenizer) : openNLPTokenizer; 
+      matchers.add(getIntentMatcher(intentModels.get(machineLearning.getIntentModel()), tokenizer, slotMatcher));
     }
     
-    List<OpenNLPIntentMatcher> matchers = getIntentMatchers(intentModels, tokenizer, slotMatcher);
     createTemplateIntents(templateConfig, templatedIntentMatcher);
     createMachineLearningIntents(machineLearnings, matchers);
 
@@ -130,14 +134,8 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
     } 
   }
   
-  private List<OpenNLPIntentMatcher> getIntentMatchers(List<IntentModel> intentModels, OpenNLPTokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
-    List<OpenNLPIntentMatcher> openNLPIntentMatchers = new ArrayList<>();
-    
-    for (IntentModel intentModel : intentModels) {
-      openNLPIntentMatchers.add(new OpenNLPIntentMatcher(intentModel, tokenizer, slotMatcher, 0.75f, -1));
-    }
-    
-    return openNLPIntentMatchers;
+  private OpenNLPIntentMatcher getIntentMatcher(IntentModel intentModel, Tokenizer tokenizer, OpenNLPSlotMatcher slotMatcher) {
+    return new OpenNLPIntentMatcher(intentModel, tokenizer, slotMatcher, 0.75f, -1);
   }
 
   @Override

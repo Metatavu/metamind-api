@@ -79,6 +79,14 @@
     <!-- Freemarker -->
     
     <freemarker.version>2.3.23</freemarker.version>
+
+    <!-- Beer API -->    
+    
+    <beer-api-client.version>0.0.11</beer-api-client.version>
+
+    <!-- Optimaize language detector -->
+
+    <optimaize-languagedetector.version>0.6</optimaize-languagedetector.version>
     
     <!-- Test -->
     
@@ -360,7 +368,15 @@
       <artifactId>mailgun</artifactId>
       <version>${sargue-mailgun.version}</version>
     </dependency>
-
+    
+    <!-- Beer API -->
+    
+    <dependency>
+      <groupId>fi.metatavu.beer</groupId>
+      <artifactId>beer-api-client</artifactId>
+      <version>${beer-api-client.version}</version>
+    </dependency>
+    
     <!-- Freemarker -->
     
     <dependency>
@@ -377,6 +393,14 @@
       <scope>provided</scope>
     </dependency>
     
+    <!-- Optimaize language detector -->
+
+    <dependency>
+      <groupId>com.optimaize.languagedetector</groupId>
+      <artifactId>language-detector</artifactId>
+      <version>${optimaize-languagedetector.version}</version>
+    </dependency>
+
     <!-- Test -->
 
     <dependency>
