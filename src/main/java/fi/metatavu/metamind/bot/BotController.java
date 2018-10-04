@@ -146,19 +146,22 @@ public class BotController {
 
   protected void loadSlotModels(StoryConfig storyConfig, Map<String, SlotModel> slotModels) {
     List<MachineLearningConfig> machineLearningConfigs = storyConfig.getMachineLearning();
-    
     for (MachineLearningConfig machineLearningConfig : machineLearningConfigs) {
       if (machineLearningConfig.getSlotModels() != null) {
-        Collection<String> slotModelNames = machineLearningConfig.getSlotModels().values();
-        for (String slotModelName : slotModelNames) {
-          SlotModel slotModel = modelsContoller.findSlotModelByName(String.format("%s.bin", slotModelName));
-          if (slotModel !=  null) {
-            slotModels.put(slotModelName, slotModel);
-          } else {
-            if (logger.isWarnEnabled()) {
-              logger.warn(String.format("Could not find slot model %s", slotModelName));
-            }
-          }
+        loadSlotModels(machineLearningConfig, slotModels);
+      }
+    }
+  }
+
+  private void loadSlotModels(MachineLearningConfig machineLearningConfig, Map<String, SlotModel> slotModels) {
+    Collection<String> slotModelNames = machineLearningConfig.getSlotModels().values();
+    for (String slotModelName : slotModelNames) {
+      SlotModel slotModel = modelsContoller.findSlotModelByName(String.format("%s.bin", slotModelName));
+      if (slotModel !=  null) {
+        slotModels.put(slotModelName, slotModel);
+      } else {
+        if (logger.isWarnEnabled()) {
+          logger.warn(String.format("Could not find slot model %s", slotModelName));
         }
       }
     }
