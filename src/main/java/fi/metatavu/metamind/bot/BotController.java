@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
 
+import fi.metatavu.metamind.bot.config.MachineLearningConfig;
 import fi.metatavu.metamind.bot.config.StoryConfig;
 import fi.metatavu.metamind.bot.functions.MetaBotFunction;
 import fi.metatavu.metamind.models.ModelsContoller;
@@ -110,36 +111,57 @@ public class BotController {
     String storyJson = story.getStoryJson();
     
     Map<String, SlotModel> slotModels = new HashMap<>();
-    IntentModel intentModel = null;
+    Map<String, IntentModel> intentModels = new HashMap<>();
     
+    List<MachineLearningConfig> machineLearningConfigs = storyConfig.getMachineLearning();
     if (storyConfig.getMachineLearning() != null) {
-      loadSlotModels(storyConfig, slotModels);
-      
-      String intentModelName = storyConfig.getMachineLearning().getIntentModel();
-      if (intentModelName != null) {
-        intentModel = modelsContoller.findIntentModelByName(String.format("%s.bin", intentModelName));
-        if (intentModel == null && logger.isWarnEnabled()) {
-          logger.warn(String.format("Failed to load intent model %s", intentModelName));
-        }
-      }
+      loadSlotModels(storyConfig, slotModels);  
+      loadIntentModels(machineLearningConfigs, intentModels);
     }
     
-    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(storyConfig, functions, storyJson, intentModel, slotModels);
+    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(storyConfig, functions, storyJson, intentModels, slotModels);
     
     return new MetamindBot(botConfiguration);
   }
 
-  protected void loadSlotModels(StoryConfig storyConfig, Map<String, SlotModel> slotModels) {
-    if (storyConfig.getMachineLearning().getSlotModels() != null) {
-      Collection<String> slotModelNames = storyConfig.getMachineLearning().getSlotModels().values();
-      for (String slotModelName : slotModelNames) {
-        SlotModel slotModel = modelsContoller.findSlotModelByName(String.format("%s.bin", slotModelName));
-        if (slotModel !=  null) {
-          slotModels.put(slotModelName, slotModel);
+  private void loadIntentModels(List<MachineLearningConfig> machineLearningConfigs, Map<String, IntentModel> intentModels) {
+    List<String> intentModelNames = new ArrayList<>();
+    
+    for (MachineLearningConfig machineLearningConfig : machineLearningConfigs) {
+      intentModelNames.add(machineLearningConfig.getIntentModel());
+    }
+    
+    for (String intentModelName : intentModelNames) {
+      if (intentModelName != null && !intentModels.containsKey(intentModelName)) {
+        IntentModel intentModel = modelsContoller.findIntentModelByName(String.format("%s.bin", intentModelName));
+        
+        if (intentModel == null && logger.isWarnEnabled()) {
+          logger.warn(String.format("Failed to load intent model %s", intentModelName));
         } else {
-          if (logger.isWarnEnabled()) {
-            logger.warn(String.format("Could not find slot model %s", slotModelName));
-          }
+          intentModels.put(intentModelName, intentModel);
+        }
+      }
+    }
+  }
+
+  protected void loadSlotModels(StoryConfig storyConfig, Map<String, SlotModel> slotModels) {
+    List<MachineLearningConfig> machineLearningConfigs = storyConfig.getMachineLearning();
+    for (MachineLearningConfig machineLearningConfig : machineLearningConfigs) {
+      if (machineLearningConfig.getSlotModels() != null) {
+        loadSlotModels(machineLearningConfig, slotModels);
+      }
+    }
+  }
+
+  private void loadSlotModels(MachineLearningConfig machineLearningConfig, Map<String, SlotModel> slotModels) {
+    Collection<String> slotModelNames = machineLearningConfig.getSlotModels().values();
+    for (String slotModelName : slotModelNames) {
+      SlotModel slotModel = modelsContoller.findSlotModelByName(String.format("%s.bin", slotModelName));
+      if (slotModel !=  null) {
+        slotModels.put(slotModelName, slotModel);
+      } else {
+        if (logger.isWarnEnabled()) {
+          logger.warn(String.format("Could not find slot model %s", slotModelName));
         }
       }
     }
@@ -156,6 +178,7 @@ public class BotController {
     return null;
   }
 
+  @SuppressWarnings ("squid:S4508")
   private com.rabidgremlin.mutters.core.session.Session deserializeBotSession(byte[] data) throws IOException, ClassNotFoundException {
     try (ByteArrayInputStream dataStream = new ByteArrayInputStream(data)) {
       try (ObjectInputStream objectStream = new ObjectInputStream(dataStream)) {
