@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.bot.functions;
 
+import java.text.NumberFormat;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -86,7 +87,7 @@ public class BeerApiBeerInfoMetaBotFunction extends AbstractMetaBotFunction {
       }
 
       if (ibuVariable != null && beer.getIbu() != null) {
-        story.getVariablesState().set(ibuVariable, beer.getIbu());
+        story.getVariablesState().set(ibuVariable, formatDouble(beer.getIbu()));
       }
 
       if (styleVariable != null && beer.getStyle() != null) {
@@ -151,6 +152,13 @@ public class BeerApiBeerInfoMetaBotFunction extends AbstractMetaBotFunction {
    * @return Formatted beer rating
    */
   private String formatBeerRating(BeerRating rating) {
-    return String.format("%f / %f", rating.getRate(), rating.getScale());
+    return String.format("%d / %d", Math.round(rating.getRate()), Math.round(rating.getScale()));
+  }
+
+  private String formatDouble(Double value) {
+    if (value == null) {
+      return "";
+    }
+    return NumberFormat.getInstance().format(value);
   }
 }

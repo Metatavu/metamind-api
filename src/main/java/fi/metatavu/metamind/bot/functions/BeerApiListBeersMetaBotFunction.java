@@ -50,9 +50,9 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
     String includeFlavors = getCommaDelimetedVariable(story, functionParams.get("includeFlavors"));
     String excludeFlavors = getCommaDelimetedVariable(story, functionParams.get("excludeFlavors"));
     String preferFlavors = getCommaDelimetedVariable(story, functionParams.get("preferFlavors"));
-    Float minAbv = getVariableFloat(story, "minAbv");
-    Float maxAbv = getVariableFloat(story, "maxAbv");
-    String sort = getVariableString(story, "sort");
+
+    Float minAbv = NumberUtils.createFloat(functionParams.get("minAbv"));
+    Float maxAbv = NumberUtils.createFloat(functionParams.get("maxAbv"));
     Long firstResult = NumberUtils.createLong(functionParams.get("firstResult"));
     Long maxResults = NumberUtils.createLong(functionParams.get("maxResults"));
     
@@ -77,11 +77,7 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
     }
     
     if (minAbv != null) {
-      params.maxAbv(minAbv);
-    }
-    
-    if (sort != null) {
-      params.sort(Collections.singletonList(sort));
+      params.minAbv(minAbv);
     }
     
     if (firstResult != null) {
@@ -89,7 +85,7 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
     }
     
     if (maxResults != null) {
-      params.firstResult(maxResults);
+      params.maxResults(maxResults);
     }
     
     List<Beer> beers = barBeersApi.listBeers(barId, params);
@@ -127,6 +123,10 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
    * @return trimmed value for a comma delimited variable
    */
   private String getCommaDelimetedVariable(Story story, String variableName) {
+    if (variableName == null) {
+      return null;
+    }
+
     String result = getVariableString(story, variableName);
     return StringUtils.trimToNull(StringUtils.stripEnd(StringUtils.stripStart(result, ","), ","));
   }
