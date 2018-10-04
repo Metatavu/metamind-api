@@ -175,6 +175,7 @@ public class BotController {
     return null;
   }
 
+  @SuppressWarnings ("squid:S4508")
   private com.rabidgremlin.mutters.core.session.Session deserializeBotSession(byte[] data) throws IOException, ClassNotFoundException {
     try (ByteArrayInputStream dataStream = new ByteArrayInputStream(data)) {
       try (ObjectInputStream objectStream = new ObjectInputStream(dataStream)) {

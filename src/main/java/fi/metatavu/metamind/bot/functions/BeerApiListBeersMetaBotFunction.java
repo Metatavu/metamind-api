@@ -93,7 +93,6 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
       story.getVariablesState().set(variableName, beers.stream().map(beer -> String.valueOf(beer.getId())).collect(Collectors.joining("|")));
     } catch (Exception e) {
       logger.error("Could not set variable state", e);
-      return;
     }
   }
   
