@@ -64,11 +64,11 @@ public class BeerApiListBeersMetaBotFunction extends AbstractMetaBotFunction {
     }
 
     if (includeFlavors != null) {
-      params.excludeFlavors(includeFlavors);
+      params.includeFlavors(includeFlavors);
     }
 
     if (preferFlavors != null) {
-      params.excludeFlavors(preferFlavors);
+      params.preferFlavors(preferFlavors);
     }
     
     if (maxAbv != null) {
