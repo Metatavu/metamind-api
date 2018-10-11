@@ -10,6 +10,7 @@ public class StoryConfig {
   private List<MachineLearningConfig> machineLearningConfigs;
   private TemplateConfig template;
   private Map<String, String> globalIntents;
+  private List<String> defaultResponses;
  
   public TemplateConfig getTemplate() {
     return template;
@@ -49,6 +50,24 @@ public class StoryConfig {
   
   public void setGlobalIntents(Map<String, String> globalIntents) {
     this.globalIntents = globalIntents;
+  }
+
+  /**
+   * Returns list of default responses from the config
+   * 
+   * @return list of default responses from the config
+   */
+  public List<String> getDefaultResponses() {
+    return defaultResponses;
+  }
+
+  /**
+   * Sets default responses
+   * 
+   * @param defaultResponses default responses
+   */
+  public void setDefaultResponses(List<String> defaultResponses) {
+    this.defaultResponses = defaultResponses;
   }
   
 }

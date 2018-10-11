@@ -174,6 +174,11 @@ public class MetamindBotConfiguration implements InkBotConfiguration {
 
   @Override
   public List<String> getDefaultResponses() {
-    return Arrays.asList("Anteeksi, nyt en ihan ymmärtänyt. Suosittelen teitä ottamaan yhteyttä asiakaspalveluumme.");
+    List<String> defaultResponses = config.getDefaultResponses();
+    if (defaultResponses == null || defaultResponses.isEmpty()) {
+      return Arrays.asList("Anteeksi, nyt en ihan ymmärtänyt. Suosittelen teitä ottamaan yhteyttä asiakaspalveluumme.");
+    }
+
+    return defaultResponses;
   }
 }
