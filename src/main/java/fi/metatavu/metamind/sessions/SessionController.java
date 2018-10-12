@@ -24,7 +24,7 @@ public class SessionController {
    * @return created session
    */
   public Session createSession(Story story, String locale, String timeZone, String visitor, byte[] data) {
-    return sessionDAO.create(story, UUID.randomUUID().toString(), locale, timeZone, visitor, data);
+    return sessionDAO.create(story, UUID.randomUUID().toString(), locale, timeZone, truncateString(visitor, 190), data);
   }
   
   /**
@@ -70,4 +70,22 @@ public class SessionController {
     return sessionDAO.updateData(session, data);
   }
   
+  /**
+   * Truncates string
+   * 
+   * @param string string
+   * @param maxLength max length
+   * @return truncated string
+   */
+  private String truncateString(String string, int maxLength) {
+    if (string == null) {
+      return null;
+    }
+
+    if (string.length() > maxLength) {
+      return string.substring(0, maxLength);
+    }
+
+    return string;
+  }
 }
