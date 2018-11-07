@@ -1,6 +1,10 @@
 package fi.metatavu.metamind.bot.functions;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,6 +30,10 @@ import fi.metatavu.metamind.scripts.ScriptController;
  */
 @ApplicationScoped
 public class RunScriptMetaBotFunction extends AbstractMetaBotFunction {
+
+  private static final Set<String> RESERVED_PARAMS = new HashSet<String>(Arrays.asList(
+    new String[] {"name", "version", "module", "function", "target"}
+  ));
 
   @Inject
   private Logger logger;
@@ -74,6 +82,13 @@ public class RunScriptMetaBotFunction extends AbstractMetaBotFunction {
     }
     
     try (Context scriptingContext = Context.create(script.getLanguage())) {
+      Map<String, String> scriptArgs = new HashMap<>();
+      params.keySet().stream().forEach(param -> {
+        if (!RESERVED_PARAMS.contains(param)) {
+          scriptArgs.put(param, params.get(param));
+        }
+      });
+
       scriptingContext.getPolyglotBindings().putMember("storyVariablesState", story.getVariablesState());
       Source source = Source.newBuilder(script.getLanguage(), script.getContent(), script.getName()).build();
       Value modules = scriptingContext.eval(source);
@@ -87,7 +102,7 @@ public class RunScriptMetaBotFunction extends AbstractMetaBotFunction {
         logger.error(String.format("Function with name %s does not exits or is not executable", functionName));
       }
 
-      Value returnValue = module.getMember(functionName).execute();
+      Value returnValue = module.getMember(functionName).execute(scriptArgs);
       if (params.containsKey("target")) {
         String targetVariableName = params.get("target");
         story.getVariablesState().set(targetVariableName, returnValue.asString());
