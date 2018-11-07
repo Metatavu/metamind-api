@@ -49,7 +49,7 @@
     
     <!-- Spec -->
     
-    <metamind-spec.version>0.0.6</metamind-spec.version>
+    <metamind-spec.version>0.0.11</metamind-spec.version>
        
     <!-- Maven -->
 
@@ -87,6 +87,10 @@
     <!-- Optimaize language detector -->
 
     <optimaize-languagedetector.version>0.6</optimaize-languagedetector.version>
+
+    <!-- Graal -->
+
+    <graal-sdk.version>1.0.0-rc7</graal-sdk.version>
     
     <!-- Test -->
     
@@ -185,6 +189,7 @@
   </build>
 
   <dependencies>
+
     <dependency>
       <groupId>fi.metatavu.kunta-api</groupId>
       <artifactId>kunta-api-client</artifactId>
@@ -399,6 +404,14 @@
       <groupId>com.optimaize.languagedetector</groupId>
       <artifactId>language-detector</artifactId>
       <version>${optimaize-languagedetector.version}</version>
+    </dependency>
+
+    <!-- Graal -->
+
+    <dependency>
+      <groupId>org.graalvm</groupId>
+      <artifactId>graal-sdk</artifactId>
+      <version>${graal-sdk.version}</version>
     </dependency>
 
     <!-- Test -->
