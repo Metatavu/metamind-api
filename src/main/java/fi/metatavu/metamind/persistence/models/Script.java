@@ -6,11 +6,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
+@Table (
+  uniqueConstraints = {
+    @UniqueConstraint (name = "UN_SCRIPT_NAME_VERSION", columnNames = {"name", "version"})
+  }
+)
 public class Script {
 
   @Id

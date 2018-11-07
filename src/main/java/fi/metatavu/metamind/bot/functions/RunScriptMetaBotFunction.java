@@ -32,7 +32,7 @@ import fi.metatavu.metamind.scripts.ScriptController;
 public class RunScriptMetaBotFunction extends AbstractMetaBotFunction {
 
   private static final Set<String> RESERVED_PARAMS = new HashSet<String>(Arrays.asList(
-    new String[] {"name", "version", "module", "function", "target"}
+    new String[] { "name", "version", "module", "function", "target" }
   ));
 
   @Inject
