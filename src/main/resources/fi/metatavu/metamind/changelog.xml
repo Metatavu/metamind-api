@@ -219,5 +219,30 @@
       </column>
     </createTable>
   </changeSet>
+
+  <changeSet id="scripting-api-init" author="Heikki Kurhinen">
+    <createTable tableName="script">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="externalId" type="varchar(191)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="UN_SCRIPT_EXTERNAL_ID"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="version" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="language" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="content" type="longtext">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  
+    <addUniqueConstraint constraintName="UN_SCRIPT_NAME_VERSION" columnNames="name,version" tableName="script"/>
+  </changeSet>
   
 </databaseChangeLog>
