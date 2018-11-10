@@ -21,6 +21,7 @@ import org.graalvm.polyglot.Value;
 import org.slf4j.Logger;
 
 import fi.metatavu.metamind.persistence.models.Script;
+import fi.metatavu.metamind.polyglot.XMLHttpRequest;
 import fi.metatavu.metamind.scripts.ScriptController;
 
 /**
@@ -88,18 +89,22 @@ public class RunScriptMetaBotFunction extends AbstractMetaBotFunction {
           scriptArgs.put(param, params.get(param));
         }
       });
-
+      scriptingContext.getBindings(script.getLanguage()).putMember("XMLHttpRequest", XMLHttpRequest.class);
       scriptingContext.getPolyglotBindings().putMember("storyVariablesState", story.getVariablesState());
+
       Source source = Source.newBuilder(script.getLanguage(), script.getContent(), script.getName()).build();
-      Value modules = scriptingContext.eval(source);
+      scriptingContext.eval(source);
+
+      Value modules = scriptingContext.getPolyglotBindings();
       if (!modules.hasMember(moduleName)) {
-        logger.error(String.format("Module with name %s not found", moduleName));
+        logger.error(String.format("Module with name %s not found. Available modules %s", moduleName, StringUtils.join(modules.getMemberKeys(), ", ")));
         return;
       }
 
       Value module = modules.getMember(moduleName);
-      if (!module.hasMember(functionName) || module.getMember(functionName).canExecute()) {
+      if (!module.hasMember(functionName) || !module.getMember(functionName).canExecute()) {
         logger.error(String.format("Function with name %s does not exits or is not executable", functionName));
+        return;
       }
 
       Value returnValue = module.getMember(functionName).execute(scriptArgs);
