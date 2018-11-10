@@ -297,7 +297,6 @@ public class XMLHttpRequest {
       response = null;
       responseText = null;
       logger.error("Error executing XMLHttpRequest", e);
-      e.printStackTrace();
     } finally {
       readyStateChange(ReadyState.DONE);
     }
