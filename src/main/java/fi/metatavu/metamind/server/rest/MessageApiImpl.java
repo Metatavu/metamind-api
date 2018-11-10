@@ -18,6 +18,7 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.rabidgremlin.mutters.core.Context;
+import com.rabidgremlin.mutters.core.bot.BotException;
 import com.rabidgremlin.mutters.core.bot.BotResponse;
 
 import fi.metatavu.metamind.bot.BotController;
@@ -55,7 +56,7 @@ public class MessageApiImpl extends AbstractRestApi implements MessagesApi {
   private MessageTranslator messageTranslator;
   
   @Override
-  public Response createMessage(Message body) throws Exception {
+  public Response createMessage(Message body) {
     Session session = sessionController.findSession(body.getSessionId());
     if (session == null) {
       return respondBadRequest("Invalid session id");
@@ -81,18 +82,23 @@ public class MessageApiImpl extends AbstractRestApi implements MessagesApi {
     context.setLocale(LocaleUtils.toLocale(session.getLocale()));
     context.setTimeZone(TimeZone.getTimeZone(session.getTimeZone()));
     
-    BotResponse botResponse = metamind.respond(botSession, context, message.getContent());
-    Map<String, Object> debugValues = botResponse.getDebugValues();
-    String matchedIntent = (String) debugValues.get(MetamindBot.DK_MATCHED_INTENT);
-    Double responseScore = getMatchingScore(debugValues);
-    
-    fi.metatavu.metamind.persistence.models.Message updatedMessage = messageController.updateMessage(message, botResponse.getHint(), botResponse.getResponse(), matchedIntent, responseScore);
-    List<QuickResponse> quickResponses = messageController.updateMessageQuickResponses(updatedMessage, botResponse.getQuickReplies());
-    
-    byte[] updatedBotSession = botController.serializeBotSession(botSession);
-    sessionController.updateSessionState(session, updatedBotSession);
-    
-    return respondOk(messageTranslator.translateMessage(updatedMessage, quickResponses));
+    try {
+      BotResponse botResponse = metamind.respond(botSession, context, message.getContent());
+      Map<String, Object> debugValues = botResponse.getDebugValues();
+      String matchedIntent = (String) debugValues.get(MetamindBot.DK_MATCHED_INTENT);
+      Double responseScore = getMatchingScore(debugValues);
+      
+      fi.metatavu.metamind.persistence.models.Message updatedMessage = messageController.updateMessage(message, botResponse.getHint(), botResponse.getResponse(), matchedIntent, responseScore);
+      List<QuickResponse> quickResponses = messageController.updateMessageQuickResponses(updatedMessage, botResponse.getQuickReplies());
+      
+      byte[] updatedBotSession = botController.serializeBotSession(botSession);
+      sessionController.updateSessionState(session, updatedBotSession);
+      
+      return respondOk(messageTranslator.translateMessage(updatedMessage, quickResponses));
+
+    } catch (BotException e) {
+      return respondInternalServerError(e);
+	  }
   }
   
   @SuppressWarnings("unchecked")

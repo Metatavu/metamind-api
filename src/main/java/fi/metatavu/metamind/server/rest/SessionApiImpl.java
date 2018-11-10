@@ -42,7 +42,7 @@ public class SessionApiImpl extends AbstractRestApi implements SessionsApi {
   private SessionTranslator sessionTranslator;
   
   @Override
-  public Response createSession(Session body) throws Exception {
+  public Response createSession(Session body) {
     com.rabidgremlin.mutters.core.session.Session botSession = botController.createBotSession();
     if (botSession == null) {
       return respondInternalServerError("Could not initialize bot session");
