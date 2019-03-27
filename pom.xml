@@ -58,7 +58,7 @@
     
     <!-- Wildfly -->
     
-    <wildfly-spec-api.version>11.0.0.Final</wildfly-spec-api.version>
+    <wildfly.version>16.0.0.Final</wildfly.version>
     
     <!--  slf4j-api -->
     
@@ -107,7 +107,7 @@
       <dependency>
         <groupId>org.wildfly</groupId>
         <artifactId>wildfly-spec-api</artifactId>
-        <version>${wildfly-spec-api.version}</version>
+        <version>${wildfly.version}</version>
         <type>pom</type>
         <scope>import</scope>
         <exclusions>
@@ -204,13 +204,7 @@
 	
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
-      <artifactId>jboss-servlet-api_3.1_spec</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.jboss.spec.javax.enterprise.concurrent</groupId>
-      <artifactId>jboss-concurrency-api_1.0_spec</artifactId>
+      <artifactId>jboss-servlet-api_4.0_spec</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -235,7 +229,7 @@
 
     <dependency>
       <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+      <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -340,7 +334,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <scope>provided</scope>
     </dependency>
