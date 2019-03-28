@@ -1,0 +1,7 @@
+embed-server --server-config=standalone-full-ha.xml
+/subsystem=jgroups/stack=tcp/protocol=MPING:remove
+/subsystem=jgroups/stack=tcp/protocol=org.jgroups.protocols.kubernetes.KUBE_PING:add(module=org.jgroups.kubernetes)
+/subsystem=jgroups/stack=tcp/protocol=org.jgroups.protocols.kubernetes.KUBE_PING/property=namespace:add(value=${env.KUBERNETES_NAMESPACE})
+/subsystem=jgroups/stack=tcp/protocol=org.jgroups.protocols.kubernetes.KUBE_PING/property=masterPort:add(value=${env.KUBERNETES_SERVICE_PORT})
+/subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tcp)
+/subsystem=jgroups/stack=udp:remove
