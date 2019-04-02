@@ -1,108 +1,147 @@
 package fi.metatavu.metamind.persistence.dao;
 
 import java.util.List;
+import java.util.UUID;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import fi.metatavu.metamind.persistence.models.Message;
-import fi.metatavu.metamind.persistence.models.Message_;
-import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.*;
 
 /**
- * DAO for messages
+ * DAO class for Message
  * 
- * @author Heikki Kurhinen
- * @author Antti Leppä
+ * @author Antti Leppä
  */
-@ApplicationScoped
 public class MessageDAO extends AbstractDAO<Message> {
 
-  /**
-   * Creates new message
-   * 
-   * @param content user's message content
-   * @param externalId external id
-   * @param session session
-   * @return created message
-   */
-  public Message create(String content, String externalId, Session session) {
-    Message message = new Message();
-    message.setContent(content);
-    message.setExternalId(externalId);
-    message.setSession(session);
-    return persist(message);
-  }
+    /**
+     * Creates new message
+     *
+     * @param session session
+     * @param content content
+     * @param hint hint
+     * @param confidence confidence
+     * @param sourceKnot sourceKnot
+     * @param matchedIntent matchedIntent
+     * @param creatorId creator's id
+     * @param lastModifierId last modifier's id
+     * @return created message
+     */
+    public Message create(UUID id, Session session, String content, String hint, Double confidence, Knot sourceKnot, Intent matchedIntent, UUID creatorId, UUID lastModifierId) {
+      Message message = new Message();
+      message.setSession(session);
+      message.setContent(content);
+      message.setHint(hint);
+      message.setConfidence(confidence);
+      message.setSourceKnot(sourceKnot);
+      message.setMatchedIntent(matchedIntent);
+      message.setId(id);
+      message.setCreatorId(creatorId);
+      message.setLastModifierId(lastModifierId);
+      return persist(message);
+    }
 
-  /**
-   * Lists messages by session
-   * 
-   * @param session session
-   * @return List of messages
-   */
-  public List<Message> listByMessage(Session session) {
-    EntityManager entityManager = getEntityManager();
+    /**
+     * Lists messages by session
+     * 
+     * @param session session
+     * @return List of messages
+     */
+    public List<Message> listBySession(Session session) {
+      EntityManager entityManager = getEntityManager();
 
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Message> criteria = criteriaBuilder.createQuery(Message.class);
-    Root<Message> root = criteria.from(Message.class);
+      CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+      CriteriaQuery<Message> criteria = criteriaBuilder.createQuery(Message.class);
+      Root<Message> root = criteria.from(Message.class);
 
-    criteria.select(root);
-    criteria.where(criteriaBuilder.equal(root.get(Message_.session), session));
+      criteria.select(root);
+      criteria.where(criteriaBuilder.equal(root.get(Message_.session), session));
+      
+      TypedQuery<Message> query = entityManager.createQuery(criteria);
+      
+      return query.getResultList();
+    }
     
-    TypedQuery<Message> query = entityManager.createQuery(criteria);
-    
-    return query.getResultList();
-  }
-  
-  /**
-   * Updates response
-   *
-   * @param message message
-   * @param response response
-   * @return updated message
-   */
-  public Message updateResponse(Message message, String response) {
-    message.setResponse(response);
-    return persist(message);
-  }
+    /**
+     * Updates session
+     *
+     * @param session session
+     * @param lastModifierId last modifier's id
+     * @return updated message
+     */
+    public Message updateSession(Message message, Session session, UUID lastModifierId) {
+      message.setLastModifierId(lastModifierId);
+      message.setSession(session);
+      return persist(message);
+    }
 
-  /**
-   * Updates hint
-   *
-   * @param message message
-   * @param hint hint
-   * @return updated message
-   */
-  public Message updateHint(Message message, String hint) {
-    message.setHint(hint);
-    return persist(message);
-  }
+    /**
+     * Updates content
+     *
+     * @param content content
+     * @param lastModifierId last modifier's id
+     * @return updated message
+     */
+    public Message updateContent(Message message, String content, UUID lastModifierId) {
+      message.setLastModifierId(lastModifierId);
+      message.setContent(content);
+      return persist(message);
+    }
 
-  /**
-   * Updates matchedIntent
-   *
-   * @param matchedIntent matchedIntent
-   * @return updated message
-   */
-   public Message updateMatchedIntent(Message message, String matchedIntent) {
-     message.setMatchedIntent(matchedIntent);
-     return persist(message);
-   }
+    /**
+     * Updates hint
+     *
+     * @param hint hint
+     * @param lastModifierId last modifier's id
+     * @return updated message
+     */
+    public Message updateHint(Message message, String hint, UUID lastModifierId) {
+      message.setLastModifierId(lastModifierId);
+      message.setHint(hint);
+      return persist(message);
+    }
 
-  /**
-   * Updates responseScore
-   *
-   * @param responseScore responseScore
-   * @return updated message
-   */
-   public Message updateResponseScore(Message message, Double responseScore) {
-     message.setResponseScore(responseScore);
-     return persist(message);
-   }
+    /**
+     * Updates confidence
+     *
+     * @param confidence confidence
+     * @param lastModifierId last modifier's id
+     * @return updated message
+     */
+    public Message updateConfidence(Message message, Double confidence, UUID lastModifierId) {
+      message.setLastModifierId(lastModifierId);
+      message.setConfidence(confidence);
+      return persist(message);
+    }
+
+    /**
+     * Updates sourceKnot
+     *
+     * @param sourceKnot sourceKnot
+     * @param lastModifierId last modifier's id
+     * @return updated message
+     */
+    public Message updateSourceKnot(Message message, Knot sourceKnot, UUID lastModifierId) {
+      message.setLastModifierId(lastModifierId);
+      message.setSourceKnot(sourceKnot);
+      return persist(message);
+    }
+
+    /**
+     * Updates matchedIntent
+     *
+     * @param matchedIntent matchedIntent
+     * @param lastModifierId last modifier's id
+     * @return updated message
+     */
+    public Message updateMatchedIntent(Message message, Intent matchedIntent, UUID lastModifierId) {
+      message.setLastModifierId(lastModifierId);
+      message.setMatchedIntent(matchedIntent);
+      return persist(message);
+    }
 
 }

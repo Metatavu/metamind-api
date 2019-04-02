@@ -1,78 +1,88 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.Session;
-import fi.metatavu.metamind.persistence.models.Session_;
-import fi.metatavu.metamind.persistence.models.Story;
+import java.util.UUID;
+import fi.metatavu.metamind.persistence.models.*;
 
 /**
- * DAO for sessions
+ * DAO class for Session
  * 
- * @author Heikki Kurhinen
- *
+ * @author Antti Leppä
  */
-@ApplicationScoped
 public class SessionDAO extends AbstractDAO<Session> {
 
-  /**
-   * Creates new session
-   * 
-   * @param story session story
-   * @param externalId external id in uuid format
-   * @param locale users locale
-   * @param timeZone users time zone
-   * @param visitor visitor details
-   * @param data serialized session data
-   * @return new session
-   */
-  public Session create(Story story, String externalId, String locale, String timeZone, String visitor, byte[] data) {
-    Session session = new Session();
-    session.setStory(story);
-    session.setExternalId(externalId);
-    session.setLocale(locale);
-    session.setTimeZone(timeZone);
-    session.setData(data);
-    session.setVisitor(visitor);
-    return persist(session);
-  }
-  
-  /**
-   * Finds single session with external id
-   * 
-   * @param externalId external id
-   * @return Session or null if not found
-   */
-  public Session findByExternalId(String externalId) {
-    EntityManager entityManager = getEntityManager();
+    /**
+     * Creates new session
+     *
+     * @param story story
+     * @param locale locale
+     * @param timeZone timeZone
+     * @param visitor visitor
+     * @param creatorId creator's id
+     * @param lastModifierId last modifier's id
+     * @return created session
+     */
+    public Session create(UUID id, Story story, String locale, String timeZone, String visitor, UUID creatorId, UUID lastModifierId) {
+      Session session = new Session();
+      session.setStory(story);
+      session.setLocale(locale);
+      session.setTimeZone(timeZone);
+      session.setVisitor(visitor);
+      session.setId(id);
+      session.setCreatorId(creatorId);
+      session.setLastModifierId(lastModifierId);
+      return persist(session);
+    }
 
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Session> criteria = criteriaBuilder.createQuery(Session.class);
-    Root<Session> root = criteria.from(Session.class);
+    /**
+     * Updates story
+     *
+     * @param story story
+     * @param lastModifierId last modifier's id
+     * @return updated session
+     */
+    public Session updateStory(Session session, Story story, UUID lastModifierId) {
+      session.setLastModifierId(lastModifierId);
+      session.setStory(story);
+      return persist(session);
+    }
 
-    criteria.select(root);
-    criteria.where(criteriaBuilder.equal(root.get(Session_.externalId), externalId));
-    
-    TypedQuery<Session> query = entityManager.createQuery(criteria);
-    
-    return getSingleResult(query);
-  }
-  
-  /**
-   * Updates data
-   *
-   * @param session session to update
-   * @param data data
-   * @return updated session
-   */
-   public Session updateData(Session session, byte[] data) {
-     session.setData(data);
-     return persist(session);
-   }
-  
+    /**
+     * Updates locale
+     *
+     * @param locale locale
+     * @param lastModifierId last modifier's id
+     * @return updated session
+     */
+    public Session updateLocale(Session session, String locale, UUID lastModifierId) {
+      session.setLastModifierId(lastModifierId);
+      session.setLocale(locale);
+      return persist(session);
+    }
+
+    /**
+     * Updates timeZone
+     *
+     * @param timeZone timeZone
+     * @param lastModifierId last modifier's id
+     * @return updated session
+     */
+    public Session updateTimeZone(Session session, String timeZone, UUID lastModifierId) {
+      session.setLastModifierId(lastModifierId);
+      session.setTimeZone(timeZone);
+      return persist(session);
+    }
+
+    /**
+     * Updates visitor
+     *
+     * @param visitor visitor
+     * @param lastModifierId last modifier's id
+     * @return updated session
+     */
+    public Session updateVisitor(Session session, String visitor, UUID lastModifierId) {
+      session.setLastModifierId(lastModifierId);
+      session.setVisitor(visitor);
+      return persist(session);
+    }
+
 }

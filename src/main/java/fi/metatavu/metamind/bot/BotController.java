@@ -75,54 +75,6 @@ public class BotController {
       return null;
     }
   }
-  
-  /**
-   * Returns initialized bot session from persisted session
-   * 
-   * @param session persisted session
-   * @return bot session
-   */
-  public com.rabidgremlin.mutters.core.session.Session getBotSession(Session session) {
-    try {
-      return deserializeBotSession(session.getData());
-    } catch (ClassNotFoundException | IOException e) {
-      logger.error(String.format("Failed to deserialize session from session %d", session.getId()), e);
-      return null;
-    }
-  }
-  
-  /**
-   * Returns new bot instance
-   * 
-   * @param story story
-   * 
-   * @return new bot instance
-   */
-  public MetamindBot getBotInstance(Story story) {
-    List<InkBotFunction> functions = new ArrayList<>();
-    this.metabotFunctions.forEach(functions::add);
-    
-    StoryConfig storyConfig = loadStoryConfig(story.getConfigJson());
-    if (storyConfig == null) {
-      logger.error("Story config is missing");
-      return null;
-    }
-    
-    String storyJson = story.getStoryJson();
-    
-    Map<String, SlotModel> slotModels = new HashMap<>();
-    Map<String, IntentModel> intentModels = new HashMap<>();
-    
-    List<MachineLearningConfig> machineLearningConfigs = storyConfig.getMachineLearning();
-    if (storyConfig.getMachineLearning() != null) {
-      loadSlotModels(storyConfig, slotModels);  
-      loadIntentModels(machineLearningConfigs, intentModels);
-    }
-    
-    MetamindBotConfiguration botConfiguration = new MetamindBotConfiguration(storyConfig, functions, storyJson, intentModels, slotModels);
-    
-    return new MetamindBot(botConfiguration);
-  }
 
   private void loadIntentModels(List<MachineLearningConfig> machineLearningConfigs, Map<String, IntentModel> intentModels) {
     List<String> intentModelNames = new ArrayList<>();

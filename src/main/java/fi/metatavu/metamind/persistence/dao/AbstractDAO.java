@@ -3,6 +3,7 @@ package fi.metatavu.metamind.persistence.dao;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -36,7 +37,7 @@ public abstract class AbstractDAO<T> {
    * @return entity or null if non found
    */
   @SuppressWarnings("unchecked")
-  public T findById(String id) {
+  public T findById(UUID id) {
     return (T) getEntityManager().find(getGenericTypeClass(), id);
   }
   

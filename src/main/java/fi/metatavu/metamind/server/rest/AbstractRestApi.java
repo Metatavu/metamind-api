@@ -4,14 +4,20 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
+import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
+
+import fi.metatavu.metamind.rest.model.ErrorResponse;
 
 /**
  * Abstract base class for rest services
@@ -26,53 +32,138 @@ public abstract class AbstractRestApi {
   
   @Inject
   private Logger logger;
-  
+
   /**
-   * Send bad request response
+   * Returns logged user id
    * 
-   * @param entity response entity
-   * @return response with status 400
+   * @return logged user id
    */
-  protected Response respondBadRequest(Object entity) {
-    return Response.status(Response.Status.BAD_REQUEST).entity(entity).build();
+  protected UUID getLoggerUserId() {
+    HttpServletRequest httpServletRequest = getHttpServletRequest();
+    String remoteUser = httpServletRequest.getRemoteUser();
+    if (remoteUser == null) {
+      return null;
+    }
+    
+    return UUID.fromString(remoteUser);
+  }
+
+  /**
+   * Returns request locale
+   * 
+   * @return request locale
+   */
+  protected Locale getLocale() {
+    return getHttpServletRequest().getLocale();
   }
   
   /**
-   * Send not found response
+   * Return current HttpServletRequest
    * 
-   * @return response with status 404
+   * @return current http servlet request
    */
-  protected Response respondNotFound() {
-    return Response.status(Response.Status.NOT_FOUND).build();
+  protected HttpServletRequest getHttpServletRequest() {
+    return ResteasyProviderFactory.getContextData(HttpServletRequest.class);
+  }
+
+  /**
+   * Constructs ok response
+   * 
+   * @param entity payload
+   * @return response
+   */
+  protected Response createOk(Object entity) {
+    return Response
+      .status(Response.Status.OK)
+      .entity(entity)
+      .build();
   }
   
   /**
-   * Send internal server error response
+   * Constructs not found response
    * 
-   * @param entity response entity
-   * @return response with status 500
+   * @param message message
+   * @return response
    */
-  protected Response respondInternalServerError(Object entity) {
-    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(entity).build();
+  protected Response createNotFound(String message) {
+    ErrorResponse entity = new ErrorResponse();
+    entity.setMessage(message);
+    return Response
+      .status(Response.Status.NOT_FOUND)
+      .entity(entity)
+      .build();
   }
   
   /**
-   * Send no content response
+   * Constructs forbidden response
    * 
-   * @return response with status 204
+   * @param message message
+   * @return response
    */
-  protected Response respondNoContent() {
-    return Response.status(Response.Status.NO_CONTENT).build();
+  protected Response createForbidden(String message) {
+    ErrorResponse entity = new ErrorResponse();
+    entity.setMessage(message);
+    return Response
+      .status(Response.Status.FORBIDDEN)
+      .entity(entity)
+      .build();
   }
   
   /**
-   * Send ok response
+   * Constructs bad request response
    * 
-   * @param entity response entity
-   * @return response with status 200
+   * @param message message
+   * @return response
    */
-  protected Response respondOk(Object entity) {
-    return Response.status(Response.Status.OK).entity(entity).build();
+  protected Response createBadRequest(String message) {
+    ErrorResponse entity = new ErrorResponse();
+    entity.setMessage(message);
+    return Response
+      .status(Response.Status.BAD_REQUEST)
+      .entity(entity)
+      .build();
+  }
+  
+  /**
+   * Constructs internal server error response
+   * 
+   * @param message message
+   * @return response
+   */
+  protected Response createInternalServerError(String message) {
+    ErrorResponse entity = new ErrorResponse();
+    entity.setMessage(message);
+    return Response
+      .status(Response.Status.INTERNAL_SERVER_ERROR)
+      .entity(entity)
+      .build();
+  }
+  
+  
+  /**
+   * Constructs ok response
+   * 
+   * @param entity payload
+   * @param totalHits total hits
+   * @return response
+   */
+  protected Response createOk(Object entity, Long totalHits) {
+    return Response
+      .status(Response.Status.OK)
+      .entity(entity)
+      .header("Total-Results", totalHits)
+      .build();
+  }
+  
+  /**
+   * Constructs no content response
+   * 
+   * @return response
+   */
+  protected Response createNoContent() {
+    return Response
+      .status(Response.Status.NO_CONTENT)
+      .build();
   }
   
   /**

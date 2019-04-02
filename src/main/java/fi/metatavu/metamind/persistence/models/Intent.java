@@ -6,45 +6,39 @@ import java.util.UUID;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import fi.metatavu.metamind.rest.model.IntentType;
+
 @Entity
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-public class Message {
+public class Intent {
 
   @Id
   private UUID id;
 
-  @ManyToOne(optional = false)
-  private Session session;
-
-  @NotNull
-  @NotEmpty
-  @Lob
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private String content;
-
-  @Column(nullable = true)
-  private String hint;
-
-  @Column(nullable = false)
-  private Double confidence;
+  private IntentType type;
 
   @ManyToOne
   private Knot sourceKnot;
 
-  @ManyToOne
-  private Intent matchedIntent;
+  @ManyToOne(optional = false)
+  private Knot targetKnot;
+
+  @Column(nullable = false)
+  private Boolean global;
 
   @Column(nullable = false)
   @NotNull
@@ -68,36 +62,12 @@ public class Message {
     this.id = id;
   }
 
-  public Session getSession() {
-    return session;
+  public IntentType getType() {
+    return type;
   }
 
-  public void setSession(Session session) {
-    this.session = session;
-  }
-
-  public String getContent() {
-    return content;
-  }
-
-  public void setContent(String content) {
-    this.content = content;
-  }
-
-  public String getHint() {
-    return hint;
-  }
-
-  public void setHint(String hint) {
-    this.hint = hint;
-  }
-
-  public Double getConfidence() {
-    return confidence;
-  }
-
-  public void setConfidence(Double confidence) {
-    this.confidence = confidence;
+  public void setType(IntentType type) {
+    this.type = type;
   }
 
   public Knot getSourceKnot() {
@@ -108,12 +78,20 @@ public class Message {
     this.sourceKnot = sourceKnot;
   }
 
-  public Intent getMatchedIntent() {
-    return matchedIntent;
+  public Knot getTargetKnot() {
+    return targetKnot;
   }
 
-  public void setMatchedIntent(Intent matchedIntent) {
-    this.matchedIntent = matchedIntent;
+  public void setTargetKnot(Knot targetKnot) {
+    this.targetKnot = targetKnot;
+  }
+
+  public Boolean getGlobal() {
+    return global;
+  }
+
+  public void setGlobal(Boolean global) {
+    this.global = global;
   }
 
   public UUID getCreatorId() {

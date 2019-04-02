@@ -6,6 +6,8 @@ import java.util.UUID;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -17,16 +19,24 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import fi.metatavu.metamind.rest.model.KnotType;
+
 @Entity
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-public class Message {
+public class Knot {
 
   @Id
   private UUID id;
 
-  @ManyToOne(optional = false)
-  private Session session;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private KnotType type;
+
+  @NotNull
+  @NotEmpty
+  @Column(nullable = false)
+  private String name;
 
   @NotNull
   @NotEmpty
@@ -34,17 +44,8 @@ public class Message {
   @Column(nullable = false)
   private String content;
 
-  @Column(nullable = true)
-  private String hint;
-
-  @Column(nullable = false)
-  private Double confidence;
-
-  @ManyToOne
-  private Knot sourceKnot;
-
-  @ManyToOne
-  private Intent matchedIntent;
+  @ManyToOne(optional = false)
+  private Story story;
 
   @Column(nullable = false)
   @NotNull
@@ -68,12 +69,20 @@ public class Message {
     this.id = id;
   }
 
-  public Session getSession() {
-    return session;
+  public KnotType getType() {
+    return type;
   }
 
-  public void setSession(Session session) {
-    this.session = session;
+  public void setType(KnotType type) {
+    this.type = type;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public String getContent() {
@@ -84,36 +93,12 @@ public class Message {
     this.content = content;
   }
 
-  public String getHint() {
-    return hint;
+  public Story getStory() {
+    return story;
   }
 
-  public void setHint(String hint) {
-    this.hint = hint;
-  }
-
-  public Double getConfidence() {
-    return confidence;
-  }
-
-  public void setConfidence(Double confidence) {
-    this.confidence = confidence;
-  }
-
-  public Knot getSourceKnot() {
-    return sourceKnot;
-  }
-
-  public void setSourceKnot(Knot sourceKnot) {
-    this.sourceKnot = sourceKnot;
-  }
-
-  public Intent getMatchedIntent() {
-    return matchedIntent;
-  }
-
-  public void setMatchedIntent(Intent matchedIntent) {
-    this.matchedIntent = matchedIntent;
+  public void setStory(Story story) {
+    this.story = story;
   }
 
   public UUID getCreatorId() {

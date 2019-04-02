@@ -75,9 +75,11 @@ public abstract class AbstractFreemarkerMetaBotFunction extends AbstractMetaBotF
     
     List<FreemarkerMessageModel> result = new ArrayList<>(sessionMessages.size());
     for (Message sessionMessage : sessionMessages) {
-      result.add(new FreemarkerMessageModel(getDate(sessionMessage.getCreated()), 
+      String response = messageController.getMessageResponse(sessionMessage);
+      
+      result.add(new FreemarkerMessageModel(getDate(sessionMessage.getCreatedAt()), 
         stripHtml(sessionMessage.getContent()), 
-        stripHtml(sessionMessage.getResponse())));
+        stripHtml(response)));
     }
     
     return result;

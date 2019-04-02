@@ -16,27 +16,27 @@ public class ScriptController {
 
   /**
    * Creates new script
-   * 
-   * @param name script name
-   * @param version script version
-   * @param language script language
-   * @param content script content
-   * 
+   *
+   * @param name name
+   * @param content content
+   * @param version version
+   * @param language language
+   * @param creatorId creator's id
    * @return created script
    */
-  public Script createScript(String name, String version, String language, String content) {
-    return scriptDAO.create(name, version, language, UUID.randomUUID().toString(), content);
+  public Script createScript(String name, String content, String version, String language, UUID creatorId) {
+    return scriptDAO.create(UUID.randomUUID(), name, content, version, language, creatorId, creatorId);
   }
 
   /**
-   * Finds script by external id
+   * Finds script by id
    * 
-   * @param externalId external id to find script for
+   * @param id id to find script for
    * 
    * @return found script or null
    */
-  public Script findScript(String externalId) {
-    return scriptDAO.findByExternalId(externalId);
+  public Script findScriptById(UUID id) {
+    return scriptDAO.findById(id);
   }
 
   /**
@@ -47,22 +47,21 @@ public class ScriptController {
    * 
    * @return found script or null
    */
-  public Script findScript(String name, String version) {
+  public Script findScriptByNameAndVersion(String name, String version) {
     return scriptDAO.findByNameAndVersion(name, version);
   }
 
   /**
-   * Updates script
-   * 
-   * @param script script to update
-   * @param content updated content
-   * @param language updated language
-   * 
+   * Update script
+   *
+   * @param script script
+   * @param content content
+   * @param language language
+   * @param lastModifierId last modifier's id
    * @return updated script
    */
-  public Script updateScript(Script script, String content, String language) {
-    scriptDAO.updateContent(script, content);
-    scriptDAO.updateLanguage(script, language);
-    return script;
+  public Script updateScript(Script script, String content, String language, UUID lastModifierId) {
+    return scriptDAO.updateLanguage(scriptDAO.updateContent(script, content, lastModifierId), language, lastModifierId);
   }
+  
 }

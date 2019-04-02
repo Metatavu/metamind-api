@@ -1,115 +1,119 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import javax.enterprise.context.ApplicationScoped;
+import java.util.UUID;
+
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import fi.metatavu.metamind.persistence.models.Script;
-import fi.metatavu.metamind.persistence.models.Script_;
+import fi.metatavu.metamind.persistence.models.*;
 
 /**
- * DAO for scripts
+ * DAO class for Script
  * 
- * @author Heikki Kurhinen
- *
+ * @author Antti Leppä
  */
-@ApplicationScoped
 public class ScriptDAO extends AbstractDAO<Script> {
 
-  /**
-   * Creates new script
-   * 
-   * @param name script name
-   * @param version script version
-   * @param language script language
-   * @param externalId script external id
-   * @param content script content
-   * 
-   * @return created script
-   */
-  public Script create(String name, String version, String language, String externalId, String content) {
-    Script script = new Script();
-    script.setName(name);
-    script.setVersion(version);
-    script.setLanguage(language);
-    script.setExternalId(externalId);
-    script.setContent(content);
-    return persist(script);
-  }
-  
-  /**
-   * Finds script by name and version
-   * 
-   * @param name Script name
-   * @param version Script version
-   * 
-   * @return found script or null if not found
-   */
-  public Script findByNameAndVersion(String name, String version) {
-    EntityManager entityManager = getEntityManager();
-
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Script> criteria = criteriaBuilder.createQuery(Script.class);
-    Root<Script> root = criteria.from(Script.class);
-    criteria.select(root);
-    criteria.where(
-      criteriaBuilder.and(
-        criteriaBuilder.equal(root.get(Script_.name), name),
-        criteriaBuilder.equal(root.get(Script_.version), version)
-      )
-    );
+    /**
+     * Creates new script
+     *
+     * @param name name
+     * @param content content
+     * @param version version
+     * @param language language
+     * @param creatorId creator's id
+     * @param lastModifierId last modifier's id
+     * @return created script
+     */
+    public Script create(UUID id, String name, String content, String version, String language, UUID creatorId, UUID lastModifierId) {
+      Script script = new Script();
+      script.setName(name);
+      script.setContent(content);
+      script.setVersion(version);
+      script.setLanguage(language);
+      script.setId(id);
+      script.setCreatorId(creatorId);
+      script.setLastModifierId(lastModifierId);
+      return persist(script);
+    }
     
-    return getSingleResult(entityManager.createQuery(criteria));
-  }
+    /**
+     * Finds script by name and version
+     * 
+     * @param name Script name
+     * @param version Script version
+     * 
+     * @return found script or null if not found
+     */
+    public Script findByNameAndVersion(String name, String version) {
+      EntityManager entityManager = getEntityManager();
 
-  /**
-   * Finds single session with external id
-   * 
-   * @param externalId script external id
-   * 
-   * @return Found script
-   */
-  public Script findByExternalId(String externalId) {
-    EntityManager entityManager = getEntityManager();
-
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Script> criteria = criteriaBuilder.createQuery(Script.class);
-    Root<Script> root = criteria.from(Script.class);
-
-    criteria.select(root);
-    criteria.where(criteriaBuilder.equal(root.get(Script_.externalId), externalId));
+      CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+      CriteriaQuery<Script> criteria = criteriaBuilder.createQuery(Script.class);
+      Root<Script> root = criteria.from(Script.class);
+      criteria.select(root);
+      criteria.where(
+        criteriaBuilder.and(
+          criteriaBuilder.equal(root.get(Script_.name), name),
+          criteriaBuilder.equal(root.get(Script_.version), version)
+        )
+      );
+      
+      return getSingleResult(entityManager.createQuery(criteria));
+    } 
     
-    TypedQuery<Script> query = entityManager.createQuery(criteria);
-    
-    return getSingleResult(query);
-  }
+    /**
+     * Updates name
+     *
+     * @param name name
+     * @param lastModifierId last modifier's id
+     * @return updated script
+     */
+    public Script updateName(Script script, String name, UUID lastModifierId) {
+      script.setLastModifierId(lastModifierId);
+      script.setName(name);
+      return persist(script);
+    }
 
-  /**
-   * Updates script language
-   * 
-   * @param script Script to update
-   * @param language new script language
-   * 
-   * @return updated script
-   */
-  public Script updateLanguage(Script script, String language) {
-    script.setLanguage(language);
-    return persist(script);
-  }
+    /**
+     * Updates content
+     *
+     * @param content content
+     * @param lastModifierId last modifier's id
+     * @return updated script
+     */
+    public Script updateContent(Script script, String content, UUID lastModifierId) {
+      script.setLastModifierId(lastModifierId);
+      script.setContent(content);
+      return persist(script);
+    }
 
-  /**
-   * Updates script content
-   *
-   * @param script Script to update
-   * @param content new script content
-   * 
-   * @return updated script
-   */
-  public Script updateContent(Script script, String content) {
-    script.setContent(content);
-    return persist(script);
-  }
+    /**
+     * Updates version
+     *
+     * @param version version
+     * @param lastModifierId last modifier's id
+     * @return updated script
+     */
+    public Script updateVersion(Script script, String version, UUID lastModifierId) {
+      script.setLastModifierId(lastModifierId);
+      script.setVersion(version);
+      return persist(script);
+    }
+
+    /**
+     * Updates language
+     *
+     * @param language language
+     * @param lastModifierId last modifier's id
+     * @return updated script
+     */
+    public Script updateLanguage(Script script, String language, UUID lastModifierId) {
+      script.setLastModifierId(lastModifierId);
+      script.setLanguage(language);
+      return persist(script);
+    }
+
 }

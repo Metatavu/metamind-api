@@ -14,31 +14,33 @@ public class SessionController {
   
   @Inject
   private SessionDAO sessionDAO;
-
+  
   /**
    * Creates new session
-   * 
-   * @param locale session locale
-   * @param visitor visitor details
-   * @param data serialized session data
+   *
+   * @param story story
+   * @param locale locale
+   * @param timeZone timeZone
+   * @param visitor visitor
+   * @param creatorId creator's id
    * @return created session
    */
-  public Session createSession(Story story, String locale, String timeZone, String visitor, byte[] data) {
-    return sessionDAO.create(story, UUID.randomUUID().toString(), locale, timeZone, truncateString(visitor, 190), data);
+  public Session create(Story story, String locale, String timeZone, String visitor, UUID creatorId) {
+    return sessionDAO.create(UUID.randomUUID(), story, locale, timeZone, visitor, creatorId, creatorId);
   }
   
   /**
-   * Finds a session by an external id
+   * Finds a session by an id
    * 
-   * @param externalId 
+   * @param id 
    * @return
    */
-  public Session findSession(UUID externalId) {
-    if (externalId == null) {
+  public Session findSessionById(UUID id) {
+    if (id == null) {
       return null;
     }
     
-    return sessionDAO.findByExternalId(externalId.toString());
+    return sessionDAO.findById(id);
   }
   
   /**
@@ -59,33 +61,4 @@ public class SessionController {
     return sessionDAO.findById(sessionId);
   }
   
-  /**
-   * Updates session state
-   * 
-   * @param session session
-   * @param data new session state serialized
-   * @return updated session
-   */
-  public Session updateSessionState(Session session, byte[] data) {
-    return sessionDAO.updateData(session, data);
-  }
-  
-  /**
-   * Truncates string
-   * 
-   * @param string string
-   * @param maxLength max length
-   * @return truncated string
-   */
-  private String truncateString(String string, int maxLength) {
-    if (string == null) {
-      return null;
-    }
-
-    if (string.length() > maxLength) {
-      return string.substring(0, maxLength);
-    }
-
-    return string;
-  }
 }

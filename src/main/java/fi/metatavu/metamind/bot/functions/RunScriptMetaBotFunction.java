@@ -76,7 +76,7 @@ public class RunScriptMetaBotFunction extends AbstractMetaBotFunction {
       return;
     }
 
-    Script script = scriptController.findScript(name, version);
+    Script script = scriptController.findScriptByNameAndVersion(name, version);
     if (script == null) {
       logger.error(String.format("Could not find script with name %s and version %s", name, version));
       return;
