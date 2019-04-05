@@ -120,6 +120,36 @@ public class IntentDAO extends AbstractDAO<Intent> {
     
     return query.getResultList();
   }
+
+
+  /**
+   * Lists intents by story, global and type
+   * 
+   * @param story story
+   * @param global global
+   * @return List of intents
+   */
+  public List<Intent> listByStoryAndGlobalAndType(Story story, Boolean global, IntentType type) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Intent> criteria = criteriaBuilder.createQuery(Intent.class);
+    Root<Intent> root = criteria.from(Intent.class);
+    Join<Intent, Knot> sourceKnotJoin = root.join(Intent_.targetKnot);
+
+    criteria.select(root);
+    criteria.where(
+      criteriaBuilder.and(
+        criteriaBuilder.equal(sourceKnotJoin.get(Knot_.story), story),
+        criteriaBuilder.equal(root.get(Intent_.global), global),
+        criteriaBuilder.equal(root.get(Intent_.type), type)
+      )
+    );
+    
+    TypedQuery<Intent> query = entityManager.createQuery(criteria);
+    
+    return query.getResultList();
+  }
   
   /**
    * Lists intents by training material
@@ -193,6 +223,33 @@ public class IntentDAO extends AbstractDAO<Intent> {
     );
     
     return entityManager.createQuery(criteria).getResultList();
+  }
+
+  /**
+   * Lists intents by source knot and type
+   * 
+   * @param sourceKnot source knot
+   * @param intentType type
+   * @return intents by source knot and type
+   */
+  public List<Intent> listBySourceKnotAndType(Knot sourceKnot, IntentType intentType) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Intent> criteria = criteriaBuilder.createQuery(Intent.class);
+    Root<Intent> root = criteria.from(Intent.class);
+
+    criteria.select(root);
+    criteria.where(
+      criteriaBuilder.and(
+        criteriaBuilder.equal(root.get(Intent_.sourceKnot), sourceKnot),
+        criteriaBuilder.equal(root.get(Intent_.type), intentType)
+      )
+    );
+    
+    TypedQuery<Intent> query = entityManager.createQuery(criteria);
+    
+    return query.getResultList();
   }
 
   /**

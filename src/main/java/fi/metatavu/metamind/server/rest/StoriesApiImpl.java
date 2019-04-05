@@ -173,6 +173,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       fi.metatavu.metamind.persistence.models.Knot knot = matchedIntent.getTargetKnot();
       messageResponses.add(messageController.createMessageResponse(message, knot.getContent()));
       sessionController.updateSessionCurrentKnot(session, knot, loggedUserId);
+    } else {
+      return createInternalServerError("Could not resolve intent");
     }
     
     return createOk(messageTranslator.translateMessage(message, quickResponses, messageResponses));

@@ -11,6 +11,7 @@ import java.util.TimeZone;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 
 import fi.metatavu.metamind.bot.match.IntentMatch;
@@ -25,6 +26,7 @@ import fi.metatavu.metamind.persistence.models.KnotIntentModel;
 import fi.metatavu.metamind.persistence.models.Session;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
+import fi.metatavu.metamind.rest.model.IntentType;
 import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
@@ -70,9 +72,32 @@ public class BotController {
       }
     }
   
-    return new BotResponse(0d, null); 
+    return new BotResponse(0d, getConfusedIntent(session)); 
   }
   
+  /**
+   * Returns confused intent for a session
+   * 
+   * @param session session
+   * @return confused intent
+   */
+  private Intent getConfusedIntent(Session session) {
+    Knot currentKnot = session.getCurrentKnot();
+    if (currentKnot != null) {
+      List<Intent> knotConfusedIntents = intentDAO.listBySourceKnotAndType(currentKnot, IntentType.CONFUSED);
+      if (!knotConfusedIntents.isEmpty()) {
+        return knotConfusedIntents.get(RandomUtils.nextInt(0, knotConfusedIntents.size()));
+      }
+    }
+    
+    List<Intent> globalConfusedIntents = intentDAO.listByStoryAndGlobalAndType(session.getStory(), Boolean.TRUE, IntentType.CONFUSED);
+    if (!globalConfusedIntents.isEmpty()) {
+      return globalConfusedIntents.get(RandomUtils.nextInt(0, globalConfusedIntents.size()));
+    }
+    
+    return null;
+  }
+
   /**
    * Lists intent matchers for given knot. If knot is null, story global intent matchers are returned
    * 
