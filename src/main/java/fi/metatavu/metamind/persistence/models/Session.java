@@ -39,6 +39,9 @@ public class Session {
 
   private String visitor;
 
+  @ManyToOne
+  private Knot currentKnot;
+
   @Column(nullable = false)
   @NotNull
   private UUID creatorId;
@@ -67,6 +70,14 @@ public class Session {
 
   public void setStory(Story story) {
     this.story = story;
+  }
+  
+  public Knot getCurrentKnot() {
+    return currentKnot;
+  }
+  
+  public void setCurrentKnot(Knot currentKnot) {
+    this.currentKnot = currentKnot;
   }
 
   public String getLocale() {

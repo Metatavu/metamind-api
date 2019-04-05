@@ -18,10 +18,13 @@ import fi.metatavu.metamind.bot.match.IntentMatcher;
 import fi.metatavu.metamind.bot.match.OpenNPLIntentMatcher;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
+import fi.metatavu.metamind.persistence.dao.StoryGlobalIntentModelDAO;
 import fi.metatavu.metamind.persistence.models.Intent;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.KnotIntentModel;
 import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
@@ -43,18 +46,20 @@ public class BotController {
   @Inject
   private KnotIntentModelDAO knotIntentModelDAO;
 
+  @Inject
+  private StoryGlobalIntentModelDAO storyGlobalIntentModelDAO;
+
   /**
    * Retrieves response from bot
    * 
    * @param session session
-   * @param sourceKnot source knot
    * @param message message
    * @param locale locale
    * @param timeZone time zone
    * @return response
    */
-  public BotResponse getResponse(Session session, Knot sourceKnot, String message, Locale locale, TimeZone timeZone) {
-    List<IntentMatcher> matchers = getIntentMatchers(sourceKnot);
+  public BotResponse getResponse(Session session, String message, Locale locale, TimeZone timeZone) {
+    List<IntentMatcher> matchers = getIntentMatchers(session.getStory(), session.getCurrentKnot());
     for (IntentMatcher matcher : matchers) {
       IntentMatch intentMatch = matcher.matchIntents(message);
       if (intentMatch != null) {
@@ -69,12 +74,57 @@ public class BotController {
   }
   
   /**
+   * Lists intent matchers for given knot. If knot is null, story global intent matchers are returned
+   * 
+   * @param story story
+   * @param sourceKnot source knot
+   * @return list of intent matchers
+   */
+  private List<IntentMatcher> getIntentMatchers(Story story, Knot sourceKnot) {
+    
+    if (sourceKnot == null) {
+      return getStoryGlobalIntentMatches(story);
+    } else {
+      return getKnotIntentMatchers(sourceKnot);      
+    }
+  }
+
+  /**
+   * Lists intent matchers for story
+   * 
+   * @param sourceKnot source knot
+   * @return list of intent matchers
+   */
+  private List<IntentMatcher> getStoryGlobalIntentMatches(Story story) {
+    // TODO: Story settings: Tokenizer, Strategy, minMatch?
+    
+    List<IntentMatcher> result = new ArrayList<>();
+    Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
+    
+    StoryGlobalIntentModel intentModel = storyGlobalIntentModelDAO.findByStory(story);
+    if (intentModel != null) {
+      try {
+        double minMatch = 0.75d;      
+        byte[] modelData = intentModel.getData();
+        try (InputStream modelStream = new ByteArrayInputStream(modelData)) {
+          DoccatModel model = new DoccatModel(modelStream);
+          result.add(new OpenNPLIntentMatcher(model, tokenizer, minMatch));      
+        }    
+      } catch (IOException e) {
+        logger.error("Failed to read doccat model", e);
+      }
+    }
+    
+    return result;
+  }
+
+  /**
    * Lists intent matchers for given knot
    * 
    * @param sourceKnot source knot
    * @return list of intent matchers
    */
-  private List<IntentMatcher> getIntentMatchers(Knot sourceKnot) {
+  private List<IntentMatcher> getKnotIntentMatchers(Knot sourceKnot) {
     // TODO: Knot settings: Tokenizer, Strategy, minMatch?
     
     List<IntentMatcher> result = new ArrayList<>();

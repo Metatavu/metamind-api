@@ -6,6 +6,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import fi.metatavu.metamind.persistence.dao.SessionDAO;
+import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Session;
 import fi.metatavu.metamind.persistence.models.Story;
 
@@ -26,7 +27,7 @@ public class SessionController {
    * @return created session
    */
   public Session create(Story story, String locale, String timeZone, String visitor, UUID creatorId) {
-    return sessionDAO.create(UUID.randomUUID(), story, locale, timeZone, visitor, creatorId, creatorId);
+    return sessionDAO.create(UUID.randomUUID(), story, null, locale, timeZone, visitor, creatorId, creatorId);
   }
   
   /**
@@ -59,6 +60,17 @@ public class SessionController {
     }
     
     return sessionDAO.findById(sessionId);
+  }
+
+  /**
+   * Updates currentKnot
+   *
+   * @param currentKnot currentKnot
+   * @param lastModifierId last modifier's id
+   * @return updated session
+   */
+  public Session updateSessionCurrentKnot(Session session, Knot currentKnot, UUID lastModifierId) {
+    return sessionDAO.updateCurrentKnot(session, currentKnot, lastModifierId);
   }
   
 }

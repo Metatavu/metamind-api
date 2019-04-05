@@ -74,7 +74,7 @@ public class IntentDAO extends AbstractDAO<Intent> {
   /**
    * Lists intents by story
    * 
-   * @param sourceKnot story
+   * @param story story
    * @return List of intents
    */
   public List<Intent> listByStory(Story story) {
@@ -83,10 +83,38 @@ public class IntentDAO extends AbstractDAO<Intent> {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Intent> criteria = criteriaBuilder.createQuery(Intent.class);
     Root<Intent> root = criteria.from(Intent.class);
-    Join<Intent, Knot> sourceKnotJoin = root.join(Intent_.sourceKnot);
+    Join<Intent, Knot> sourceKnotJoin = root.join(Intent_.targetKnot);
 
     criteria.select(root);
     criteria.where(criteriaBuilder.equal(sourceKnotJoin.get(Knot_.story), story));
+    
+    TypedQuery<Intent> query = entityManager.createQuery(criteria);
+    
+    return query.getResultList();
+  }
+  
+  /**
+   * Lists intents by story
+   * 
+   * @param story story
+   * @param global global
+   * @return List of intents
+   */
+  public List<Intent> listByStoryAndGlobal(Story story, Boolean global) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Intent> criteria = criteriaBuilder.createQuery(Intent.class);
+    Root<Intent> root = criteria.from(Intent.class);
+    Join<Intent, Knot> sourceKnotJoin = root.join(Intent_.targetKnot);
+
+    criteria.select(root);
+    criteria.where(
+      criteriaBuilder.and(
+        criteriaBuilder.equal(sourceKnotJoin.get(Knot_.story), story),
+        criteriaBuilder.equal(root.get(Intent_.global), global)
+      )
+    );
     
     TypedQuery<Intent> query = entityManager.createQuery(criteria);
     
@@ -112,6 +140,59 @@ public class IntentDAO extends AbstractDAO<Intent> {
     TypedQuery<Intent> query = entityManager.createQuery(criteria);
     
     return query.getResultList();
+  }
+  
+  /**
+   * Lists intents by training material
+   * 
+   * @param trainingMaterial trainingMaterial
+   * @param global global
+   * @return List of intents
+   */
+  public List<Intent> listByTrainingMaterialAndGlobal(TrainingMaterial trainingMaterial, Boolean global) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Intent> criteria = criteriaBuilder.createQuery(Intent.class);
+    Root<Intent> root = criteria.from(Intent.class);
+    
+    criteria.select(root);
+    criteria.where(
+      criteriaBuilder.and(
+        criteriaBuilder.equal(root.get(Intent_.trainingMaterial), trainingMaterial),
+        criteriaBuilder.equal(root.get(Intent_.global), global)
+      )
+    );
+    
+    TypedQuery<Intent> query = entityManager.createQuery(criteria);
+    
+    return query.getResultList();
+  }
+
+  /**
+   * Lists intents by training material
+   * 
+   * @param trainingMaterial trainingMaterial
+   * @param global global
+   * @return List of intents
+   */
+  public List<Story> listStoriesByTrainingMaterialAndGlobal(TrainingMaterial trainingMaterial, Boolean global) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Story> criteria = criteriaBuilder.createQuery(Story.class);
+    Root<Intent> root = criteria.from(Intent.class);
+    Join<Intent, Knot> targetKnotJoin = root.join(Intent_.targetKnot);
+    
+    criteria.select(targetKnotJoin.get(Knot_.story)).distinct(true);
+    criteria.where(
+      criteriaBuilder.and(
+        criteriaBuilder.equal(root.get(Intent_.trainingMaterial), trainingMaterial),
+        criteriaBuilder.equal(root.get(Intent_.global), global)
+      )
+    );
+    
+    return entityManager.createQuery(criteria).getResultList();
   }
 
   /**

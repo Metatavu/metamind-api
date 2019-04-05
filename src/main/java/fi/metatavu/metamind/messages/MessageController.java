@@ -51,6 +51,17 @@ public class MessageController {
   public Message createMessage(Session session, String content, String hint, Double confidence, Knot sourceKnot, Intent matchedIntent, UUID creatorId) {
     return messageDAO.create(UUID.randomUUID(), session, content, hint, confidence, sourceKnot, matchedIntent, creatorId, creatorId);
   }
+
+  /**
+   * Creates new message response
+   * 
+   * @param message message
+   * @param text response text
+   * @return created message response
+   */
+  public MessageResponse createMessageResponse(Message message, String text) {
+    return messageResponseDAO.create(message, text);
+  }
   
   /**
    * Lists messages by a session

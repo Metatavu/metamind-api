@@ -9,6 +9,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import fi.metatavu.metamind.bot.KnotTrainingMaterialUpdateRequestEvent;
+import fi.metatavu.metamind.bot.StoryGlobalTrainingMaterialUpdateRequestEvent;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
 import fi.metatavu.metamind.persistence.dao.StoryDAO;
@@ -39,7 +40,10 @@ public class StoryController {
 
   @Inject
   private Event<KnotTrainingMaterialUpdateRequestEvent> knotTrainingMaterialUpdateRequestEvent;
-  
+
+  @Inject
+  private Event<StoryGlobalTrainingMaterialUpdateRequestEvent> storyGlobalTrainingMaterialUpdateRequestEvent;
+
   /**
    * Finds story by id
    * 
@@ -110,8 +114,14 @@ public class StoryController {
   public Intent createIntent(IntentType type, String name, Knot sourceKnot, Knot targetKnot, TrainingMaterial trainingMaterial, Boolean global, UUID creatorId) {
     Intent intent = intentDAO.create(UUID.randomUUID(), type, name, sourceKnot, targetKnot, trainingMaterial, global, creatorId, creatorId);
     
-    if (sourceKnot != null && trainingMaterial != null) {
-      knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(sourceKnot.getId()));
+    if (trainingMaterial != null) {
+      if (sourceKnot != null) {
+        knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(sourceKnot.getId()));
+      }
+      
+      if (global || intent.getGlobal()) {
+        storyGlobalTrainingMaterialUpdateRequestEvent.fire(new StoryGlobalTrainingMaterialUpdateRequestEvent(targetKnot.getStory().getId()));
+      }
     }
     
     return intent;

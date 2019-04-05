@@ -299,4 +299,30 @@
     </createTable>
   </changeSet>
   
+  <changeSet id="storyglobalintentmodel" author="Antti Leppä">
+        
+    <createTable tableName="storyglobalintentmodel">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="data" type="LONGBLOB">
+        <constraints nullable="false"/>
+      </column>
+      <column name="story_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_STORY_GLOBAL_INTENT_MODEL_STORY" referencedColumnNames="id" referencedTableName="story"/>
+      </column>
+    </createTable>
+    
+  </changeSet>
+  
+  <changeSet id="sessioncurrentknot" author="Antti Leppä">
+  
+    <addColumn tableName="session">
+      <column name="currentknot_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_SESSION_CURRENT_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+    </addColumn>
+    
+  </changeSet>
+  
 </databaseChangeLog>

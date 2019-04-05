@@ -1,9 +1,7 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import java.util.UUID;
-
 import javax.enterprise.context.ApplicationScoped;
-
+import java.util.UUID;
 import fi.metatavu.metamind.persistence.models.*;
 
 /**
@@ -15,9 +13,11 @@ import fi.metatavu.metamind.persistence.models.*;
 public class SessionDAO extends AbstractDAO<Session> {
 
   /**
-   * Creates new session
-   *
+   * Creates new Session
+   * 
+   * @param id id
    * @param story story
+   * @param currentKnot currentKnot
    * @param locale locale
    * @param timeZone timeZone
    * @param visitor visitor
@@ -25,9 +25,10 @@ public class SessionDAO extends AbstractDAO<Session> {
    * @param lastModifierId last modifier's id
    * @return created session
    */
-  public Session create(UUID id, Story story, String locale, String timeZone, String visitor, UUID creatorId, UUID lastModifierId) {
+  public Session create(UUID id, Story story, Knot currentKnot, String locale, String timeZone, String visitor, UUID creatorId, UUID lastModifierId) {
     Session session = new Session();
     session.setStory(story);
+    session.setCurrentKnot(currentKnot);
     session.setLocale(locale);
     session.setTimeZone(timeZone);
     session.setVisitor(visitor);
@@ -47,6 +48,19 @@ public class SessionDAO extends AbstractDAO<Session> {
   public Session updateStory(Session session, Story story, UUID lastModifierId) {
     session.setLastModifierId(lastModifierId);
     session.setStory(story);
+    return persist(session);
+  }
+
+  /**
+   * Updates currentKnot
+   *
+   * @param currentKnot currentKnot
+   * @param lastModifierId last modifier's id
+   * @return updated session
+   */
+  public Session updateCurrentKnot(Session session, Knot currentKnot, UUID lastModifierId) {
+    session.setLastModifierId(lastModifierId);
+    session.setCurrentKnot(currentKnot);
     return persist(session);
   }
 

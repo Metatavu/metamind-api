@@ -106,7 +106,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Target knot %s is not from the story %s", targetKnot.getId(), story.getId()));
     }
 
-    if (!isKnotFromStory(sourceKnot, story)) {
+    if (sourceKnot != null && !isKnotFromStory(sourceKnot, story)) {
       return createBadRequest(String.format("Source knot %s is not from the story %s", sourceKnot.getId(), story.getId()));
     }
     
@@ -153,31 +153,27 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest("Session is not from this story");
     }
     
-    UUID sourceKnotId = body.getSourceKnotId();
-    
-    fi.metatavu.metamind.persistence.models.Knot sourceKnot = storyController.findKnotById(sourceKnotId);
-    if (sourceKnot == null) {
-      return createBadRequest(String.format("Source knot %s not found", sourceKnotId)); 
-    }
-
-    if (!isKnotFromStory(sourceKnot, story)) {
-      return createBadRequest(String.format("Source knot %s is not from the story %s", sourceKnot.getId(), story.getId()));
-    }
-    
-    BotResponse botResponse = botController.getResponse(session, sourceKnot, content, LocaleUtils.toLocale(session.getLocale()), TimeZone.getTimeZone(session.getTimeZone()));
+    BotResponse botResponse = botController.getResponse(session, content, LocaleUtils.toLocale(session.getLocale()), TimeZone.getTimeZone(session.getTimeZone()));
     
     String hint = null; // TODO: hint
-    UUID loggedUserId = null; // TODO
-    fi.metatavu.metamind.persistence.models.Message message = messageController.createMessage(session, content, hint, botResponse.getConfidence(), sourceKnot, botResponse.getMatchedIntent(), loggedUserId);
+    UUID loggedUserId = getLoggerUserId();
+    fi.metatavu.metamind.persistence.models.Message message = messageController.createMessage(session, content, hint, botResponse.getConfidence(), session.getCurrentKnot(), botResponse.getMatchedIntent(), loggedUserId);
     if (message == null) {
       return createInternalServerError("Could not create new message");
     }
-    
+
     // TODO: Quick responses
-    // TODO: Message responses
+    // TODO: Confused knot?
     
     List<QuickResponse> quickResponses = new ArrayList<>();
     List<MessageResponse> messageResponses = new ArrayList<>();
+    
+    fi.metatavu.metamind.persistence.models.Intent matchedIntent = botResponse.getMatchedIntent();
+    if (matchedIntent != null) {
+      fi.metatavu.metamind.persistence.models.Knot knot = matchedIntent.getTargetKnot();
+      messageResponses.add(messageController.createMessageResponse(message, knot.getContent()));
+      sessionController.updateSessionCurrentKnot(session, knot, loggedUserId);
+    }
     
     return createOk(messageTranslator.translateMessage(message, quickResponses, messageResponses));
   }
@@ -469,7 +465,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return false;
     }
     
-    return isKnotFromStory(intent.getSourceKnot(), story);
+    return isKnotFromStory(intent.getTargetKnot(), story);
   }
 
   /**
