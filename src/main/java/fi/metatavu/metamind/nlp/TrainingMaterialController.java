@@ -284,8 +284,20 @@ public class TrainingMaterialController {
    * @param trainingMaterial training material
    */
   private void requestKnotsTrainingMaterialUpdate(fi.metatavu.metamind.persistence.models.TrainingMaterial trainingMaterial) {
-    for (Knot knot : knotDAO.listByTargetIntentTrainingMaterial(trainingMaterial)) {
-      knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(knot.getId()));
+    List<Story> stories = intentDAO.listStoriesByTrainingMaterialAndGlobal(trainingMaterial, Boolean.TRUE);
+    if (stories.isEmpty()) {
+      // Material is not attached into global intents, no need to update everything
+      
+      for (Knot knot : knotDAO.listByTargetIntentTrainingMaterial(trainingMaterial)) {
+        knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(knot.getId()));
+      }      
+    } else {
+      // Material is attached into global intents, we need to update all knots in related stories
+      
+      List<UUID> knotIds = stories.stream().map(story -> knotDAO.listByStory(story)).flatMap(List::stream).map(Knot::getId).collect(Collectors.toList());
+      for (UUID knotId : knotIds) {
+        knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(knotId));
+      }
     }
   }
   
