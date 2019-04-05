@@ -1,4 +1,4 @@
-package fi.metatavu.metamind.bot.functions;
+package fi.metatavu.metamind.bot.functions.old;
 
 import java.util.Map;
 

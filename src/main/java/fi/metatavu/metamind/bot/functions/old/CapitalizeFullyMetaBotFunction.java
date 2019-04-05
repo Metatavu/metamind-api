@@ -1,10 +1,11 @@
-package fi.metatavu.metamind.bot.functions;
+package fi.metatavu.metamind.bot.functions.old;
 
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 
 import com.bladecoder.ink.runtime.Story;
@@ -13,20 +14,20 @@ import com.rabidgremlin.mutters.core.IntentMatch;
 import com.rabidgremlin.mutters.core.session.Session;
 
 /**
- * Metabot function for rounding numbers.
+ * Metabot function for capitalizing words in a String into capitalized words, that is each word is made up of a titlecase character and then a series of lowercase characters.
  * 
  * @author Antti Leppä
  * @author Heikki Kurhinen
  */
 @ApplicationScoped
-public class RoundMetaBotFunction extends AbstractMetaBotFunction {
+public class CapitalizeFullyMetaBotFunction extends AbstractMetaBotFunction {
 
   @Inject
   private Logger logger;
 
   @Override
   public String getFunctionName() {
-    return "ROUND";
+    return "CAPITALIZE_FULLY";
   }
   
   @Override
@@ -34,42 +35,26 @@ public class RoundMetaBotFunction extends AbstractMetaBotFunction {
     Map<String, String> params = getParsedParam(paramString);
     
     String variableName = params.get("variable");
-    String nearValue = params.get("near");
+    String delimiters = params.get("delimiters");
     if (variableName == null) {
       logger.error("Could not capitalize without variable name");
       return;
     }
     
-    Integer near = null;
-    if (nearValue != null) {
-      try {
-        near = Integer.parseInt(nearValue);
-      } catch (NumberFormatException e) {
-        logger.warn("Failed to parse near value", e);
-      }
+    if (delimiters == null) {
+      delimiters = " ";
     }
     
-    Float value = getVariableNumber(story, variableName);
+    String value = getVariableString(story, variableName);
     if (value != null) {
-      Integer rounded = null;
-      
-      if (near != null) {
-        rounded = roundNear(value, near);
-      } else {
-        rounded = Math.round(value);
-      }
-      
+      String capitalized = WordUtils.capitalizeFully((String) value, delimiters.toCharArray());
       try {
-        setVariable(story, variableName, rounded);
+        setVariable(story, variableName, capitalized);
       } catch (Exception e) {
         logger.error("Could not set variable state", e);
         return;
       }
     }
-  }
-
-  private int roundNear(float value, int near) {
-    return Math.round((value / near)) * near;
   }
 
 }
