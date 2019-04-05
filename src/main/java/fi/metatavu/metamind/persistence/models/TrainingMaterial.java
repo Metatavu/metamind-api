@@ -1,15 +1,14 @@
 package fi.metatavu.metamind.persistence.models;
 
 import java.time.OffsetDateTime;
-import java.util.Locale;
 import java.util.UUID;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -19,19 +18,24 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-public class Story {
+public class TrainingMaterial {
 
   @Id
   private UUID id;
 
   @NotNull
   @NotEmpty
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private String name;
 
   @NotNull
+  @NotEmpty
   @Column(nullable = false)
-  private Locale locale;
+  @Lob
+  private String text;
+  
+  @ManyToOne
+  private Story story;
 
   @Column(nullable = false)
   @NotNull
@@ -50,27 +54,35 @@ public class Story {
   public UUID getId() {
     return id;
   }
-  
+
   public void setId(UUID id) {
     this.id = id;
   }
-  
-  public Locale getLocale() {
-    return locale;
-  }
-  
-  public void setLocale(Locale locale) {
-    this.locale = locale;
-  }
-  
+
   public String getName() {
     return name;
   }
-
+  
   public void setName(String name) {
     this.name = name;
   }
   
+  public String getText() {
+    return text;
+  }
+  
+  public void setText(String text) {
+    this.text = text;
+  }
+  
+  public Story getStory() {
+    return story;
+  }
+  
+  public void setStory(Story story) {
+    this.story = story;
+  }
+
   public UUID getCreatorId() {
     return creatorId;
   }
@@ -103,15 +115,4 @@ public class Story {
     this.modifiedAt = modifiedAt;
   }
 
-  @PrePersist
-  public void onCreate() {
-    setCreatedAt(OffsetDateTime.now());
-    setModifiedAt(OffsetDateTime.now());
-  }
-
-  @PreUpdate
-  public void onUpdate() {
-    setModifiedAt(OffsetDateTime.now());
-  }
-  	
 }

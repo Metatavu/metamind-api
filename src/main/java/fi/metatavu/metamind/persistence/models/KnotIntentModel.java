@@ -7,16 +7,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.validation.constraints.NotNull;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-public class IntentModel {
+public class KnotIntentModel {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +25,8 @@ public class IntentModel {
   @Lob
   private byte[] data;
   
-  @NotNull
-  @NotEmpty
-  @Column(nullable = false, unique = true)
-  private String name;
+  @ManyToOne
+  private Knot knot;
   
   public Long getId() {
     return id;
@@ -47,12 +44,12 @@ public class IntentModel {
     this.data = data;
   }
   
-  public String getName() {
-    return name;
+  public Knot getKnot() {
+    return knot;
   }
   
-  public void setName(String name) {
-    this.name = name;
+  public void setKnot(Knot knot) {
+    this.knot = knot;
   }
   
 }

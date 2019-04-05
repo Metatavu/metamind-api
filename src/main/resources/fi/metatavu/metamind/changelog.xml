@@ -22,6 +22,9 @@
       <column name="name" type="varchar(191)">
         <constraints nullable="false"/>
       </column>
+      <column name="locale" type="VARCHAR(191)">
+        <constraints nullable="false"/>
+      </column>
     </createTable>
     
   	<createTable tableName="knot">
@@ -53,6 +56,33 @@
         <constraints nullable="false"/>
       </column> 
     </createTable>
+    
+    <createTable tableName="trainingmaterial">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="story_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_TRAININGMATERIAL_STORY" referencedColumnNames="id" referencedTableName="story"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="text" type="LONGTEXT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
   
     <createTable tableName="intent">
       <column name="id" type="binary(16)">
@@ -73,11 +103,17 @@
       <column name="type" type="varchar(191)">
         <constraints nullable="false"/>
       </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
       <column name="sourceknot_id" type="binary(16)">
         <constraints nullable="true" foreignKeyName="FK_INTENT_SOURCE_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
       </column>
       <column name="targetknot_id" type="binary(16)">
         <constraints nullable="false" foreignKeyName="FK_INTENT_TARGET_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+      <column name="trainingmaterial_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_INTENT_TRAINING_MATERIAL" referencedColumnNames="id" referencedTableName="trainingmaterial"/>
       </column>
       <column name="global" type="boolean">
         <constraints nullable="false"/>
@@ -170,7 +206,7 @@
         <constraints nullable="false"/>
       </column> 
       <column name="message_id" type="binary(16)">
-        <constraints nullable="true" foreignKeyName="FK_QUICK_RESPONSE_MESSAGE" referencedColumnNames="id" referencedTableName="message"/>
+        <constraints nullable="true" foreignKeyName="FK_MESSAGE_RESPONSE_MESSAGE" referencedColumnNames="id" referencedTableName="message"/>
       </column>
     </createTable>
     
@@ -249,6 +285,18 @@
     </createTable>
     
     <addUniqueConstraint constraintName="UN-SYSTEM-SETTING-SETTING-KEY" columnNames="settingkey" tableName="systemsetting"/>
+    
+    <createTable tableName="knotintentmodel">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="data" type="LONGBLOB">
+        <constraints nullable="false"/>
+      </column>
+      <column name="knot_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_KNOT_INTENT_MODEL_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+    </createTable>
   </changeSet>
   
 </databaseChangeLog>

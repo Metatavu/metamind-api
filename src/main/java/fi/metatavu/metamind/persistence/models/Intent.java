@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cache;
@@ -31,11 +32,19 @@ public class Intent {
   @Column(nullable = false)
   private IntentType type;
 
+  @NotNull
+  @NotEmpty
+  @Column(nullable = false)
+  private String name;
+
   @ManyToOne
   private Knot sourceKnot;
 
   @ManyToOne(optional = false)
   private Knot targetKnot;
+
+  @ManyToOne(optional = false)
+  private TrainingMaterial trainingMaterial;
 
   @Column(nullable = false)
   private Boolean global;
@@ -69,6 +78,14 @@ public class Intent {
   public void setType(IntentType type) {
     this.type = type;
   }
+  
+  public String getName() {
+    return name;
+  }
+  
+  public void setName(String name) {
+    this.name = name;
+  }
 
   public Knot getSourceKnot() {
     return sourceKnot;
@@ -84,6 +101,14 @@ public class Intent {
 
   public void setTargetKnot(Knot targetKnot) {
     this.targetKnot = targetKnot;
+  }
+  
+  public TrainingMaterial getTrainingMaterial() {
+    return trainingMaterial;
+  }
+  
+  public void setTrainingMaterial(TrainingMaterial trainingMaterial) {
+    this.trainingMaterial = trainingMaterial;
   }
 
   public Boolean getGlobal() {

@@ -1,142 +1,99 @@
 package fi.metatavu.metamind.bot;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rabidgremlin.mutters.bot.ink.InkBotFunction;
-
-import fi.metatavu.metamind.bot.config.MachineLearningConfig;
-import fi.metatavu.metamind.bot.config.StoryConfig;
-import fi.metatavu.metamind.bot.functions.MetaBotFunction;
-import fi.metatavu.metamind.models.ModelsContoller;
-import fi.metatavu.metamind.persistence.models.IntentModel;
+import fi.metatavu.metamind.bot.match.IntentMatch;
+import fi.metatavu.metamind.bot.match.IntentMatcher;
+import fi.metatavu.metamind.bot.match.OpenNPLIntentMatcher;
+import fi.metatavu.metamind.persistence.dao.IntentDAO;
+import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
+import fi.metatavu.metamind.persistence.models.Intent;
+import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.KnotIntentModel;
 import fi.metatavu.metamind.persistence.models.Session;
-import fi.metatavu.metamind.persistence.models.SlotModel;
-import fi.metatavu.metamind.persistence.models.Story;
+import opennlp.tools.doccat.DoccatModel;
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 /**
- * Controller for the bot
+ * Bot controller
  * 
  * @author Antti Leppä
  */
 @ApplicationScoped
 public class BotController {
-  
-  @Any
-  @Inject
-  private Instance<MetaBotFunction> metabotFunctions;
-
-  @Inject
-  private ModelsContoller modelsContoller;
 
   @Inject
   private Logger logger;
-  
-  /**
-   * Creates new bot session
-   * 
-   * @return created bot session
-   */
-  public com.rabidgremlin.mutters.core.session.Session createBotSession() {
-    return new com.rabidgremlin.mutters.core.session.Session();
-  }
-  
-  /**
-   * Serializes bot session into byte array
-   * 
-   * @param botSession session to be serialized
-   * @return serialized session or null if serialization fails
-   */
-  @SuppressWarnings ("squid:S1168")
-  public byte[] serializeBotSession(com.rabidgremlin.mutters.core.session.Session botSession) {
-    try (ByteArrayOutputStream dataStream = new ByteArrayOutputStream()) {
-      try (ObjectOutputStream objectStream = new ObjectOutputStream(dataStream)) {
-        objectStream.writeObject(botSession);
-        return dataStream.toByteArray();
-      }
-    } catch (IOException e) {
-      logger.error("Failed to serialize session from session", e);
-      return null;
-    }
-  }
 
-  private void loadIntentModels(List<MachineLearningConfig> machineLearningConfigs, Map<String, IntentModel> intentModels) {
-    List<String> intentModelNames = new ArrayList<>();
-    
-    for (MachineLearningConfig machineLearningConfig : machineLearningConfigs) {
-      intentModelNames.add(machineLearningConfig.getIntentModel());
-    }
-    
-    for (String intentModelName : intentModelNames) {
-      if (intentModelName != null && !intentModels.containsKey(intentModelName)) {
-        IntentModel intentModel = modelsContoller.findIntentModelByName(String.format("%s.bin", intentModelName));
-        
-        if (intentModel == null && logger.isWarnEnabled()) {
-          logger.warn(String.format("Failed to load intent model %s", intentModelName));
-        } else {
-          intentModels.put(intentModelName, intentModel);
+  @Inject
+  private IntentDAO intentDAO;
+
+  @Inject
+  private KnotIntentModelDAO knotIntentModelDAO;
+
+  /**
+   * Retrieves response from bot
+   * 
+   * @param session session
+   * @param sourceKnot source knot
+   * @param message message
+   * @param locale locale
+   * @param timeZone time zone
+   * @return response
+   */
+  public BotResponse getResponse(Session session, Knot sourceKnot, String message, Locale locale, TimeZone timeZone) {
+    List<IntentMatcher> matchers = getIntentMatchers(sourceKnot);
+    for (IntentMatcher matcher : matchers) {
+      IntentMatch intentMatch = matcher.matchIntents(message);
+      if (intentMatch != null) {
+        Intent intent = intentDAO.findById(intentMatch.getIntentId());
+        if (intent != null) {
+          return new BotResponse(intentMatch.getScore(), intent); 
         }
       }
     }
-  }
-
-  protected void loadSlotModels(StoryConfig storyConfig, Map<String, SlotModel> slotModels) {
-    List<MachineLearningConfig> machineLearningConfigs = storyConfig.getMachineLearning();
-    for (MachineLearningConfig machineLearningConfig : machineLearningConfigs) {
-      if (machineLearningConfig.getSlotModels() != null) {
-        loadSlotModels(machineLearningConfig, slotModels);
-      }
-    }
-  }
-
-  private void loadSlotModels(MachineLearningConfig machineLearningConfig, Map<String, SlotModel> slotModels) {
-    Collection<String> slotModelNames = machineLearningConfig.getSlotModels().values();
-    for (String slotModelName : slotModelNames) {
-      SlotModel slotModel = modelsContoller.findSlotModelByName(String.format("%s.bin", slotModelName));
-      if (slotModel !=  null) {
-        slotModels.put(slotModelName, slotModel);
-      } else {
-        if (logger.isWarnEnabled()) {
-          logger.warn(String.format("Could not find slot model %s", slotModelName));
-        }
-      }
-    }
-  }
-
-  private StoryConfig loadStoryConfig(String configJson) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    try {
-      return objectMapper.readValue(configJson, StoryConfig.class);
-    } catch (IOException e) {
-      logger.error("Failed to read story config", e);
-    }
-    
-    return null;
-  }
-
-  @SuppressWarnings ("squid:S4508")
-  private com.rabidgremlin.mutters.core.session.Session deserializeBotSession(byte[] data) throws IOException, ClassNotFoundException {
-    try (ByteArrayInputStream dataStream = new ByteArrayInputStream(data)) {
-      try (ObjectInputStream objectStream = new ObjectInputStream(dataStream)) {
-        return (com.rabidgremlin.mutters.core.session.Session) objectStream.readObject();
-      }
-    }
+  
+    return new BotResponse(0d, null); 
   }
   
+  /**
+   * Lists intent matchers for given knot
+   * 
+   * @param sourceKnot source knot
+   * @return list of intent matchers
+   */
+  private List<IntentMatcher> getIntentMatchers(Knot sourceKnot) {
+    // TODO: Knot settings: Tokenizer, Strategy, minMatch?
+    
+    List<IntentMatcher> result = new ArrayList<>();
+    Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
+    KnotIntentModel knotIntentModel = knotIntentModelDAO.findByKnot(sourceKnot);
+    if (knotIntentModel != null) {
+      try {
+        double minMatch = 0.75d;      
+        byte[] modelData = knotIntentModel.getData();
+        try (InputStream modelStream = new ByteArrayInputStream(modelData)) {
+          DoccatModel model = new DoccatModel(modelStream);
+          result.add(new OpenNPLIntentMatcher(model, tokenizer, minMatch));      
+        }    
+      } catch (IOException e) {
+        logger.error("Failed to read doccat model", e);
+      }
+    }
+    
+    return result;
+  }
+
 }

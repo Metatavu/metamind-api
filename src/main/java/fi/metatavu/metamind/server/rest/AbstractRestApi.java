@@ -27,6 +27,7 @@ import fi.metatavu.metamind.rest.model.ErrorResponse;
  */
 public abstract class AbstractRestApi {
 
+  private static final UUID ANONYMOUS_USER_ID = new UUID(0L, 0L);
   private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
   private static final String FAILED_TO_STREAM_DATA_TO_CLIENT = "Failed to stream data to client";
   
@@ -42,7 +43,7 @@ public abstract class AbstractRestApi {
     HttpServletRequest httpServletRequest = getHttpServletRequest();
     String remoteUser = httpServletRequest.getRemoteUser();
     if (remoteUser == null) {
-      return null;
+      return ANONYMOUS_USER_ID;
     }
     
     return UUID.fromString(remoteUser);

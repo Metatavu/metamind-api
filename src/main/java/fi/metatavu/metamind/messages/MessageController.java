@@ -19,6 +19,11 @@ import fi.metatavu.metamind.persistence.models.MessageResponse;
 import fi.metatavu.metamind.persistence.models.QuickResponse;
 import fi.metatavu.metamind.persistence.models.Session;
 
+/**
+ * Controller for messages
+ * 
+ * @author Antti Leppä
+ */
 @ApplicationScoped
 public class MessageController {
 
@@ -43,7 +48,7 @@ public class MessageController {
    * @param creatorId creator's id
    * @return created message
    */
-  public Message create(Session session, String content, String hint, Double confidence, Knot sourceKnot, Intent matchedIntent, UUID creatorId) {
+  public Message createMessage(Session session, String content, String hint, Double confidence, Knot sourceKnot, Intent matchedIntent, UUID creatorId) {
     return messageDAO.create(UUID.randomUUID(), session, content, hint, confidence, sourceKnot, matchedIntent, creatorId, creatorId);
   }
   

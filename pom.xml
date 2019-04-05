@@ -345,6 +345,14 @@
       <version>${liquibase.version}</version>
     </dependency>
     
+    <!-- OpenNPL -->
+    
+    <dependency>
+	  <groupId>org.apache.opennlp</groupId>
+	  <artifactId>opennlp-tools</artifactId>
+	  <version>1.9.1</version>
+	</dependency>
+    
     <!-- Mutter -->
     
     <dependency>

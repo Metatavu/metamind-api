@@ -11,7 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 
-@WebFilter (urlPatterns = "/v1/*")
+@WebFilter (urlPatterns = "/v2/*")
 public class AccessControlAllowOriginFilter implements Filter {
   
   @Override
