@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
@@ -19,13 +20,17 @@ import org.slf4j.Logger;
 
 import fi.metatavu.metamind.bot.BotRuntimeContext;
 import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.Script;
 import fi.metatavu.metamind.polyglot.XMLHttpRequest;
+import fi.metatavu.metamind.scripts.ScriptController;
 
 @ApplicationScoped
 public class ScriptProcessor {
   
   private static final Pattern INLINE_PATTERN = Pattern.compile("(<script.*>)((.|\\n)*?)(<\\/script>)");
   private static final Pattern NAMED_PATTERN = Pattern.compile("(<script)(.*)(\\/>)");
+  private static final Pattern ATTRIBUTES_PATTERN = Pattern.compile("([a-z]{1,})\\s{0,}\\=\\s{0,}\\\"((.|\\\\n\\s)*?)\\\""); 
+
   private static final Set<String> RESERVED_PARAMS = new HashSet<String>(Arrays.asList(
     new String[] { "name", "version", "module", "function", "target" }
   ));
@@ -38,6 +43,9 @@ public class ScriptProcessor {
   
   @Inject
   private BotRuntimeContext botRuntimeContext;
+
+  @Inject
+  private ScriptController scriptController; 
   
   /**
    * Processes texts in current knot
@@ -55,6 +63,7 @@ public class ScriptProcessor {
    */
   public String processScripts(String text) {
     String result = processInlineScripts(text);
+    result = processNamedScripts(result);
     return result;
   }
   
@@ -70,6 +79,54 @@ public class ScriptProcessor {
       String content = result.group(2);
       return processScript(new RunnableScript("js", content, "inline"), Collections.emptyMap());
     });
+  }
+
+  /**
+   * Processes named scripts from text
+   * 
+   * @param text text
+   * @return processed text
+   */
+  private String processNamedScripts(String text) {
+    Matcher matcher = NAMED_PATTERN.matcher(text);   
+    return matcher.replaceAll((result) -> {
+      Map<String, String> params = parseNamedAttributes(StringUtils.trim(result.group(2)));
+      String name = params.get("name");
+      String version = params.get("version");
+      
+      if (StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(version)) {
+        Script script = scriptController.findScriptByNameAndVersion(name, version);
+        if (script == null) {          
+          logger.warn("Script with name {} and version {} could not be found, skipping", name, version);
+        } else {
+          return processScript(new RunnableScript(script.getLanguage(), script.getContent(), script.getName()), params);
+        }
+      } else {
+        logger.warn("Script without name or version attribute, skipping");
+      }
+      
+      return "";
+    });
+  }
+  
+  /**
+   * Parses script tag attributes
+   * 
+   * @param string attribute string
+   * @return parsed attributes
+   */
+  private Map<String, String> parseNamedAttributes(String string) {
+    Map<String, String> result = new HashMap<>();
+    
+    Matcher matcher = ATTRIBUTES_PATTERN.matcher(string);
+    
+    while (matcher.find()) {
+      String name = matcher.group(1);
+      String value = matcher.group(2);
+      result.put(name, value);
+    }
+    
+    return result;
   }
 
   /**

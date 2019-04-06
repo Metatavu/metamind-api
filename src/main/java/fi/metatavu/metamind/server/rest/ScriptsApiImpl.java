@@ -1,6 +1,7 @@
 package fi.metatavu.metamind.server.rest;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
@@ -87,7 +88,7 @@ public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
 
   @Override
   public Response listScripts() {
-    return createOk(scriptController.listScripts().stream().map(scriptTranslator::translateScript));
+    return createOk(scriptController.listScripts().stream().map(scriptTranslator::translateScript).collect(Collectors.toList()));
   }
 
   @Override
