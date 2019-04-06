@@ -129,6 +129,11 @@ public class TrainingMaterialController {
     updateKnotTrainingMaterial(knot, knotLines, language);
   }
 
+  /**
+   * Updates story's training material
+   * 
+   * @param story story
+   */
   public void updateStoryTrainingMaterial(Story story) {
     String knotLines = getTrainingMaterialLines(intentDAO.listByStoryAndGlobal(story, true));
     Locale locale = story.getLocale();
@@ -170,6 +175,12 @@ public class TrainingMaterialController {
     trainingMaterialDAO.delete(trainingMaterial);
   }
   
+  /**
+   * Resolves training material lines for given list of intents
+   * 
+   * @param intents intents
+   * @return training material lines
+   */
   private String getTrainingMaterialLines(List<Intent> intents) {
     return intents.stream()
       .filter(intent -> intent != null && intent.getTrainingMaterial() != null && StringUtils.isNotBlank(intent.getTrainingMaterial().getText()))
