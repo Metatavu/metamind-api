@@ -13,12 +13,15 @@ import fi.metatavu.metamind.bot.StoryGlobalTrainingMaterialUpdateRequestEvent;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
 import fi.metatavu.metamind.persistence.dao.StoryDAO;
+import fi.metatavu.metamind.persistence.dao.VariableDAO;
 import fi.metatavu.metamind.persistence.models.Intent;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
+import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
+import fi.metatavu.metamind.rest.model.VariableType;
 import jersey.repackaged.com.google.common.base.Objects;
 
 /**
@@ -37,6 +40,9 @@ public class StoryController {
 
   @Inject
   private IntentDAO intentDAO;
+
+  @Inject
+  private VariableDAO variableDAO;
 
   @Inject
   private Event<KnotTrainingMaterialUpdateRequestEvent> knotTrainingMaterialUpdateRequestEvent;
@@ -126,6 +132,20 @@ public class StoryController {
     
     return intent;
   }
+  
+  /**
+   * Creates new variable
+   *
+   * @param type type
+   * @param story story
+   * @param name name
+   * @param validationScript validationScript
+   * @param creatorId creator's id
+   * @return created variable
+   */
+  public Variable createVariable(VariableType type, Story story, String name, String validationScript, UUID creatorId) {
+    return variableDAO.create(UUID.randomUUID(), type, story, name, validationScript, creatorId, creatorId);
+  }
 
   /**
    * Finds an intent by id
@@ -135,6 +155,16 @@ public class StoryController {
    */
   public Intent findIntentById(UUID intentId) {
     return intentDAO.findById(intentId);
+  }
+  
+  /**
+   * Finds a variable by id
+   * 
+   * @param variableId variable id
+   * @return found variable or null if not found
+   */
+  public Variable findVariableById(UUID variableId) {
+    return variableDAO.findById(variableId);
   }
 
   /**
@@ -155,6 +185,16 @@ public class StoryController {
    */
   public List<Knot> listKnotsByStory(Story story) {
     return knotDAO.listByStory(story);
+  }
+  
+  /**
+   * List variables by story
+   * 
+   * @param story story
+   * @return variables
+   */
+  public List<Variable> listVariablesByStory(Story story) {
+    return variableDAO.listByStory(story);
   }
 
   /**
@@ -224,6 +264,23 @@ public class StoryController {
     story = storyDAO.updateName(story, name, lastModifierId);
     return story;
   }
+  
+  /**
+   * Updates variable
+   * 
+   * @param variable variable
+   * @param name name
+   * @param type type
+   * @param validationScript validation script
+   * @param lastModifierId last modifier's id
+   * @return updated variable
+   */
+  public Variable updateVariable(Variable variable, String name, VariableType type, String validationScript, UUID lastModifierId) {
+    variable = variableDAO.updateName(variable, name, lastModifierId);
+    variable = variableDAO.updateType(variable, type, lastModifierId);
+    variable = variableDAO.updateValidationScript(variable, validationScript, lastModifierId);
+    return variable;
+  }
 
   /**
    * Deletes a story
@@ -250,6 +307,15 @@ public class StoryController {
    */
   public void deleteIntent(Intent intent) {
     intentDAO.delete(intent);
+  }
+  
+  /**
+   * Deletes a variable
+   * 
+   * @param variable variable
+   */
+  public void deleteVariable(Variable variable) {
+    variableDAO.delete(variable);
   }
 
 }

@@ -1,7 +1,16 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import java.util.List;
 import java.util.UUID;
-import fi.metatavu.metamind.persistence.models.*;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.Variable;
+import fi.metatavu.metamind.persistence.models.Variable_;
 import fi.metatavu.metamind.rest.model.VariableType;
 
 /**
@@ -32,6 +41,25 @@ public class VariableDAO extends AbstractDAO<Variable> {
       variable.setCreatorId(creatorId);
       variable.setLastModifierId(lastModifierId);
       return persist(variable);
+    }
+    
+    /**
+     * Lists variables by story
+     * 
+     * @param story story
+     * @return List of variables
+     */
+    public List<Variable> listByStory(Story story) {
+      EntityManager entityManager = getEntityManager();
+
+      CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+      CriteriaQuery<Variable> criteria = criteriaBuilder.createQuery(Variable.class);
+      Root<Variable> root = criteria.from(Variable.class);
+     
+      criteria.select(root);
+      criteria.where(criteriaBuilder.equal(root.get(Variable_.story), story));
+      
+      return entityManager.createQuery(criteria).getResultList();
     }
 
     /**

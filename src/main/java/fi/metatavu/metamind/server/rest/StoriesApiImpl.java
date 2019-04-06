@@ -37,6 +37,7 @@ import fi.metatavu.metamind.server.rest.translation.KnotTranslator;
 import fi.metatavu.metamind.server.rest.translation.MessageTranslator;
 import fi.metatavu.metamind.server.rest.translation.SessionTranslator;
 import fi.metatavu.metamind.server.rest.translation.StoryTranslator;
+import fi.metatavu.metamind.server.rest.translation.VariableTranslator;
 import fi.metatavu.metamind.sessions.SessionController;
 import fi.metatavu.metamind.story.StoryController;
 
@@ -66,7 +67,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Inject
   private TrainingMaterialController trainingMaterialController;
-
+  
   @Inject
   private ScriptProcessor scriptProcessor;
 
@@ -85,6 +86,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Inject
   private SessionTranslator sessionTranslator;
   
+  @Inject
+  private VariableTranslator variableTranslator;
+
   @Inject
   private BotRuntimeContext botRuntimeContext;
   
@@ -231,8 +235,16 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createVariable(Variable body, UUID storyId) {
-    // TODO Auto-generated method stub
-    return null;
+    UUID loggedUserId = getLoggerUserId();
+    
+    // TODO: Permission check
+    
+    fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
+    if (story == null) {
+      return createBadRequest(String.format("Story %s not found", storyId)); 
+    }
+    
+    return createOk(variableTranslator.translateVariable(storyController.createVariable(body.getType(), story, body.getName(), body.getValidationScript(), loggedUserId)));
   }
 
   @Override
@@ -297,8 +309,25 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteVariable(UUID storyId, UUID variableId) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO: Permission check
+    
+    fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
+    if (variable == null) {
+      return createBadRequest(String.format("Variable %s not found", variableId)); 
+    }
+    
+    fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
+    if (story == null) {
+      return createBadRequest(String.format("Story %s not found", storyId)); 
+    }
+    
+    if (!isVariableFromStory(variable, story)) {
+      return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
+    }
+    
+    storyController.deleteVariable(variable);
+    
+    return createNoContent();
   }
 
   @Override
@@ -357,8 +386,23 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findVariable(UUID storyId, UUID variableId) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO: Permission check
+    
+    fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
+    if (variable == null) {
+      return createBadRequest(String.format("Variable %s not found", variableId)); 
+    }
+    
+    fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
+    if (story == null) {
+      return createBadRequest(String.format("Story %s not found", storyId)); 
+    }
+    
+    if (!isVariableFromStory(variable, story)) {
+      return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
+    }
+    
+    return createOk(variableTranslator.translateVariable(variable));
   }
 
   @Override
@@ -400,8 +444,16 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listVariables(UUID storyId) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO: Permission check
+    
+    fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
+    if (story == null) {
+      return createBadRequest(String.format("Story %s not found", storyId)); 
+    }
+    
+    return createOk(storyController.listVariablesByStory(story).stream()
+      .map(variableTranslator::translateVariable)
+      .collect(Collectors.toList()));
   }
 
   @Override
@@ -472,8 +524,24 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response updateVariable(Variable body, UUID storyId, UUID variableId) {
-    // TODO Auto-generated method stub
-    return null;
+    UUID loggedUserId = getLoggerUserId();
+    // TODO: Permission check
+    
+    fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
+    if (variable == null) {
+      return createBadRequest(String.format("Variable %s not found", variableId)); 
+    }
+    
+    fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
+    if (story == null) {
+      return createBadRequest(String.format("Story %s not found", storyId)); 
+    }
+    
+    if (!isVariableFromStory(variable, story)) {
+      return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
+    }
+    
+    return createOk(variableTranslator.translateVariable(storyController.updateVariable(variable, body.getName(), body.getType(), body.getValidationScript(), loggedUserId)));
   }
 
   /**
@@ -504,6 +572,21 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     return story.getId().equals(knot.getStory().getId());
+  }
+
+  /**
+   * Returns whether variable is from given story
+   * 
+   * @param variable variable
+   * @param story story
+   * @return  whether variable is from given story
+   */
+  private boolean isVariableFromStory(fi.metatavu.metamind.persistence.models.Variable variable, fi.metatavu.metamind.persistence.models.Story story) {
+    if (variable == null || story == null) {
+      return false;
+    }
+    
+    return story.getId().equals(variable.getStory().getId());
   }
   
 }

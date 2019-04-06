@@ -24,6 +24,11 @@ import fi.metatavu.metamind.persistence.models.Script;
 import fi.metatavu.metamind.polyglot.XMLHttpRequest;
 import fi.metatavu.metamind.scripts.ScriptController;
 
+/**
+ * Script processor 
+ * 
+ * @author Antti Leppä
+ */
 @ApplicationScoped
 public class ScriptProcessor {
   
