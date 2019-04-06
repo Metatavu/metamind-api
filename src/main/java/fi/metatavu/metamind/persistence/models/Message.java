@@ -44,6 +44,9 @@ public class Message {
   private Knot sourceKnot;
 
   @ManyToOne
+  private Knot targetKnot;
+
+  @ManyToOne
   private Intent matchedIntent;
 
   @Column(nullable = false)
@@ -106,6 +109,14 @@ public class Message {
 
   public void setSourceKnot(Knot sourceKnot) {
     this.sourceKnot = sourceKnot;
+  }
+  
+  public Knot getTargetKnot() {
+    return targetKnot;
+  }
+  
+  public void setTargetKnot(Knot targetKnot) {
+    this.targetKnot = targetKnot;
   }
 
   public Intent getMatchedIntent() {

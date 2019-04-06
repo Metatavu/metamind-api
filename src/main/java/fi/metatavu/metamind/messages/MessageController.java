@@ -44,12 +44,13 @@ public class MessageController {
    * @param hint hint
    * @param confidence confidence
    * @param sourceKnot sourceKnot
+   * @param targetKnot targetKnot
    * @param matchedIntent matchedIntent
    * @param creatorId creator's id
    * @return created message
    */
-  public Message createMessage(Session session, String content, String hint, Double confidence, Knot sourceKnot, Intent matchedIntent, UUID creatorId) {
-    return messageDAO.create(UUID.randomUUID(), session, content, hint, confidence, sourceKnot, matchedIntent, creatorId, creatorId);
+  public Message createMessage(Session session, String content, String hint, Double confidence, Knot sourceKnot, Knot targetKnot, Intent matchedIntent, UUID creatorId) {
+    return messageDAO.create(UUID.randomUUID(), session, content, hint, confidence, sourceKnot, targetKnot, matchedIntent, creatorId, creatorId);
   }
 
   /**
@@ -70,7 +71,7 @@ public class MessageController {
    * @return messages
    */
   public List<Message> listSessionMessages(Session session) {
-    return messageDAO.listBySession(session);
+    return messageDAO.listBySession(session, null, null);
   }
   
   /**
@@ -116,6 +117,18 @@ public class MessageController {
     }
     
     return result;
+  }
+  
+  /**
+   * Updates targetKnot
+   *
+   * @param message message
+   * @param targetKnot targetKnot
+   * @param lastModifierId last modifier's id
+   * @return updated message
+   */
+  public Message updateMessageTargetKnot(Message message, Knot targetKnot, UUID lastModifierId) {
+    return messageDAO.updateTargetKnot(message, targetKnot, lastModifierId);
   }
 
 }

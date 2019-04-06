@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import fi.metatavu.metamind.bot.BotController;
 import fi.metatavu.metamind.bot.BotResponse;
+import fi.metatavu.metamind.bot.BotRuntimeContext;
+import fi.metatavu.metamind.bot.script.ScriptProcessor;
 import fi.metatavu.metamind.messages.MessageController;
 import fi.metatavu.metamind.nlp.TrainingMaterialController;
 import fi.metatavu.metamind.persistence.models.MessageResponse;
@@ -66,6 +68,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   private TrainingMaterialController trainingMaterialController;
 
   @Inject
+  private ScriptProcessor scriptProcessor;
+
+  @Inject
   private MessageTranslator messageTranslator;
 
   @Inject
@@ -79,6 +84,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Inject
   private SessionTranslator sessionTranslator;
+  
+  @Inject
+  private BotRuntimeContext botRuntimeContext;
   
   @Override
   public Response createIntent(Intent body, UUID storyId) {
@@ -157,11 +165,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     String hint = null; // TODO: hint
     UUID loggedUserId = getLoggerUserId();
-    fi.metatavu.metamind.persistence.models.Message message = messageController.createMessage(session, content, hint, botResponse.getConfidence(), session.getCurrentKnot(), botResponse.getMatchedIntent(), loggedUserId);
-    if (message == null) {
-      return createInternalServerError("Could not create new message");
-    }
-
+    
     // TODO: Quick responses
     // TODO: Confused knot?
     
@@ -171,13 +175,30 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     fi.metatavu.metamind.persistence.models.Intent matchedIntent = botResponse.getMatchedIntent();
     if (matchedIntent != null) {
       fi.metatavu.metamind.persistence.models.Knot knot = matchedIntent.getTargetKnot();
-      messageResponses.add(messageController.createMessageResponse(message, knot.getContent()));
-      sessionController.updateSessionCurrentKnot(session, knot, loggedUserId);
+      
+      botRuntimeContext.setSession(session);    
+      botRuntimeContext.setLoggedUserId(loggedUserId);
+      botRuntimeContext.setCurrentKnot(knot);
+      botRuntimeContext.setMatchedIntent(matchedIntent);
+        
+      scriptProcessor.processScripts();
+
+      fi.metatavu.metamind.persistence.models.Message message = messageController.createMessage(session, content, hint, botResponse.getConfidence(), session.getCurrentKnot(), knot, botResponse.getMatchedIntent(), loggedUserId);
+      if (message == null) {
+        return createInternalServerError("Could not create new message");
+      }
+
+      for (String response : botRuntimeContext.getResponses()) {
+        messageResponses.add(messageController.createMessageResponse(message, response));
+      }
+ 
+      messageController.updateMessageTargetKnot(message, botRuntimeContext.getCurrentKnot(), loggedUserId);
+      sessionController.updateSessionCurrentKnot(session, botRuntimeContext.getCurrentKnot(), loggedUserId);
+    
+      return createOk(messageTranslator.translateMessage(message, quickResponses, messageResponses));
     } else {
       return createInternalServerError("Could not resolve intent");
-    }
-    
-    return createOk(messageTranslator.translateMessage(message, quickResponses, messageResponses));
+    }    
   }
 
   @Override

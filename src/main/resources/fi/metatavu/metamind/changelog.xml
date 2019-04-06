@@ -325,4 +325,15 @@
     
   </changeSet>
   
+  <changeSet id="messagetargetknot" author="Antti Leppä">
+  
+    <addColumn tableName="message">
+      <column name="targetknot_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_SESSION_TARGET_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+    </addColumn>
+    
+  </changeSet>
+  
+  
 </databaseChangeLog>
