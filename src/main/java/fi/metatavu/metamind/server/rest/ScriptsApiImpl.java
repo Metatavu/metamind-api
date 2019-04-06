@@ -36,6 +36,8 @@ public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
 
   @Override
   public Response createScript(Script body) {
+    // TODO: Permission checks
+    
     String name = body.getName();
     String version = body.getVersion();
     String content = body.getContent();
@@ -59,26 +61,45 @@ public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
 
   @Override
   public Response deleteScript(UUID scriptId) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO: Permission checks
+    
+    fi.metatavu.metamind.persistence.models.Script script = scriptController.findScriptById(scriptId);
+    if (script == null) {
+      return createNotFound(String.format("Script %s not found", scriptId));
+    }
+    
+    scriptController.deleteScript(script);
+    
+    return createNoContent();
   }
 
   @Override
   public Response findScript(UUID scriptId) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO: Permission checks
+    
+    fi.metatavu.metamind.persistence.models.Script script = scriptController.findScriptById(scriptId);
+    if (script == null) {
+      return createNotFound(String.format("Script %s not found", scriptId));
+    }
+    
+    return createOk(scriptTranslator.translateScript(script));
   }
 
   @Override
   public Response listScripts() {
-    // TODO Auto-generated method stub
-    return null;
+    return createOk(scriptController.listScripts().stream().map(scriptTranslator::translateScript));
   }
 
   @Override
   public Response updateScript(Script body, UUID scriptId) {
-    // TODO Auto-generated method stub
-    return null;
+    fi.metatavu.metamind.persistence.models.Script script = scriptController.findScriptById(scriptId);
+    if (script == null) {
+      return createNotFound(String.format("Script %s not found", scriptId));
+    }
+    
+    UUID loggerUserId = getLoggerUserId();
+    
+    return createOk(scriptTranslator.translateScript(scriptController.updateScript(script, body.getContent(), body.getLanguage(), loggerUserId)));
   }
 
 }

@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.scripts;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -52,6 +53,15 @@ public class ScriptController {
   }
 
   /**
+   * Lists scripts
+   * 
+   * @return scripts
+   */
+  public List<Script> listScripts() {
+    return scriptDAO.listAll();
+  }
+
+  /**
    * Update script
    *
    * @param script script
@@ -62,6 +72,15 @@ public class ScriptController {
    */
   public Script updateScript(Script script, String content, String language, UUID lastModifierId) {
     return scriptDAO.updateLanguage(scriptDAO.updateContent(script, content, lastModifierId), language, lastModifierId);
+  }
+  
+  /**
+   * Deletes a script
+   * 
+   * @param script script
+   */
+  public void deleteScript(Script script) {
+    scriptDAO.delete(script);
   }
   
 }
