@@ -8,10 +8,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
-import fi.metatavu.metamind.persistence.models.*;
+import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.Knot_;
+import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.rest.model.KnotType;
 
 /**
@@ -46,29 +47,6 @@ public class KnotDAO extends AbstractDAO<Knot> {
     return persist(knot);
   }
 
-  /**
-   * Lists knots with attached target intents having specified training material
-   * 
-   * @param trainingMaterial trainingMaterial
-   * @return List of knots with attached target intents having specified training material
-   */
-  public List<Knot> listByTargetIntentTrainingMaterial(TrainingMaterial trainingMaterial) {
-    EntityManager entityManager = getEntityManager();
-
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Knot> criteria = criteriaBuilder.createQuery(Knot.class);
-    Root<Intent> root = criteria.from(Intent.class);
-    Join<Intent, Knot> knotJoin = root.join(Intent_.sourceKnot);
-    
-    criteria.select(knotJoin);
-    criteria.where(criteriaBuilder.equal(root.get(Intent_.trainingMaterial), trainingMaterial));
-    criteria.groupBy(knotJoin);
-    
-    TypedQuery<Knot> query = entityManager.createQuery(criteria);
-    
-    return query.getResultList();
-  }
-  
   /**
    * Lists intents by story
    * 

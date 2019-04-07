@@ -7,6 +7,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import fi.metatavu.metamind.persistence.models.*;
+import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 
 /**
  * DAO class for StoryGlobalIntentModel
@@ -19,14 +20,16 @@ public class StoryGlobalIntentModelDAO extends AbstractDAO<StoryGlobalIntentMode
   /**
    * Creates new StoryGlobalIntentModel
    * 
+   * @param type type
    * @param data data
    * @param story story
    * @return created storyGlobalIntentModel
    */
-  public StoryGlobalIntentModel create(byte[] data, Story story) {
+  public StoryGlobalIntentModel create(TrainingMaterialType type, byte[] data, Story story) {
     StoryGlobalIntentModel storyGlobalIntentModel = new StoryGlobalIntentModel();
     storyGlobalIntentModel.setData(data);
     storyGlobalIntentModel.setStory(story);
+    storyGlobalIntentModel.setType(type);
     return persist(storyGlobalIntentModel);
   }
 

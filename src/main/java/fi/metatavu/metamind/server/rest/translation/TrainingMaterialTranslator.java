@@ -32,7 +32,8 @@ public class TrainingMaterialTranslator {
     result.setText(jpaTrainingMaterial.getText());
     result.setName(jpaTrainingMaterial.getName());
     result.setStoryId(jpaTrainingMaterial.getStory() != null ? jpaTrainingMaterial.getId() : null);
-
+    result.setType(jpaTrainingMaterial.getType());
+    
     return result;
   }
 

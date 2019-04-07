@@ -23,14 +23,17 @@ import fi.metatavu.metamind.bot.BotRuntimeContext;
 import fi.metatavu.metamind.bot.script.ScriptProcessor;
 import fi.metatavu.metamind.messages.MessageController;
 import fi.metatavu.metamind.nlp.TrainingMaterialController;
+import fi.metatavu.metamind.persistence.models.IntentTrainingMaterial;
 import fi.metatavu.metamind.persistence.models.MessageResponse;
 import fi.metatavu.metamind.persistence.models.QuickResponse;
 import fi.metatavu.metamind.persistence.models.Session;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.rest.api.StoriesApi;
 import fi.metatavu.metamind.rest.model.Intent;
+import fi.metatavu.metamind.rest.model.IntentTrainingMaterials;
 import fi.metatavu.metamind.rest.model.Knot;
 import fi.metatavu.metamind.rest.model.Story;
+import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.rest.model.Variable;
 import fi.metatavu.metamind.server.rest.translation.IntentTranslator;
 import fi.metatavu.metamind.server.rest.translation.KnotTranslator;
@@ -109,11 +112,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Invalid target knot id %s", body.getTargetKnotId()));
     }
 
-    TrainingMaterial trainingMaterial = body.getTrainingMaterialId() != null ? trainingMaterialController.findTrainingMaterialById(body.getTrainingMaterialId()) : null;
-    if (body.getTrainingMaterialId() != null && trainingMaterial == null) {
-      return createBadRequest(String.format("Invalid training material id %s", body.getTrainingMaterialId()));
-    }
-    
     if (!isKnotFromStory(targetKnot, story)) {
       return createBadRequest(String.format("Target knot %s is not from the story %s", targetKnot.getId(), story.getId()));
     }
@@ -126,8 +124,24 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     Boolean global = body.isisGlobal();
     UUID loggedUserId = getLoggerUserId();
+    fi.metatavu.metamind.persistence.models.Intent intent = storyController.createIntent(body.getType(), body.getName(), sourceKnot, targetKnot, global, loggedUserId);
     
-    return createOk(intentTranslator.translateIntent(storyController.createIntent(body.getType(), body.getName(), sourceKnot, targetKnot, trainingMaterial, global, loggedUserId)));
+    IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
+    
+    TrainingMaterial openNlpDoccatMaterial = findTrainingMaterialById(intentTrainingMaterials.getOpenNlpDoccatId());
+    if (intentTrainingMaterials.getOpenNlpDoccatId() != null && openNlpDoccatMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getOpenNlpDoccatId()));
+    }
+    
+    TrainingMaterial openNlpNerMaterial = findTrainingMaterialById(intentTrainingMaterials.getOpenNlpNerId());
+    if (intentTrainingMaterials.getOpenNlpNerId() != null && openNlpNerMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getOpenNlpNerId()));
+    }
+
+    IntentTrainingMaterial openNlpDocatTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPDOCCAT, openNlpDoccatMaterial);
+    IntentTrainingMaterial openNlpNerTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPNER, openNlpNerMaterial);
+    
+    return createOk(intentTranslator.translateIntent(intent, openNlpDocatTrainingMaterial, openNlpNerTrainingMaterial));
   }
 
   @Override
@@ -348,7 +362,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
     }
     
-    return createOk(intentTranslator.translateIntent(intent));
+    return createOk(intentTranslator.translateIntent(intent, trainingMaterialController.listTrainingMaterialByIntent(intent)));
   }
 
   @Override
@@ -415,7 +429,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     return createOk(storyController.listIntentsByStory(story).stream()
-      .map(intentTranslator::translateIntent)
+      .map(intent -> intentTranslator.translateIntent(intent, trainingMaterialController.listTrainingMaterialByIntent(intent)))
       .collect(Collectors.toList()));
   }
 
@@ -467,11 +481,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (targetKnot == null) {
       return createBadRequest(String.format("Invalid target knot id %s", body.getTargetKnotId()));
     }
-
-    TrainingMaterial trainingMaterial = body.getTrainingMaterialId() != null ? trainingMaterialController.findTrainingMaterialById(body.getTrainingMaterialId()) : null;
-    if (body.getTrainingMaterialId() != null && trainingMaterial == null) {
-      return createBadRequest(String.format("Invalid training material id %s", body.getTrainingMaterialId()));
-    }
     
     fi.metatavu.metamind.persistence.models.Intent intent = storyController.findIntentById(intentId);
     
@@ -481,7 +490,22 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     Boolean global = body.isisGlobal();
     UUID loggedUserId = getLoggerUserId();
     
-    return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, trainingMaterial, global, loggedUserId)));
+    IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
+    
+    TrainingMaterial openNlpDoccatMaterial = findTrainingMaterialById(intentTrainingMaterials.getOpenNlpDoccatId());
+    if (intentTrainingMaterials.getOpenNlpDoccatId() != null && openNlpDoccatMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getOpenNlpDoccatId()));
+    }
+    
+    TrainingMaterial openNlpNerMaterial = findTrainingMaterialById(intentTrainingMaterials.getOpenNlpNerId());
+    if (intentTrainingMaterials.getOpenNlpNerId() != null && openNlpNerMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getOpenNlpNerId()));
+    }
+
+    IntentTrainingMaterial openNlpDocatTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPDOCCAT, openNlpDoccatMaterial);
+    IntentTrainingMaterial openNlpNerTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPNER, openNlpNerMaterial);
+    
+    return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, loggedUserId), openNlpDocatTrainingMaterial, openNlpNerTrainingMaterial));
   }
 
   @Override
@@ -587,6 +611,20 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     return story.getId().equals(variable.getStory().getId());
+  }
+
+  /**
+   * Finds training material by id
+   * 
+   * @param id id
+   * @return training material or null if not found
+   */
+  private TrainingMaterial findTrainingMaterialById(UUID id) {
+    if (id == null) {
+      return null;
+    }
+    
+    return trainingMaterialController.findTrainingMaterialById(id);
   }
   
 }

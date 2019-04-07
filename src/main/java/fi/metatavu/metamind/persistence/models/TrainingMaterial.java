@@ -6,6 +6,8 @@ import java.util.UUID;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -15,6 +17,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+
 @Entity
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
@@ -22,6 +26,10 @@ public class TrainingMaterial {
 
   @Id
   private UUID id;
+  
+  @Enumerated (EnumType.STRING)
+  @Column(nullable = false)
+  private TrainingMaterialType type;
 
   @NotNull
   @NotEmpty
@@ -57,6 +65,14 @@ public class TrainingMaterial {
 
   public void setId(UUID id) {
     this.id = id;
+  }
+  
+  public TrainingMaterialType getType() {
+    return type;
+  }
+  
+  public void setType(TrainingMaterialType type) {
+    this.type = type;
   }
 
   public String getName() {

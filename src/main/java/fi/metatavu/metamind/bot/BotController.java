@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -27,6 +28,7 @@ import fi.metatavu.metamind.persistence.models.Session;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.rest.model.IntentType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
@@ -67,12 +69,13 @@ public class BotController {
       if (intentMatch != null) {
         Intent intent = intentDAO.findById(intentMatch.getIntentId());
         if (intent != null) {
-          return new BotResponse(intentMatch.getScore(), intent); 
+          // TODO: variables
+          return new BotResponse(intentMatch.getScore(), intent, Collections.emptyMap()); 
         }
       }
     }
   
-    return new BotResponse(0d, getConfusedIntent(session)); 
+    return new BotResponse(0d, getConfusedIntent(session), Collections.emptyMap()); 
   }
   
   /**
@@ -154,7 +157,7 @@ public class BotController {
     
     List<IntentMatcher> result = new ArrayList<>();
     Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
-    KnotIntentModel knotIntentModel = knotIntentModelDAO.findByKnot(sourceKnot);
+    KnotIntentModel knotIntentModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.OPENNLPDOCCAT);
     if (knotIntentModel != null) {
       try {
         double minMatch = 0.75d;      

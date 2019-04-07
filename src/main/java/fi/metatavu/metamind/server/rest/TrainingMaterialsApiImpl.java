@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 import fi.metatavu.metamind.nlp.TrainingMaterialController;
 import fi.metatavu.metamind.rest.api.TrainingMaterialsApi;
 import fi.metatavu.metamind.rest.model.TrainingMaterial;
+import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.server.rest.translation.TrainingMaterialTranslator;
 import fi.metatavu.metamind.story.StoryController;
 
@@ -42,13 +43,14 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
     
     UUID loggedUserId = getLoggerUserId();
     UUID storyId = body.getStoryId();
+    TrainingMaterialType type = body.getType();
     
     fi.metatavu.metamind.persistence.models.Story story = storyId != null ? storyController.findStoryById(storyId) : null;
     if (storyId != null && story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.createTrainingMaterial(body.getName(), body.getText(), story, loggedUserId)));
+    return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.createTrainingMaterial(type, body.getName(), body.getText(), story, loggedUserId)));
   }
 
   @Override
@@ -76,9 +78,9 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
     
     return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterial));
   }
-
+  
   @Override
-  public Response listTrainingMaterials(UUID storyId) {
+  public Response listTrainingMaterials(UUID storyId, TrainingMaterialType type) {
     // TODO: Check permissions
     
     fi.metatavu.metamind.persistence.models.Story story = storyId != null ? storyController.findStoryById(storyId) : null;
@@ -86,7 +88,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    return createOk(trainingMaterialController.listTrainingMaterials(story).stream()
+    return createOk(trainingMaterialController.listTrainingMaterials(story, type).stream()
       .map(trainingMaterialTranslator::translateTrainingMaterial)
       .collect(Collectors.toList()));
   }

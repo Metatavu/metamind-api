@@ -137,7 +137,7 @@ public abstract class AbstractDAO<T> {
       return null;
     
     if (list.size() > 1) {
-      logger.error("SingleResult query returned %d elements from %s", list.size(), getGenericTypeClass().getName());
+      logger.error("SingleResult query returned {} elements from {}", list.size(), getGenericTypeClass().getName());
     }
 
     return list.get(list.size() - 1);

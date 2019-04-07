@@ -335,5 +335,56 @@
     
   </changeSet>
   
+  <changeSet id="trainingmaterialtype" author="Antti Leppä">
+
+    <dropForeignKeyConstraint baseTableName="intent" constraintName="FK_INTENT_TRAINING_MATERIAL"/>
+    
+    <dropColumn tableName="intent">
+      <column name="trainingmaterial_id"/>
+    </dropColumn>
+    
+    <createTable tableName="intenttrainingmaterial">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="intent_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_INTENT_TRA_MAT_INTENT" referencedColumnNames="id" referencedTableName="intent"/>
+      </column>
+      <column name="trainingmaterial_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_INTENT_TRA_MATL_TRAINING_MATERIAL" referencedColumnNames="id" referencedTableName="trainingmaterial"/>
+      </column>
+    </createTable>
+    
+    <addColumn tableName="knotintentmodel">
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    
+    <addColumn tableName="storyglobalintentmodel">
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    
+    <addColumn tableName="trainingmaterial">
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    
+    <update tableName="knotintentmodel">
+      <column name="type" value="OPENNLPDOCCAT"/>
+    </update>
+    
+    <update tableName="storyglobalintentmodel">
+      <column name="type" value="OPENNLPDOCCAT"/>
+    </update>
+    
+    <update tableName="trainingmaterial">
+      <column name="type" value="OPENNLPDOCCAT"/>
+    </update>
+  </changeSet>
+  
   
 </databaseChangeLog>

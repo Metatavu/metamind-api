@@ -43,9 +43,6 @@ public class Intent {
   @ManyToOne(optional = false)
   private Knot targetKnot;
 
-  @ManyToOne(optional = false)
-  private TrainingMaterial trainingMaterial;
-
   @Column(nullable = false)
   private Boolean global;
 
@@ -101,14 +98,6 @@ public class Intent {
 
   public void setTargetKnot(Knot targetKnot) {
     this.targetKnot = targetKnot;
-  }
-  
-  public TrainingMaterial getTrainingMaterial() {
-    return trainingMaterial;
-  }
-  
-  public void setTrainingMaterial(TrainingMaterial trainingMaterial) {
-    this.trainingMaterial = trainingMaterial;
   }
 
   public Boolean getGlobal() {

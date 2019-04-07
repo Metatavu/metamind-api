@@ -4,11 +4,14 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import fi.metatavu.metamind.persistence.models.*;
+import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 
 /**
  * DAO class for TrainingMaterial
@@ -22,6 +25,7 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
    * Creates new TrainingMaterial
    * 
    * @param id id
+   * @param type type
    * @param name name
    * @param text text
    * @param story story
@@ -29,8 +33,9 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
    * @param lastModifierId last modifier's id
    * @return created trainingMaterial
    */
-  public TrainingMaterial create(UUID id, String name, String text, Story story, UUID creatorId, UUID lastModifierId) {
+  public TrainingMaterial create(UUID id, TrainingMaterialType type, String name, String text, Story story, UUID creatorId, UUID lastModifierId) {
     TrainingMaterial trainingMaterial = new TrainingMaterial();
+    trainingMaterial.setType(type);
     trainingMaterial.setName(name);
     trainingMaterial.setText(text);
     trainingMaterial.setStory(story);
@@ -39,31 +44,58 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
     trainingMaterial.setLastModifierId(lastModifierId);
     return persist(trainingMaterial);
   }
-  
+
   /**
-   * List by story equals or story is null
+   * List training materials
    * 
-   * @param story story
+   * @param includeNullStories whether to include stories with null story
+   * @param story story include also stories
+   * @param type filter by type
    * 
-   * @return found story
+   * @return found training materials
    */
-  public List<TrainingMaterial> listByStoryOrStoryNull(Story story) {
+  public List<TrainingMaterial> list(boolean includeNullStories, Story story, TrainingMaterialType type) {
     EntityManager entityManager = getEntityManager();
 
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<TrainingMaterial> criteria = criteriaBuilder.createQuery(TrainingMaterial.class);
     Root<TrainingMaterial> root = criteria.from(TrainingMaterial.class);
     criteria.select(root);
-    criteria.where(
-      criteriaBuilder.or(
-        criteriaBuilder.isNull(root.get(TrainingMaterial_.story)),
-        criteriaBuilder.equal(root.get(TrainingMaterial_.story), story)
-      )
-    );
+    
+    List<Predicate> restrictions = new ArrayList<>();
+    
+    if (includeNullStories) {
+      if (story == null) {
+        restrictions.add(criteriaBuilder.isNull(root.get(TrainingMaterial_.story)));        
+      } else {
+        restrictions.add(criteriaBuilder.or(criteriaBuilder.isNull(root.get(TrainingMaterial_.story)), criteriaBuilder.equal(root.get(TrainingMaterial_.story), story)));
+      }
+    } else {
+      restrictions.add(criteriaBuilder.equal(root.get(TrainingMaterial_.story), story));
+    }
+    
+    if (type != null) {
+      restrictions.add(criteriaBuilder.equal(root.get(TrainingMaterial_.type), type));
+    }
+
+    criteria.where(restrictions.toArray(new Predicate[0]));
     
     return entityManager.createQuery(criteria).getResultList();
   } 
-  
+
+  /**
+   * Updates type
+   *
+   * @param type type
+   * @param lastModifierId last modifier's id
+   * @return updated trainingMaterial
+   */
+  public TrainingMaterial updateType(TrainingMaterial trainingMaterial, TrainingMaterialType type, UUID lastModifierId) {
+    trainingMaterial.setLastModifierId(lastModifierId);
+    trainingMaterial.setType(type);
+    return persist(trainingMaterial);
+  }
+
   /**
    * Updates name
    *

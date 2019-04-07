@@ -9,7 +9,6 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import fi.metatavu.metamind.bot.KnotTrainingMaterialUpdateRequestEvent;
-import fi.metatavu.metamind.bot.StoryGlobalTrainingMaterialUpdateRequestEvent;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
 import fi.metatavu.metamind.persistence.dao.StoryDAO;
@@ -17,7 +16,6 @@ import fi.metatavu.metamind.persistence.dao.VariableDAO;
 import fi.metatavu.metamind.persistence.models.Intent;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
@@ -46,9 +44,6 @@ public class StoryController {
 
   @Inject
   private Event<KnotTrainingMaterialUpdateRequestEvent> knotTrainingMaterialUpdateRequestEvent;
-
-  @Inject
-  private Event<StoryGlobalTrainingMaterialUpdateRequestEvent> storyGlobalTrainingMaterialUpdateRequestEvent;
 
   /**
    * Finds story by id
@@ -112,25 +107,12 @@ public class StoryController {
    * @param name name
    * @param sourceKnot sourceKnot
    * @param targetKnot targetKnot
-   * @param trainingMaterial trainingMaterial
    * @param global global
    * @param creatorId creator's id
    * @return created intent
    */
-  public Intent createIntent(IntentType type, String name, Knot sourceKnot, Knot targetKnot, TrainingMaterial trainingMaterial, Boolean global, UUID creatorId) {
-    Intent intent = intentDAO.create(UUID.randomUUID(), type, name, sourceKnot, targetKnot, trainingMaterial, global, creatorId, creatorId);
-    
-    if (trainingMaterial != null) {
-      if (sourceKnot != null) {
-        knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(sourceKnot.getId()));
-      }
-      
-      if (global || intent.getGlobal()) {
-        storyGlobalTrainingMaterialUpdateRequestEvent.fire(new StoryGlobalTrainingMaterialUpdateRequestEvent(targetKnot.getStory().getId()));
-      }
-    }
-    
-    return intent;
+  public Intent createIntent(IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, UUID creatorId) {
+    return intentDAO.create(UUID.randomUUID(), type, name, sourceKnot, targetKnot, global, creatorId, creatorId);
   }
   
   /**
@@ -210,23 +192,19 @@ public class StoryController {
    * @param lastModifierId last modifier's id
    * @return updated intent
    */
-  public Intent updateIntent(Intent intent, IntentType type, String name, Knot sourceKnot, Knot targetKnot, TrainingMaterial trainingMaterial, Boolean global, UUID lastModifierId) {
-    UUID oldTrainingMaterialId = intent.getTrainingMaterial() != null ? intent.getTrainingMaterial().getId() : null;
-    UUID newTrainingMaterialId = trainingMaterial != null ? trainingMaterial.getId() : null;
+  public Intent updateIntent(Intent intent, IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, UUID lastModifierId) {
     UUID oldSourceKnotId = intent.getSourceKnot() != null ? intent.getSourceKnot().getId() : null;
     UUID newSourceKnotId = sourceKnot != null ? sourceKnot.getId() : null;
     
-    boolean trainingMaterialChanged = !Objects.equal(newTrainingMaterialId, oldTrainingMaterialId);
     boolean sourceKnotChanged = !Objects.equal(newSourceKnotId, oldSourceKnotId);
     
     intentDAO.updateGlobal(intent, global, lastModifierId);
     intentDAO.updateSourceKnot(intent, sourceKnot, lastModifierId);
     intentDAO.updateTargetKnot(intent, targetKnot, lastModifierId);
-    intentDAO.updateTrainingMaterial(intent, trainingMaterial, lastModifierId);
     intentDAO.updateType(intent, type, lastModifierId);
     intentDAO.updateName(intent, name, lastModifierId);
     
-    if (sourceKnot != null && (sourceKnotChanged || trainingMaterialChanged)) {
+    if (sourceKnot != null && sourceKnotChanged) {
       knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(sourceKnot.getId()));
     }
     

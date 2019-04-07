@@ -1,5 +1,8 @@
 package fi.metatavu.metamind.bot;
 
+import java.util.Map;
+import java.util.UUID;
+
 import fi.metatavu.metamind.persistence.models.Intent;
 
 /**
@@ -11,6 +14,7 @@ public class BotResponse {
 
   private double confidence;
   private Intent matchedIntent;
+  private Map<UUID, String> variableValues;
 
   /**
    * Constructor
@@ -18,10 +22,11 @@ public class BotResponse {
    * @param confidence match confidence
    * @param matchedIntent mached intent
    */
-  public BotResponse(double confidence, Intent matchedIntent) {
+  public BotResponse(double confidence, Intent matchedIntent, Map<UUID, String> variableValues) {
     super();
     this.confidence = confidence;
     this.matchedIntent = matchedIntent;
+    this.variableValues = variableValues;
   }
 
   public void setConfidence(double confidence) {
@@ -38,6 +43,10 @@ public class BotResponse {
 
   public Intent getMatchedIntent() {
     return matchedIntent;
+  }
+  
+  public Map<UUID, String> getVariableValues() {
+    return variableValues;
   }
 
 }
