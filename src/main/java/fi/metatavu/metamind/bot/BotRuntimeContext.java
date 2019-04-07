@@ -2,6 +2,7 @@ package fi.metatavu.metamind.bot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -23,6 +24,7 @@ public class BotRuntimeContext {
   private Session session;
   private Intent matchedIntent;
   private Knot currentKnot;
+  private Map<UUID, String> variableValues;
   private String response;
   private List<String> responseBefore;
   private List<String> responseAfter;
@@ -145,6 +147,34 @@ public class BotRuntimeContext {
    */
   public void setMatchedIntent(Intent matchedIntent) {
     this.matchedIntent = matchedIntent;
+  }
+
+  /**
+   * Sets session variables found during current message
+   * 
+   * @param variableValues session variables
+   */
+  public void setVariableValues(Map<UUID, String> variableValues) {
+    this.variableValues = variableValues;
+  }
+  
+  /**
+   * Returns session variables found during current message
+   * 
+   * @return session variables found during current message
+   */
+  public Map<UUID, String> getVariableValues() {
+    return variableValues;
+  }
+  
+  /**
+   * Sets variable value
+   * 
+   * @param variableId variable id
+   * @param value value
+   */
+  public void setVariableValue(UUID variableId, Object value) {
+    variableValues.put(variableId, value != null ? value.toString() : null);
   }
   
 }

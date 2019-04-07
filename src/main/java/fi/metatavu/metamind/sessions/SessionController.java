@@ -8,10 +8,13 @@ import javax.inject.Inject;
 
 import fi.metatavu.metamind.persistence.dao.MessageDAO;
 import fi.metatavu.metamind.persistence.dao.SessionDAO;
+import fi.metatavu.metamind.persistence.dao.SessionVariableValueDAO;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Message;
 import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.SessionVariableValue;
 import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.Variable;
 
 @ApplicationScoped
 public class SessionController {
@@ -21,6 +24,9 @@ public class SessionController {
 
   @Inject
   private MessageDAO messageDAO;
+
+  @Inject
+  private SessionVariableValueDAO sessionVariableValueDAO;
   
   /**
    * Creates new session
@@ -49,7 +55,7 @@ public class SessionController {
     
     return sessionDAO.findById(id);
   }
-  
+
   /**
    * Finds a metamind session by bot session
    * 
@@ -66,6 +72,41 @@ public class SessionController {
     }
     
     return sessionDAO.findById(sessionId);
+  }
+  
+  /**
+   * Returns session variable value as string
+   * 
+   * @param session session
+   * @param variable variable
+   * @return session variable value as string or null if not found
+   */
+  public String getSessionVariableValue(Session session, Variable variable) {
+    SessionVariableValue sessionVariableValue = sessionVariableValueDAO.findBySessionAndVariable(session, variable);
+    if (sessionVariableValue == null) {
+      return null;
+    }
+    
+    return sessionVariableValue.getValue();
+  }
+  
+  /**
+   * Sets session variable value as string
+   * 
+   * @param session session
+   * @param variable variable
+   * @param value value
+   * @return updated session variable value as null if removed
+   */
+  public void setSessionVariableValue(Session session, Variable variable, String value) {
+    SessionVariableValue sessionVariableValue = sessionVariableValueDAO.findBySessionAndVariable(session, variable);
+    if (sessionVariableValue != null) {
+      sessionVariableValueDAO.delete(sessionVariableValue);
+    }
+    
+    if (value != null) {
+      sessionVariableValueDAO.create(session, variable, value);
+    }
   }
 
   /**

@@ -82,6 +82,13 @@ public class BotController {
     return new BotResponse(0d, getConfusedIntent(session), Collections.emptyMap()); 
   }
 
+  /**
+   * Resolves variables from message
+   * 
+   * @param session session
+   * @param message message
+   * @return variables from message
+   */
   private Map<UUID, String> getVariables(Session session, String message) {
     List<VariableFinder> variableFinders = getVariableFinders(session.getStory(), session.getCurrentKnot());
     

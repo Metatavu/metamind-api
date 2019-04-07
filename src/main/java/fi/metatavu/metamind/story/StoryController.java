@@ -150,6 +150,17 @@ public class StoryController {
   }
 
   /**
+   * Finds a variable by story and variable name
+   * 
+   * @param story story
+   * @param variableName variable name
+   * @return variable
+   */
+  public Variable findVariableByStoryAndName(Story story, String variableName) {
+    return variableDAO.findByStoryNameName(story, variableName);
+  }
+
+  /**
    * Lists intents by story
    * 
    * @param story story

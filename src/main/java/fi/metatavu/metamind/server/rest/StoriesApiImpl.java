@@ -185,7 +185,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     UUID loggedUserId = getLoggerUserId();
     
     // TODO: Quick responses
-    // TODO: Confused knot?
     
     List<QuickResponse> quickResponses = new ArrayList<>();
     List<MessageResponse> messageResponses = new ArrayList<>();
@@ -198,6 +197,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       botRuntimeContext.setLoggedUserId(loggedUserId);
       botRuntimeContext.setCurrentKnot(knot);
       botRuntimeContext.setMatchedIntent(matchedIntent);
+      botRuntimeContext.setVariableValues(botResponse.getVariableValues());
         
       scriptProcessor.processScripts();
 
@@ -212,7 +212,12 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
  
       messageController.updateMessageTargetKnot(message, botRuntimeContext.getCurrentKnot(), loggedUserId);
       sessionController.updateSessionCurrentKnot(session, botRuntimeContext.getCurrentKnot(), loggedUserId);
-    
+      
+      botResponse.getVariableValues().entrySet().stream().forEach(entry -> {
+        fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(entry.getKey());
+        sessionController.setSessionVariableValue(session, variable, entry.getValue());
+      });
+      
       return createOk(messageTranslator.translateMessage(message, quickResponses, messageResponses));
     } else {
       return createInternalServerError("Could not resolve intent");
