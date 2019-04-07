@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -18,6 +20,8 @@ import org.slf4j.Logger;
 import fi.metatavu.metamind.bot.match.IntentMatch;
 import fi.metatavu.metamind.bot.match.IntentMatcher;
 import fi.metatavu.metamind.bot.match.OpenNPLIntentMatcher;
+import fi.metatavu.metamind.bot.variables.OpenNlpVariableFinder;
+import fi.metatavu.metamind.bot.variables.VariableFinder;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
 import fi.metatavu.metamind.persistence.dao.StoryGlobalIntentModelDAO;
@@ -30,6 +34,7 @@ import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import opennlp.tools.doccat.DoccatModel;
+import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 
@@ -69,15 +74,27 @@ public class BotController {
       if (intentMatch != null) {
         Intent intent = intentDAO.findById(intentMatch.getIntentId());
         if (intent != null) {
-          // TODO: variables
-          return new BotResponse(intentMatch.getScore(), intent, Collections.emptyMap()); 
+          return new BotResponse(intentMatch.getScore(), intent, getVariables(session, message)); 
         }
       }
     }
   
     return new BotResponse(0d, getConfusedIntent(session), Collections.emptyMap()); 
   }
-  
+
+  private Map<UUID, String> getVariables(Session session, String message) {
+    List<VariableFinder> variableFinders = getVariableFinders(session.getStory(), session.getCurrentKnot());
+    
+    for (VariableFinder variableFinder : variableFinders) {
+      Map<UUID, String> variables = variableFinder.findVariables(message);
+      if (variables != null) {
+        return variables;
+      }
+    }
+    
+    return Collections.emptyMap();
+  }
+
   /**
    * Returns confused intent for a session
    * 
@@ -109,7 +126,6 @@ public class BotController {
    * @return list of intent matchers
    */
   private List<IntentMatcher> getIntentMatchers(Story story, Knot sourceKnot) {
-    
     if (sourceKnot == null) {
       return getStoryGlobalIntentMatches(story);
     } else {
@@ -165,6 +181,53 @@ public class BotController {
         try (InputStream modelStream = new ByteArrayInputStream(modelData)) {
           DoccatModel model = new DoccatModel(modelStream);
           result.add(new OpenNPLIntentMatcher(model, tokenizer, minMatch));      
+        }    
+      } catch (IOException e) {
+        logger.error("Failed to read doccat model", e);
+      }
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Lists variable finders for given knot. If knot is null, story global variable finders are returned
+   * 
+   * @param story story
+   * @param sourceKnot source knot
+   * @return list of variable finders
+   */
+  private List<VariableFinder> getVariableFinders(Story story, Knot sourceKnot) {
+    if (sourceKnot == null) {
+      return getStoryGlobalVariableFinder(story);
+    } else {
+      return getKnotVariableFinders(sourceKnot);      
+    }
+  }
+
+  private List<VariableFinder> getStoryGlobalVariableFinder(Story story) {
+    // TODO Auto-generated method stub
+    return Collections.emptyList();
+  }
+
+  /**
+   * Lists variable finders for given knot
+   * 
+   * @param sourceKnot source knot
+   * @return list of variable finders
+   */
+  private List<VariableFinder> getKnotVariableFinders(Knot sourceKnot) {
+    // TODO: Knot settings: Tokenizer
+    
+    List<VariableFinder> result = new ArrayList<>();
+    Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
+    KnotIntentModel knotIntentNerModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.OPENNLPNER);
+    if (knotIntentNerModel != null) {
+      try {
+        byte[] modelData = knotIntentNerModel.getData();
+        try (InputStream modelStream = new ByteArrayInputStream(modelData)) {
+          TokenNameFinderModel model = new TokenNameFinderModel(modelStream);
+          result.add(new OpenNlpVariableFinder(model, tokenizer));      
         }    
       } catch (IOException e) {
         logger.error("Failed to read doccat model", e);

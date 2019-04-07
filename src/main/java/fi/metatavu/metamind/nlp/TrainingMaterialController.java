@@ -32,6 +32,7 @@ import fi.metatavu.metamind.persistence.dao.KnotDAO;
 import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
 import fi.metatavu.metamind.persistence.dao.StoryGlobalIntentModelDAO;
 import fi.metatavu.metamind.persistence.dao.TrainingMaterialDAO;
+import fi.metatavu.metamind.persistence.dao.VariableDAO;
 import fi.metatavu.metamind.persistence.models.Intent;
 import fi.metatavu.metamind.persistence.models.IntentTrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Knot;
@@ -39,6 +40,7 @@ import fi.metatavu.metamind.persistence.models.KnotIntentModel;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
+import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import opennlp.tools.doccat.BagOfWordsFeatureGenerator;
 import opennlp.tools.doccat.DoccatFactory;
@@ -66,7 +68,8 @@ import opennlp.tools.util.TrainingParameters;
 @ApplicationScoped
 public class TrainingMaterialController {
 
-  private static Pattern PREFIX_PATTERN = Pattern.compile("^", Pattern.MULTILINE);
+  private static Pattern OPENNLP_DOCCAT_PREFIX_PATTERN = Pattern.compile("^", Pattern.MULTILINE);
+  private static Pattern OPENNLP_NER_REPLACE_PATTERN = Pattern.compile("(<START:)(.*?)(>)");
 
   @Inject
   private Logger logger;
@@ -88,6 +91,9 @@ public class TrainingMaterialController {
 
   @Inject
   private IntentTrainingMaterialDAO intentTrainingMaterialDAO;
+
+  @Inject
+  private VariableDAO variableDAO; 
 
   @Inject
   private Event<KnotTrainingMaterialUpdateRequestEvent> knotTrainingMaterialUpdateRequestEvent;
@@ -176,7 +182,7 @@ public class TrainingMaterialController {
     intents.addAll(storyGlobalIntents);
     
     Map<TrainingMaterialType, String> lineDatas = Arrays.stream(TrainingMaterialType.values()).collect(Collectors.toMap(type -> type, (type) -> {
-      return getTrainingMaterialLines(intents, type);
+      return getTrainingMaterialLines(knot.getStory(), intents, type);
     }));
     
     Story story = knot.getStory();
@@ -192,7 +198,7 @@ public class TrainingMaterialController {
    * @param story story
    */
   public void updateStoryTrainingMaterial(Story story) {
-    String knotLines = getTrainingMaterialLines(intentDAO.listByStoryAndGlobal(story, true), TrainingMaterialType.OPENNLPDOCCAT);
+    String knotLines = getTrainingMaterialLines(story, intentDAO.listByStoryAndGlobal(story, true), TrainingMaterialType.OPENNLPDOCCAT);
     Locale locale = story.getLocale();
     String language = locale.getLanguage();
     
@@ -229,19 +235,40 @@ public class TrainingMaterialController {
     trainingMaterialDAO.delete(trainingMaterial);
   }
   
-  private String getTrainingMaterialLines(List<Intent> intents, TrainingMaterialType type) {
+  private String getTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
     switch (type) {
       case OPENNLPDOCCAT:
         return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
           TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
           Intent intent = intentTrainingMaterial.getIntent();
           String materialLines = trainingMaterial.getText();
-          Matcher prefixMatcher = PREFIX_PATTERN.matcher(materialLines);
+          Matcher prefixMatcher = OPENNLP_DOCCAT_PREFIX_PATTERN.matcher(materialLines);
           return prefixMatcher.replaceAll(String.format("%s ", intent.getId().toString()));
         });
       case OPENNLPNER:
+        Map<String, String> variableMap = new HashMap<>();
+        
         return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
-          return intentTrainingMaterial.getTrainingMaterial().getText();
+          TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
+          String materialLines = trainingMaterial.getText();
+          Matcher matcher = OPENNLP_NER_REPLACE_PATTERN.matcher(materialLines);
+          
+          return matcher.replaceAll((match) -> {
+            String variableName = match.group(2);
+            String cacheKey = String.format("%s-%s", story.getId(), variableName);
+            
+            if (!variableMap.containsKey(cacheKey)) {
+              Variable variable = variableDAO.findByStoryNameName(story, variableName);
+              if (variable != null) {
+                variableMap.put(cacheKey, variable.getId().toString());
+              } else {
+                logger.warn("Variable {} not found from story", variableName, story.getId());
+                variableMap.put(cacheKey, new UUID(0l, 0l).toString());
+              }
+            }
+            
+            return String.format("%s%s%s", match.group(1), variableMap.get(cacheKey), match.group(3));
+          });
         });
     }
     
