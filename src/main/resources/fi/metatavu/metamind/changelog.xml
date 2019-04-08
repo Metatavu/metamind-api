@@ -61,6 +61,9 @@
       <column name="id" type="binary(16)">
         <constraints unique="true" nullable="false" primaryKey="true"/>
       </column>
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
       <column name="name" type="varchar(191)">
         <constraints nullable="false"/>
       </column>
@@ -105,6 +108,9 @@
       </column>
       <column name="name" type="varchar(191)">
         <constraints nullable="false"/>
+      </column>
+      <column name="quickresponse" type="varchar(191)">
+        <constraints nullable="true"/>
       </column>
       <column name="sourceknot_id" type="binary(16)">
         <constraints nullable="true" foreignKeyName="FK_INTENT_SOURCE_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
@@ -328,9 +334,6 @@
       </column>
       <column name="trainingmaterial_id" type="binary(16)">
         <constraints nullable="false" foreignKeyName="FK_INTENT_TRA_MATL_TRAINING_MATERIAL" referencedColumnNames="id" referencedTableName="trainingmaterial"/>
-      </column>
-      <column name="type" type="varchar(191)">
-        <constraints nullable="false"/>
       </column>
     </createTable>
     

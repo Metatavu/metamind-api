@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 
 import fi.metatavu.metamind.persistence.models.MessageResponse;
-import fi.metatavu.metamind.persistence.models.QuickResponse;
 import fi.metatavu.metamind.rest.model.Message;
 
 /**
@@ -26,7 +25,7 @@ public class MessageTranslator {
    * @param messageResponses JPA message responses
    * @return REST message
    */
-  public Message translateMessage(fi.metatavu.metamind.persistence.models.Message jpaMessage, List<QuickResponse> quickResponses, List<MessageResponse> messageResponses) {
+  public Message translateMessage(fi.metatavu.metamind.persistence.models.Message jpaMessage, List<String> quickResponses, List<MessageResponse> messageResponses) {
     if (jpaMessage == null) {
       return null;
     }
@@ -39,7 +38,7 @@ public class MessageTranslator {
     result.setId(jpaMessage.getId());
     result.setMatchedIntentId(jpaMessage.getMatchedIntent() != null ? jpaMessage.getMatchedIntent().getId() : null);
     result.setModifiedAt(jpaMessage.getModifiedAt());
-    result.setQuickResponses(translateQuickResponses(quickResponses));
+    result.setQuickResponses(quickResponses);
     result.setResponse(translateMessageResponses(messageResponses));
     result.setSessionId(jpaMessage.getSession() != null ? jpaMessage.getSession().getId() : null);
     result.setSourceKnotId(jpaMessage.getSourceKnot() != null ? jpaMessage.getSourceKnot().getId() : null);
@@ -47,14 +46,12 @@ public class MessageTranslator {
     return result;
   }
 
-  private List<String> translateQuickResponses(List<QuickResponse> quickResponses) {
-    if (quickResponses == null || quickResponses.isEmpty()) {
-      return Collections.emptyList();
-    }
-    
-    return quickResponses.stream().map(QuickResponse::getText).collect(Collectors.toList());
-  }
-
+  /**
+   * Translates message responses
+   * 
+   * @param messageResponses message responses
+   * @return translated responses
+   */
   private List<String> translateMessageResponses(List<MessageResponse> messageResponses) {
     if (messageResponses == null || messageResponses.isEmpty()) {
       return Collections.emptyList();

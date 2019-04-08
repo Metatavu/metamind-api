@@ -68,6 +68,7 @@ import opennlp.tools.util.TrainingParameters;
 @ApplicationScoped
 public class TrainingMaterialController {
 
+  private static Pattern STRIP_EMPTY_LINES_PATTERN = Pattern.compile("^[ \t]*\r?\n", Pattern.MULTILINE);
   private static Pattern OPENNLP_DOCCAT_PREFIX_PATTERN = Pattern.compile("^", Pattern.MULTILINE);
   private static Pattern OPENNLP_NER_REPLACE_PATTERN = Pattern.compile("(<START:)(.*?)(>)");
 
@@ -193,7 +194,7 @@ public class TrainingMaterialController {
   }
 
   /**
-   * Updates story's training material
+   * Updates training material for given story
    * 
    * @param story story
    */
@@ -235,13 +236,21 @@ public class TrainingMaterialController {
     trainingMaterialDAO.delete(trainingMaterial);
   }
   
+  /**
+   * Resolves training materials for given list of intents and training material type
+   * 
+   * @param story story
+   * @param intents intents
+   * @param type training material type
+   * @return training material lines
+   */
   private String getTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
     switch (type) {
       case OPENNLPDOCCAT:
         return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
           TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
           Intent intent = intentTrainingMaterial.getIntent();
-          String materialLines = trainingMaterial.getText();
+          String materialLines = stripEmptyLines(trainingMaterial.getText());
           Matcher prefixMatcher = OPENNLP_DOCCAT_PREFIX_PATTERN.matcher(materialLines);
           return prefixMatcher.replaceAll(String.format("%s ", intent.getId().toString()));
         });
@@ -275,6 +284,17 @@ public class TrainingMaterialController {
     return null;
   }
   
+  /**
+   * Strips empty lines from a text
+   * 
+   * @param text text
+   * @return text with empty lines stripped
+   */
+  private String stripEmptyLines(String text) {
+    Matcher matcher = STRIP_EMPTY_LINES_PATTERN.matcher(text);
+    return matcher.replaceAll("");
+  }
+
   /**
    * Resolves training material lines for given list of intents
    * 

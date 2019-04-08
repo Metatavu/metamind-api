@@ -25,7 +25,6 @@ import fi.metatavu.metamind.messages.MessageController;
 import fi.metatavu.metamind.nlp.TrainingMaterialController;
 import fi.metatavu.metamind.persistence.models.IntentTrainingMaterial;
 import fi.metatavu.metamind.persistence.models.MessageResponse;
-import fi.metatavu.metamind.persistence.models.QuickResponse;
 import fi.metatavu.metamind.persistence.models.Session;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.rest.api.StoriesApi;
@@ -123,8 +122,10 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     // TODO: Permission check
     
     Boolean global = body.isisGlobal();
+    String quickResponse = body.getQuickResponse();
+    
     UUID loggedUserId = getLoggerUserId();
-    fi.metatavu.metamind.persistence.models.Intent intent = storyController.createIntent(body.getType(), body.getName(), sourceKnot, targetKnot, global, loggedUserId);
+    fi.metatavu.metamind.persistence.models.Intent intent = storyController.createIntent(body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, loggedUserId);
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
     
@@ -184,9 +185,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     String hint = null; // TODO: hint
     UUID loggedUserId = getLoggerUserId();
     
-    // TODO: Quick responses
-    
-    List<QuickResponse> quickResponses = new ArrayList<>();
     List<MessageResponse> messageResponses = new ArrayList<>();
     
     fi.metatavu.metamind.persistence.models.Intent matchedIntent = botResponse.getMatchedIntent();
@@ -218,6 +216,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         sessionController.setSessionVariableValue(session, variable, entry.getValue());
       });
       
+      List<String> quickResponses = storyController.listKnotQuickResponses(botRuntimeContext.getCurrentKnot());
+
       return createOk(messageTranslator.translateMessage(message, quickResponses, messageResponses));
     } else {
       return createInternalServerError("Could not resolve intent");
@@ -493,6 +493,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     // TODO: Story check
     
     Boolean global = body.isisGlobal();
+    String quickResponse = body.getQuickResponse();
     UUID loggedUserId = getLoggerUserId();
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
@@ -510,7 +511,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     IntentTrainingMaterial openNlpDocatTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPDOCCAT, openNlpDoccatMaterial);
     IntentTrainingMaterial openNlpNerTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPNER, openNlpNerMaterial);
     
-    return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, loggedUserId), openNlpDocatTrainingMaterial, openNlpNerTrainingMaterial));
+    return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, loggedUserId), openNlpDocatTrainingMaterial, openNlpNerTrainingMaterial));
   }
 
   @Override

@@ -35,7 +35,7 @@ public class IntentDAO extends AbstractDAO<Intent> {
    * @param lastModifierId last modifier's id
    * @return created intent
    */
-  public Intent create(UUID id, IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, UUID creatorId, UUID lastModifierId) {
+  public Intent create(UUID id, IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, String quickResponse, UUID creatorId, UUID lastModifierId) {
     Intent intent = new Intent();
     intent.setType(type);
     intent.setName(name);
@@ -43,6 +43,7 @@ public class IntentDAO extends AbstractDAO<Intent> {
     intent.setTargetKnot(targetKnot);
     intent.setGlobal(global);
     intent.setId(id);
+    intent.setQuickResponse(quickResponse);
     intent.setCreatorId(creatorId);
     intent.setLastModifierId(lastModifierId);
     return persist(intent);
@@ -177,6 +178,25 @@ public class IntentDAO extends AbstractDAO<Intent> {
   }
 
   /**
+   * Lists intent quick responses by sourceKnot
+   * 
+   * @param sourceKnot sourceKnot
+   * @return List of intents
+   */
+  public List<String> listQuickResponsesBySourceKnot(Knot sourceKnot) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<String> criteria = criteriaBuilder.createQuery(String.class);
+    Root<Intent> root = criteria.from(Intent.class);
+
+    criteria.select(root.get(Intent_.quickResponse));
+    criteria.where(criteriaBuilder.equal(root.get(Intent_.sourceKnot), sourceKnot));
+    
+    return entityManager.createQuery(criteria).getResultList();
+  }
+
+  /**
    * Updates type
    *
    * @param type type
@@ -238,6 +258,19 @@ public class IntentDAO extends AbstractDAO<Intent> {
   public Intent updateGlobal(Intent intent, Boolean global, UUID lastModifierId) {
     intent.setLastModifierId(lastModifierId);
     intent.setGlobal(global);
+    return persist(intent);
+  }
+
+  /**
+   * Updates quickResponse
+   *
+   * @param quickResponse quickResponse
+   * @param lastModifierId last modifier's id
+   * @return updated intent
+   */
+  public Intent updateQuickResponse(Intent intent, String quickResponse, UUID lastModifierId) {
+    intent.setLastModifierId(lastModifierId);
+    intent.setQuickResponse(quickResponse);
     return persist(intent);
   }
 

@@ -111,8 +111,8 @@ public class StoryController {
    * @param creatorId creator's id
    * @return created intent
    */
-  public Intent createIntent(IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, UUID creatorId) {
-    return intentDAO.create(UUID.randomUUID(), type, name, sourceKnot, targetKnot, global, creatorId, creatorId);
+  public Intent createIntent(IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, String quickResponse, UUID creatorId) {
+    return intentDAO.create(UUID.randomUUID(), type, name, sourceKnot, targetKnot, global, quickResponse, creatorId, creatorId);
   }
   
   /**
@@ -191,6 +191,16 @@ public class StoryController {
   }
 
   /**
+   * Lists quick responses by source knot
+   * 
+   * @param sourceKnot source knot
+   * @return quick responses
+   */
+  public List<String> listKnotQuickResponses(Knot sourceKnot) {
+    return intentDAO.listQuickResponsesBySourceKnot(sourceKnot);
+  }
+
+  /**
    * Updates an intent
    *   
    * @param intent intent
@@ -203,7 +213,7 @@ public class StoryController {
    * @param lastModifierId last modifier's id
    * @return updated intent
    */
-  public Intent updateIntent(Intent intent, IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, UUID lastModifierId) {
+  public Intent updateIntent(Intent intent, IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, String quickResponse, UUID lastModifierId) {
     UUID oldSourceKnotId = intent.getSourceKnot() != null ? intent.getSourceKnot().getId() : null;
     UUID newSourceKnotId = sourceKnot != null ? sourceKnot.getId() : null;
     
@@ -214,6 +224,7 @@ public class StoryController {
     intentDAO.updateTargetKnot(intent, targetKnot, lastModifierId);
     intentDAO.updateType(intent, type, lastModifierId);
     intentDAO.updateName(intent, name, lastModifierId);
+    intentDAO.updateQuickResponse(intent, quickResponse, lastModifierId);
     
     if (sourceKnot != null && sourceKnotChanged) {
       knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(sourceKnot.getId()));

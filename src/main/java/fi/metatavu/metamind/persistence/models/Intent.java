@@ -45,6 +45,8 @@ public class Intent {
 
   @Column(nullable = false)
   private Boolean global;
+  
+  private String quickResponse;
 
   @Column(nullable = false)
   @NotNull
@@ -107,6 +109,14 @@ public class Intent {
   public void setGlobal(Boolean global) {
     this.global = global;
   }
+  
+  public String getQuickResponse() {
+    return quickResponse;
+  }
+  
+  public void setQuickResponse(String quickResponse) {
+    this.quickResponse = quickResponse;
+  }
 
   public UUID getCreatorId() {
     return creatorId;
@@ -150,5 +160,5 @@ public class Intent {
   public void onUpdate() {
     setModifiedAt(OffsetDateTime.now());
   }
-
+  
 }
