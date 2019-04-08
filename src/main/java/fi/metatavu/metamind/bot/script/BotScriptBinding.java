@@ -16,6 +16,9 @@ public class BotScriptBinding {
 
   @Inject
   private BotStoryScriptBinding story;
+
+  @Inject
+  private BotServicesScriptBinding services;
   
   /**
    * Returns session bindings
@@ -33,6 +36,15 @@ public class BotScriptBinding {
    */
   public BotStoryScriptBinding story() {
     return story;
+  }
+  
+  /**
+   * Returns services bindings
+   * 
+   * @return services bindings
+   */
+  public BotServicesScriptBinding services() {
+    return services;
   }
   
 }
