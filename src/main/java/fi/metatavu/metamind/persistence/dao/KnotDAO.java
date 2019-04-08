@@ -29,16 +29,18 @@ public class KnotDAO extends AbstractDAO<Knot> {
    * @param id id
    * @param type type
    * @param name name
+   * @param hint hint
    * @param content content
    * @param story story
    * @param creatorId creator's id
    * @param lastModifierId last modifier's id
    * @return created knot
    */
-  public Knot create(UUID id, KnotType type, String name, String content, Story story, UUID creatorId, UUID lastModifierId) {
+  public Knot create(UUID id, KnotType type, String name, String hint, String content, Story story, UUID creatorId, UUID lastModifierId) {
     Knot knot = new Knot();
     knot.setType(type);
     knot.setName(name);
+    knot.setHint(hint);
     knot.setContent(content);
     knot.setStory(story);
     knot.setId(id);
@@ -104,6 +106,19 @@ public class KnotDAO extends AbstractDAO<Knot> {
   public Knot updateContent(Knot knot, String content, UUID lastModifierId) {
     knot.setLastModifierId(lastModifierId);
     knot.setContent(content);
+    return persist(knot);
+  }
+
+  /**
+   * Updates hint
+   *
+   * @param hint hint
+   * @param lastModifierId last modifier's id
+   * @return updated knot
+   */
+  public Knot updateHint(Knot knot, String hint, UUID lastModifierId) {
+    knot.setLastModifierId(lastModifierId);
+    knot.setHint(hint);
     return persist(knot);
   }
 

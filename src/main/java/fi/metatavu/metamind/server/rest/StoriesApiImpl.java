@@ -156,7 +156,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getName(), body.getContent(), story, loggedUserId)));
+    return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getName(), body.getContent(), body.getHint(), story, loggedUserId)));
   }
 
   @Override
@@ -182,7 +182,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     BotResponse botResponse = botController.getResponse(session, content, LocaleUtils.toLocale(session.getLocale()), TimeZone.getTimeZone(session.getTimeZone()));
     
-    String hint = null; // TODO: hint
     UUID loggedUserId = getLoggerUserId();
     
     List<MessageResponse> messageResponses = new ArrayList<>();
@@ -198,8 +197,10 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       botRuntimeContext.setVariableValues(botResponse.getVariableValues());
         
       scriptProcessor.processScripts();
+      
+      fi.metatavu.metamind.persistence.models.Knot currentKnot = botRuntimeContext.getCurrentKnot();
 
-      fi.metatavu.metamind.persistence.models.Message message = messageController.createMessage(session, content, hint, botResponse.getConfidence(), session.getCurrentKnot(), knot, botResponse.getMatchedIntent(), loggedUserId);
+      fi.metatavu.metamind.persistence.models.Message message = messageController.createMessage(session, content, currentKnot.getHint(), botResponse.getConfidence(), session.getCurrentKnot(), knot, botResponse.getMatchedIntent(), loggedUserId);
       if (message == null) {
         return createInternalServerError("Could not create new message");
       }
@@ -208,15 +209,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         messageResponses.add(messageController.createMessageResponse(message, response));
       }
  
-      messageController.updateMessageTargetKnot(message, botRuntimeContext.getCurrentKnot(), loggedUserId);
-      sessionController.updateSessionCurrentKnot(session, botRuntimeContext.getCurrentKnot(), loggedUserId);
+      messageController.updateMessageTargetKnot(message, currentKnot, loggedUserId);
+      sessionController.updateSessionCurrentKnot(session, currentKnot, loggedUserId);
       
       botResponse.getVariableValues().entrySet().stream().forEach(entry -> {
         fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(entry.getKey());
         sessionController.setSessionVariableValue(session, variable, entry.getValue());
       });
       
-      List<String> quickResponses = storyController.listKnotQuickResponses(botRuntimeContext.getCurrentKnot());
+      List<String> quickResponses = storyController.listKnotQuickResponses(currentKnot);
       messageController.updateMessageQuickResponses(message, quickResponses);
 
       return createOk(messageTranslator.translateMessage(message, quickResponses, messageResponses));
@@ -535,7 +536,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
     
-    return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getName(), body.getContent(), loggedUserId)));
+    return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getName(), body.getContent(), body.getHint(), loggedUserId)));
   }
 
   @Override

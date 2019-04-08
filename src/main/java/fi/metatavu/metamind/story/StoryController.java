@@ -92,12 +92,13 @@ public class StoryController {
    * @param type type
    * @param name name
    * @param content content
+   * @param hint hint
    * @param story story
    * @param creatorId creator's id
    * @return created knot
    */
-  public Knot createKnot(KnotType type, String name, String content, Story story, UUID creatorId) {
-    return knotDAO.create(UUID.randomUUID(), type, name, content, story, creatorId, creatorId);
+  public Knot createKnot(KnotType type, String name, String content, String hint, Story story, UUID creatorId) {
+    return knotDAO.create(UUID.randomUUID(), type, name, content, hint, story, creatorId, creatorId);
   }
   
   /**
@@ -240,13 +241,15 @@ public class StoryController {
    * @param type type
    * @param name name
    * @param content content
+   * @param hint hint
    * @param lastModifierId last modifier's id
    * @return updated knot
    */
-  public Knot updateKnot(Knot knot, KnotType type, String name, String content, UUID lastModifierId) {
+  public Knot updateKnot(Knot knot, KnotType type, String name, String content, String hint, UUID lastModifierId) {
     knot = knotDAO.updateContent(knot, content, lastModifierId);
     knot = knotDAO.updateName(knot, name, lastModifierId);
     knot = knotDAO.updateType(knot, type, lastModifierId);
+    knot = knotDAO.updateHint(knot, hint, lastModifierId);
     return knot;
   }
 

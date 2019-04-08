@@ -43,6 +43,8 @@ public class Knot {
   @Lob
   @Column(nullable = false)
   private String content;
+  
+  private String hint;
 
   @ManyToOne(optional = false)
   private Story story;
@@ -83,6 +85,14 @@ public class Knot {
 
   public void setName(String name) {
     this.name = name;
+  }
+  
+  public String getHint() {
+    return hint;
+  }
+  
+  public void setHint(String hint) {
+    this.hint = hint;
   }
 
   public String getContent() {

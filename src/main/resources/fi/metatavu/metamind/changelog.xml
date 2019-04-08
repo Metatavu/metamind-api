@@ -355,4 +355,14 @@
     <addUniqueConstraint columnNames="session_id,variable_id" tableName="sessionvariablevalue" constraintName="UN_SESSION_VARIABLE_SESSION_ID_VARIABLE_ID"/>
   </changeSet>
   
+  <changeSet id="knothints" author="Antti Leppä">
+  
+    <addColumn tableName="knot">
+      <column name="hint" type="varchar(191)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  
+  </changeSet>
+  
 </databaseChangeLog>
