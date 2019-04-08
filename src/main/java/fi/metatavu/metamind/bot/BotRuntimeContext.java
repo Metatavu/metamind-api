@@ -26,6 +26,7 @@ public class BotRuntimeContext {
   private Knot currentKnot;
   private Map<UUID, String> variableValues;
   private String response;
+  private String currentMessageContent;
   private List<String> responseBefore;
   private List<String> responseAfter;
   
@@ -176,5 +177,22 @@ public class BotRuntimeContext {
   public void setVariableValue(UUID variableId, Object value) {
     variableValues.put(variableId, value != null ? value.toString() : null);
   }
+
+  /**
+   * Returns current message's contents
+   * 
+   * @return current message's contents
+   */
+  public String getCurrentMessageContent() {
+    return currentMessageContent;
+  }
   
+  /**
+   * Sets current message's content
+   * 
+   * @param currentMessageContent current message's contents
+   */
+  public void setCurrentMessageContent(String currentMessageContent) {
+    this.currentMessageContent = currentMessageContent;
+  }
 }

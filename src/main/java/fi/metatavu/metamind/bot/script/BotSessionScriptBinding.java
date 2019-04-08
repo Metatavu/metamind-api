@@ -75,6 +75,15 @@ public class BotSessionScriptBinding {
   }
   
   /**
+   * Returns current message's content
+   * 
+   * @return current message's content
+   */
+  public String getCurrentMessageContent() {
+    return runtimeContext.getCurrentMessageContent();
+  }
+  
+  /**
    * Returns session variable value
    * 
    * @param variableName variable name

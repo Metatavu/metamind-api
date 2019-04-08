@@ -207,7 +207,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       botRuntimeContext.setCurrentKnot(knot);
       botRuntimeContext.setMatchedIntent(matchedIntent);
       botRuntimeContext.setVariableValues(botResponse.getVariableValues());
-        
+      botRuntimeContext.setCurrentMessageContent(content);  
+      
       scriptProcessor.processScripts();
       
       fi.metatavu.metamind.persistence.models.Knot currentKnot = botRuntimeContext.getCurrentKnot();
