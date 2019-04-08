@@ -155,7 +155,8 @@ public class ScriptProcessor {
       
       bindings.putMember("XMLHttpRequest", XMLHttpRequest.class);
       bindings.putMember("bot", botScriptBinding);
-     
+      bindings.putMember("args", scriptArgs);
+      
       Source source = Source.newBuilder(script.getLanguage(), script.getContent(), script.getName()).build();
       Value returnValue = scriptingContext.eval(source);
       
