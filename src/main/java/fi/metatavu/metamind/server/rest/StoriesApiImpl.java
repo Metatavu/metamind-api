@@ -217,6 +217,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       });
       
       List<String> quickResponses = storyController.listKnotQuickResponses(botRuntimeContext.getCurrentKnot());
+      messageController.updateMessageQuickResponses(message, quickResponses);
 
       return createOk(messageTranslator.translateMessage(message, quickResponses, messageResponses));
     } else {
