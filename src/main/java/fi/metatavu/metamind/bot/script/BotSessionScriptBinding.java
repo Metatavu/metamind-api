@@ -6,8 +6,8 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import fi.metatavu.metamind.bot.BotRuntimeContext;
 import fi.metatavu.metamind.persistence.models.Knot;

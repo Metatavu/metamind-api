@@ -68,10 +68,6 @@
     
     <liquibase.version>3.5.3</liquibase.version>
     
-    <!-- Mutter -->
-    
-    <mutter.version>4.1.2</mutter.version>
-    
     <!-- Sargue mailgun -->
     
     <sargue-mailgun.version>1.5.0</sargue-mailgun.version>
@@ -352,38 +348,6 @@
 	  <artifactId>opennlp-tools</artifactId>
 	  <version>1.9.1</version>
 	</dependency>
-    
-    <!-- Mutter -->
-    
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-ink-bot</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-opennlp-intent</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-opennlp-ner</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-slots</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-templated-intent</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
     
     <!-- Sargue mailgun -->
 

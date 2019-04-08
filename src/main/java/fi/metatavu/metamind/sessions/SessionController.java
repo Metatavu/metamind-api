@@ -55,24 +55,6 @@ public class SessionController {
     
     return sessionDAO.findById(id);
   }
-
-  /**
-   * Finds a metamind session by bot session
-   * 
-   * @return metamind session
-   */
-  public Session findSessionFromBotSession(com.rabidgremlin.mutters.core.session.Session botSession) {
-    if (botSession == null) {
-      return null;
-    }
-    
-    Long sessionId = (Long) botSession.getLongTermAttribute(SessionConsts.METAMIND_SESSION_ID_ATTRIBUTE);
-    if (sessionId == null) {
-      return null;
-    }
-    
-    return sessionDAO.findById(sessionId);
-  }
   
   /**
    * Returns session variable value as string
