@@ -3,13 +3,17 @@ package fi.metatavu.metamind.bot;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -19,8 +23,10 @@ import org.slf4j.Logger;
 
 import fi.metatavu.metamind.bot.match.IntentMatch;
 import fi.metatavu.metamind.bot.match.IntentMatcher;
-import fi.metatavu.metamind.bot.match.OpenNPLIntentMatcher;
-import fi.metatavu.metamind.bot.variables.OpenNlpVariableFinder;
+import fi.metatavu.metamind.bot.match.OpenNlpDoccatIntentMatcher;
+import fi.metatavu.metamind.bot.match.RegexIntentMatcher;
+import fi.metatavu.metamind.bot.variables.OpenNlpNerVariableFinder;
+import fi.metatavu.metamind.bot.variables.OpenNlpRegExVariableFinder;
 import fi.metatavu.metamind.bot.variables.VariableFinder;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
@@ -159,7 +165,7 @@ public class BotController {
         byte[] modelData = intentModel.getData();
         try (InputStream modelStream = new ByteArrayInputStream(modelData)) {
           DoccatModel model = new DoccatModel(modelStream);
-          result.add(new OpenNPLIntentMatcher(model, tokenizer, minMatch));      
+          result.add(new OpenNlpDoccatIntentMatcher(model, tokenizer, minMatch));      
         }    
       } catch (IOException e) {
         logger.error("Failed to read doccat model", e);
@@ -180,21 +186,64 @@ public class BotController {
     
     List<IntentMatcher> result = new ArrayList<>();
     Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
-    KnotIntentModel knotIntentModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.OPENNLPDOCCAT);
-    if (knotIntentModel != null) {
+    
+    KnotIntentModel knotIntentDoccatModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.INTENTOPENNLPDOCCAT);
+    if (knotIntentDoccatModel != null) {
       try {
         double minMatch = 0.75d;      
-        byte[] modelData = knotIntentModel.getData();
+        byte[] modelData = knotIntentDoccatModel.getData();
         try (InputStream modelStream = new ByteArrayInputStream(modelData)) {
           DoccatModel model = new DoccatModel(modelStream);
-          result.add(new OpenNPLIntentMatcher(model, tokenizer, minMatch));      
+          result.add(new OpenNlpDoccatIntentMatcher(model, tokenizer, minMatch));      
         }    
       } catch (IOException e) {
         logger.error("Failed to read doccat model", e);
       }
     }
     
+    KnotIntentModel knotIntentRegexModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.INTENTREGEX);
+    if (knotIntentRegexModel != null) {
+      Map<UUID, List<Pattern>> intentModel = readRegexIntentModel(knotIntentRegexModel);
+      if (intentModel != null) {
+        result.add(new RegexIntentMatcher(intentModel, tokenizer));
+      }
+    }
+    
     return result;
+  }
+  
+  /**
+   * Reads Regex intent model into map
+   * 
+   * @param knotIntentRegexModel model
+   * @return Regex intent model
+   */
+  private Map<UUID, List<Pattern>> readRegexIntentModel(KnotIntentModel knotIntentRegexModel) {
+    Map<UUID, List<Pattern>> patterns = new HashMap<>();
+    
+    try {
+      String lineDatas = new String(knotIntentRegexModel.getData(), "UTF-8");
+      for (String line : lineDatas.split("\n")) {
+        try {
+          UUID intentId = UUID.fromString(line.substring(0, 36));
+          Pattern pattern = Pattern.compile(line.substring(37));
+          
+          if (!patterns.containsKey(intentId)) {
+            patterns.put(intentId, new ArrayList<>());
+          }
+          
+          patterns.get(intentId).add(pattern);
+        } catch (IllegalArgumentException e) {
+          logger.warn("Failed to parse regex intent model line {}", line);
+        }
+      }
+      
+      return patterns;
+    } catch (UnsupportedEncodingException e) {
+      logger.error("Failed to parse regex intent model", e);
+    }
+    
+    return null;
   }
   
   /**
@@ -213,7 +262,7 @@ public class BotController {
   }
 
   private List<VariableFinder> getStoryGlobalVariableFinder(Story story) {
-    // TODO Auto-generated method stub
+    // TODO implement
     return Collections.emptyList();
   }
 
@@ -228,18 +277,33 @@ public class BotController {
     
     List<VariableFinder> result = new ArrayList<>();
     Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
-    KnotIntentModel knotIntentNerModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.OPENNLPNER);
+    KnotIntentModel knotIntentNerModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.VARIABLEOPENNLPNER);
     if (knotIntentNerModel != null) {
       try {
         byte[] modelData = knotIntentNerModel.getData();
         try (InputStream modelStream = new ByteArrayInputStream(modelData)) {
           TokenNameFinderModel model = new TokenNameFinderModel(modelStream);
-          result.add(new OpenNlpVariableFinder(model, tokenizer));      
+          result.add(new OpenNlpNerVariableFinder(model, tokenizer));      
         }    
       } catch (IOException e) {
         logger.error("Failed to read doccat model", e);
       }
     }
+
+    KnotIntentModel knotIntentRegexModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.VARIABLEOPENNLPREGEX);
+    if (knotIntentRegexModel != null) {
+      Map<UUID, List<Pattern>> intentModel = readRegexIntentModel(knotIntentRegexModel);
+      if (intentModel != null) {
+        Map<String, Pattern[]> patterns = new HashMap<>(intentModel.size());
+        
+        for (Entry<UUID, List<Pattern>> entry : intentModel.entrySet()) {
+          patterns.put(entry.getKey().toString(), entry.getValue().toArray(new Pattern[0]));
+        }
+        
+        result.add(new OpenNlpRegExVariableFinder(patterns, tokenizer));
+      }
+    }
+    
     
     return result;
   }

@@ -21,6 +21,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
@@ -71,6 +72,7 @@ public class TrainingMaterialController {
   private static Pattern STRIP_EMPTY_LINES_PATTERN = Pattern.compile("^[ \t]*\r?\n", Pattern.MULTILINE);
   private static Pattern OPENNLP_DOCCAT_PREFIX_PATTERN = Pattern.compile("^", Pattern.MULTILINE);
   private static Pattern OPENNLP_NER_REPLACE_PATTERN = Pattern.compile("(<START:)(.*?)(>)");
+  private static Pattern OPENNLP_REGEX_PATTERN = Pattern.compile("^[a-zA-Z]*", Pattern.MULTILINE);
 
   @Inject
   private Logger logger;
@@ -199,7 +201,7 @@ public class TrainingMaterialController {
    * @param story story
    */
   public void updateStoryTrainingMaterial(Story story) {
-    String knotLines = getTrainingMaterialLines(story, intentDAO.listByStoryAndGlobal(story, true), TrainingMaterialType.OPENNLPDOCCAT);
+    String knotLines = getTrainingMaterialLines(story, intentDAO.listByStoryAndGlobal(story, true), TrainingMaterialType.INTENTOPENNLPDOCCAT);
     Locale locale = story.getLocale();
     String language = locale.getLanguage();
     
@@ -245,8 +247,9 @@ public class TrainingMaterialController {
    * @return training material lines
    */
   private String getTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
-    switch (type) {
-      case OPENNLPDOCCAT:
+    switch (type) {    
+      case INTENTREGEX:
+      case INTENTOPENNLPDOCCAT:
         return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
           TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
           Intent intent = intentTrainingMaterial.getIntent();
@@ -254,34 +257,83 @@ public class TrainingMaterialController {
           Matcher prefixMatcher = OPENNLP_DOCCAT_PREFIX_PATTERN.matcher(materialLines);
           return prefixMatcher.replaceAll(String.format("%s ", intent.getId().toString()));
         });
-      case OPENNLPNER:
-        Map<String, String> variableMap = new HashMap<>();
-        
-        return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
-          TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
-          String materialLines = trainingMaterial.getText();
-          Matcher matcher = OPENNLP_NER_REPLACE_PATTERN.matcher(materialLines);
-          
-          return matcher.replaceAll((match) -> {
-            String variableName = match.group(2);
-            String cacheKey = String.format("%s-%s", story.getId(), variableName);
-            
-            if (!variableMap.containsKey(cacheKey)) {
-              Variable variable = variableDAO.findByStoryNameName(story, variableName);
-              if (variable != null) {
-                variableMap.put(cacheKey, variable.getId().toString());
-              } else {
-                logger.warn("Variable {} not found from story", variableName, story.getId());
-                variableMap.put(cacheKey, new UUID(0l, 0l).toString());
-              }
-            }
-            
-            return String.format("%s%s%s", match.group(1), variableMap.get(cacheKey), match.group(3));
-          });
-        });
+      case VARIABLEOPENNLPNER:
+        return getVarialeOpenNlpNerTrainingMaterialLines(story, intents, type);
+      case VARIABLEOPENNLPREGEX:
+        return getVarialeOpenNlpRegexTrainingMaterialLines(story, intents, type);
     }
     
     return null;
+  }
+
+  /**
+   * Returns variable OpenNLP NER training material lines 
+   * 
+   * @param story story
+   * @param intents intents
+   * @param type type
+   * @return
+   */
+  private String getVarialeOpenNlpNerTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
+    Map<String, String> variableMap = new HashMap<>();
+    
+    return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
+      TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
+      String materialLines = trainingMaterial.getText();
+      Matcher matcher = OPENNLP_NER_REPLACE_PATTERN.matcher(materialLines);
+      
+      return matcher.replaceAll((match) -> {
+        String variableName = match.group(2);
+        String cacheKey = String.format("%s-%s", story.getId(), variableName);
+        
+        if (!variableMap.containsKey(cacheKey)) {
+          Variable variable = variableDAO.findByStoryNameName(story, variableName);
+          if (variable != null) {
+            variableMap.put(cacheKey, variable.getId().toString());
+          } else {
+            logger.warn("Variable {} not found from story", variableName, story.getId());
+            variableMap.put(cacheKey, new UUID(0l, 0l).toString());
+          }
+        }
+        
+        return String.format("%s%s%s", match.group(1), variableMap.get(cacheKey), match.group(3));
+      });
+    });
+  }
+
+  /**
+   * Returns variable OpenNLP Regex training material lines 
+   * 
+   * @param story story
+   * @param intents intents
+   * @param type type
+   * @return
+   */
+  private String getVarialeOpenNlpRegexTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
+    Map<String, String> variableMap = new HashMap<>();
+    
+    return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
+      TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
+      String materialLines = trainingMaterial.getText();
+      Matcher matcher = OPENNLP_REGEX_PATTERN.matcher(materialLines);
+      
+      return matcher.replaceAll((match) -> {
+        String variableName = match.group();
+        String cacheKey = String.format("%s-%s", story.getId(), variableName);
+        
+        if (!variableMap.containsKey(cacheKey)) {
+          Variable variable = variableDAO.findByStoryNameName(story, variableName);
+          if (variable != null) {
+            variableMap.put(cacheKey, variable.getId().toString());
+          } else {
+            logger.warn("Variable {} not found from story", variableName, story.getId());
+            variableMap.put(cacheKey, new UUID(0l, 0l).toString());
+          }
+        }
+        
+        return variableMap.get(cacheKey);
+      });
+    });
   }
   
   /**
@@ -325,11 +377,11 @@ public class TrainingMaterialController {
    */
   private void updateStoryTrainingMaterial(Story story, String lines, String language) {
     try {
-      byte[] doccatModelData = createModelData(TrainingMaterialType.OPENNLPDOCCAT, language, lines);
+      byte[] doccatModelData = createModelData(TrainingMaterialType.INTENTOPENNLPDOCCAT, language, lines);
       
       StoryGlobalIntentModel storyGlobalIntentModel = storyGlobalIntentModelDAO.findByStory(story);
       if (storyGlobalIntentModel == null) {
-        storyGlobalIntentModelDAO.create(TrainingMaterialType.OPENNLPDOCCAT, doccatModelData, story);
+        storyGlobalIntentModelDAO.create(TrainingMaterialType.INTENTOPENNLPDOCCAT, doccatModelData, story);
       } else {
         storyGlobalIntentModelDAO.updateData(storyGlobalIntentModel, doccatModelData);
       }
@@ -382,9 +434,12 @@ public class TrainingMaterialController {
   private byte[] createModelData(TrainingMaterialType type, String language, String lines) throws IOException {
     try (ByteArrayInputStream lineStream = new ByteArrayInputStream(lines.getBytes("UTF-8"))) {
       switch (type) {
-        case OPENNLPDOCCAT:
+        case INTENTREGEX:
+        case VARIABLEOPENNLPREGEX:
+          return createRegexModelData(language, lineStream);      
+        case INTENTOPENNLPDOCCAT:
           return createDoccatModelData(language, lineStream);      
-        case OPENNLPNER:
+        case VARIABLEOPENNLPNER:
           return createTokenNameFinderModelData(language, lineStream);
       }  
     }
@@ -392,6 +447,18 @@ public class TrainingMaterialController {
     return new byte[0];
   }
   
+  /**
+   * Serializes Regex model data
+   * 
+   * @param language language
+   * @param lineStream line
+   * @return serialized data
+   * @throws IOException thrown when training data building fails
+   */
+  private byte[] createRegexModelData(String language, ByteArrayInputStream lineStream) throws IOException {
+    return IOUtils.toByteArray(lineStream);
+  }
+
   /**
    * Creates document categorization model from line stream
    * 

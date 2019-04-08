@@ -191,7 +191,10 @@ public class IntentDAO extends AbstractDAO<Intent> {
     Root<Intent> root = criteria.from(Intent.class);
 
     criteria.select(root.get(Intent_.quickResponse));
-    criteria.where(criteriaBuilder.equal(root.get(Intent_.sourceKnot), sourceKnot));
+    criteria.where(
+      criteriaBuilder.isNotNull(root.get(Intent_.quickResponse)),
+      criteriaBuilder.equal(root.get(Intent_.sourceKnot), sourceKnot)
+    );
     
     return entityManager.createQuery(criteria).getResultList();
   }

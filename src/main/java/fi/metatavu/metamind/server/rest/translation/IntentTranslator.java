@@ -25,51 +25,67 @@ public class IntentTranslator {
    * @return REST intent
    */
   public Intent translateIntent(fi.metatavu.metamind.persistence.models.Intent intent, List<TrainingMaterial> trainingMaterials) {
-    TrainingMaterial openNlpDocatTrainingMaterial = null;
-    TrainingMaterial openNlpNerTrainingMaterial = null;
+    TrainingMaterial intentOpenNlpDocatTrainingMaterial = null;
+    TrainingMaterial intentRegexTrainingMaterial = null;
+    TrainingMaterial variableOpenNlpNerTrainingMaterial = null;
+    TrainingMaterial variableOpenNlpRegexTrainingMaterial = null;
     
     for (TrainingMaterial trainingMaterial : trainingMaterials) {
       switch (trainingMaterial.getType()) {
-        case OPENNLPDOCCAT:
-          openNlpDocatTrainingMaterial = trainingMaterial;
+        case INTENTOPENNLPDOCCAT:
+          intentOpenNlpDocatTrainingMaterial = trainingMaterial;
         break;
-        case OPENNLPNER:
-          openNlpNerTrainingMaterial = trainingMaterial;
+        case VARIABLEOPENNLPNER:
+          variableOpenNlpNerTrainingMaterial = trainingMaterial;
+        break;
+        case INTENTREGEX:
+          intentRegexTrainingMaterial = trainingMaterial;
+        break;
+        case VARIABLEOPENNLPREGEX:
+          variableOpenNlpRegexTrainingMaterial = trainingMaterial;
         break;
       }
     }
     
-    return translateIntent(intent, openNlpDocatTrainingMaterial, openNlpNerTrainingMaterial);
+    return translateIntent(intent, intentOpenNlpDocatTrainingMaterial, variableOpenNlpNerTrainingMaterial, intentRegexTrainingMaterial, variableOpenNlpRegexTrainingMaterial);
   }
   
   /**
    * Translates JPA intent into REST intent
    * 
    * @param jpaIntent JPA intent
-   * @param openNlpNerTrainingMaterial OpenNLP training material for NER
-   * @param openNlpDocatTrainingMaterial OpenNLP training material for Doccat
+   * @param variableOpenNlpNerTrainingMaterial OpenNLP training material for NER
+   * @param intentRegexTrainingMaterial OpenNLP training material for Doccat
    * @return REST intent
    */
-  public Intent translateIntent(fi.metatavu.metamind.persistence.models.Intent jpaIntent, IntentTrainingMaterial openNlpDocatTrainingMaterial, IntentTrainingMaterial openNlpNerTrainingMaterial) {
-    return translateIntent(jpaIntent, openNlpDocatTrainingMaterial != null ? openNlpDocatTrainingMaterial.getTrainingMaterial() : null, openNlpNerTrainingMaterial != null ? openNlpNerTrainingMaterial.getTrainingMaterial() : null);
+  public Intent translateIntent(fi.metatavu.metamind.persistence.models.Intent jpaIntent, IntentTrainingMaterial intentOpenNlpDocatTrainingMaterial, IntentTrainingMaterial variableOpenNlpNerTrainingMaterial, IntentTrainingMaterial intentRegexTrainingMaterial, IntentTrainingMaterial variableOpenNlpRegexTrainingMaterial) {
+    return translateIntent(jpaIntent, 
+      intentOpenNlpDocatTrainingMaterial != null ? intentOpenNlpDocatTrainingMaterial.getTrainingMaterial() : null, 
+      variableOpenNlpNerTrainingMaterial != null ? variableOpenNlpNerTrainingMaterial.getTrainingMaterial() : null,
+      intentRegexTrainingMaterial != null ? intentRegexTrainingMaterial.getTrainingMaterial() : null,
+      variableOpenNlpRegexTrainingMaterial != null ? variableOpenNlpRegexTrainingMaterial.getTrainingMaterial() : null
+    );
   }
   
   /**
    * Translates JPA intent into REST intent
    * 
    * @param jpaIntent JPA intent
-   * @param openNlpNerTrainingMaterial OpenNLP training material for NER
-   * @param openNlpDocatTrainingMaterial OpenNLP training material for Doccat
+   * @param variableOpenNlpNerTrainingMaterial OpenNLP training material for NER
+   * @param intentOpenNlpDocatTrainingMaterial OpenNLP training material for Doccat
+   * @param regexTrainingMaterial Regex training material
    * @return REST intent
    */
-  public Intent translateIntent(fi.metatavu.metamind.persistence.models.Intent jpaIntent, TrainingMaterial openNlpDocatTrainingMaterial, TrainingMaterial openNlpNerTrainingMaterial) {
+  public Intent translateIntent(fi.metatavu.metamind.persistence.models.Intent jpaIntent, TrainingMaterial intentOpenNlpDocatTrainingMaterial, TrainingMaterial variableOpenNlpNerTrainingMaterial, TrainingMaterial intentRegexTrainingMaterial, TrainingMaterial variableOpenNlpRegexTrainingMaterial) {
     if (jpaIntent == null) {
       return null;
     }
     
     IntentTrainingMaterials trainingMaterials = new IntentTrainingMaterials();
-    trainingMaterials.setOpenNlpDoccatId(openNlpDocatTrainingMaterial != null ? openNlpDocatTrainingMaterial.getId() : null);
-    trainingMaterials.setOpenNlpNerId(openNlpNerTrainingMaterial != null ? openNlpNerTrainingMaterial.getId() : null);
+    trainingMaterials.setIntentOpenNlpDoccatId(intentOpenNlpDocatTrainingMaterial != null ? intentOpenNlpDocatTrainingMaterial.getId() : null);
+    trainingMaterials.setIntentRegexId(intentRegexTrainingMaterial != null ? intentRegexTrainingMaterial.getId() : null);
+    trainingMaterials.setVariableOpenNlpNerId(variableOpenNlpNerTrainingMaterial != null ? variableOpenNlpNerTrainingMaterial.getId() : null);
+    trainingMaterials.setVariableOpenNlpRegex(variableOpenNlpRegexTrainingMaterial != null ? variableOpenNlpRegexTrainingMaterial.getId() : null);
     
     Intent result = new Intent();
     result.setCreatedAt(jpaIntent.getCreatedAt());

@@ -129,20 +129,32 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
     
-    TrainingMaterial openNlpDoccatMaterial = findTrainingMaterialById(intentTrainingMaterials.getOpenNlpDoccatId());
-    if (intentTrainingMaterials.getOpenNlpDoccatId() != null && openNlpDoccatMaterial == null) {
-      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getOpenNlpDoccatId()));
+    TrainingMaterial intentOpenNlpDoccatMaterial = findTrainingMaterialById(intentTrainingMaterials.getIntentOpenNlpDoccatId());
+    if (intentTrainingMaterials.getIntentOpenNlpDoccatId() != null && intentOpenNlpDoccatMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getIntentOpenNlpDoccatId()));
     }
     
-    TrainingMaterial openNlpNerMaterial = findTrainingMaterialById(intentTrainingMaterials.getOpenNlpNerId());
-    if (intentTrainingMaterials.getOpenNlpNerId() != null && openNlpNerMaterial == null) {
-      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getOpenNlpNerId()));
+    TrainingMaterial variableOpenNlpNerMaterial = findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpNerId());
+    if (intentTrainingMaterials.getVariableOpenNlpNerId() != null && variableOpenNlpNerMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getVariableOpenNlpNerId()));
+    }
+    
+    TrainingMaterial intentRegexMaterial = findTrainingMaterialById(intentTrainingMaterials.getIntentRegexId());
+    if (intentTrainingMaterials.getIntentRegexId() != null && intentRegexMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getIntentRegexId()));
+    }
+    
+    TrainingMaterial variableOpenNlpRegexMaterial = findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpRegex());
+    if (intentTrainingMaterials.getVariableOpenNlpRegex() != null && variableOpenNlpRegexMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getVariableOpenNlpRegex()));
     }
 
-    IntentTrainingMaterial openNlpDocatTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPDOCCAT, openNlpDoccatMaterial);
-    IntentTrainingMaterial openNlpNerTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPNER, openNlpNerMaterial);
+    IntentTrainingMaterial intentOpenNlpDocatTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.INTENTOPENNLPDOCCAT, intentOpenNlpDoccatMaterial);
+    IntentTrainingMaterial variableOpenNlpNerTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPNER, variableOpenNlpNerMaterial);
+    IntentTrainingMaterial intentRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.INTENTREGEX, intentRegexMaterial);
+    IntentTrainingMaterial variableOpenNlpRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPREGEX, variableOpenNlpRegexMaterial);
     
-    return createOk(intentTranslator.translateIntent(intent, openNlpDocatTrainingMaterial, openNlpNerTrainingMaterial));
+    return createOk(intentTranslator.translateIntent(intent, intentOpenNlpDocatTrainingMaterial, variableOpenNlpNerTrainingMaterial, intentRegexTrainingMaterial, variableOpenNlpRegexTrainingMaterial));
   }
 
   @Override
@@ -500,20 +512,37 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
     
-    TrainingMaterial openNlpDoccatMaterial = findTrainingMaterialById(intentTrainingMaterials.getOpenNlpDoccatId());
-    if (intentTrainingMaterials.getOpenNlpDoccatId() != null && openNlpDoccatMaterial == null) {
-      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getOpenNlpDoccatId()));
+    TrainingMaterial intentOpenNlpDoccatMaterial = findTrainingMaterialById(intentTrainingMaterials.getIntentOpenNlpDoccatId());
+    if (intentTrainingMaterials.getIntentOpenNlpDoccatId() != null && intentOpenNlpDoccatMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getIntentOpenNlpDoccatId()));
     }
     
-    TrainingMaterial openNlpNerMaterial = findTrainingMaterialById(intentTrainingMaterials.getOpenNlpNerId());
-    if (intentTrainingMaterials.getOpenNlpNerId() != null && openNlpNerMaterial == null) {
-      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getOpenNlpNerId()));
+    TrainingMaterial variableOpenNlpNerMaterial = findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpNerId());
+    if (intentTrainingMaterials.getVariableOpenNlpNerId() != null && variableOpenNlpNerMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getVariableOpenNlpNerId()));
+    }
+    
+    TrainingMaterial intentRegexMaterial = findTrainingMaterialById(intentTrainingMaterials.getIntentRegexId());
+    if (intentTrainingMaterials.getIntentRegexId() != null && intentRegexMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getIntentRegexId()));
+    }
+    
+    TrainingMaterial variableOpenNlpRegexMaterial = findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpRegex());
+    if (intentTrainingMaterials.getVariableOpenNlpRegex() != null && variableOpenNlpRegexMaterial == null) {
+      return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getVariableOpenNlpRegex()));
     }
 
-    IntentTrainingMaterial openNlpDocatTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPDOCCAT, openNlpDoccatMaterial);
-    IntentTrainingMaterial openNlpNerTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.OPENNLPNER, openNlpNerMaterial);
+    IntentTrainingMaterial intentOpenNlpDocatTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.INTENTOPENNLPDOCCAT, intentOpenNlpDoccatMaterial);
+    IntentTrainingMaterial variableOpenNlpNerTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPNER, variableOpenNlpNerMaterial);
+    IntentTrainingMaterial intentRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.INTENTREGEX, intentRegexMaterial);
+    IntentTrainingMaterial variableOpenNlpRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPREGEX, variableOpenNlpRegexMaterial);
     
-    return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, loggedUserId), openNlpDocatTrainingMaterial, openNlpNerTrainingMaterial));
+    return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, loggedUserId), 
+      intentOpenNlpDocatTrainingMaterial, 
+      variableOpenNlpNerTrainingMaterial, 
+      intentRegexTrainingMaterial, 
+      variableOpenNlpRegexTrainingMaterial
+    ));
   }
 
   @Override

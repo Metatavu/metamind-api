@@ -15,7 +15,7 @@ import opennlp.tools.tokenize.Tokenizer;
  * 
  * @author Antti Leppä
  */
-public class OpenNPLIntentMatcher implements IntentMatcher {
+public class OpenNlpDoccatIntentMatcher implements IntentMatcher {
   
   private double minMatch;
   private DoccatModel model;
@@ -27,7 +27,7 @@ public class OpenNPLIntentMatcher implements IntentMatcher {
    * @param model A model for document categorization
    * @param minMatch minimum confidence for a match
    */
-  public OpenNPLIntentMatcher(DoccatModel model, Tokenizer tokenizer, double minMatch) {
+  public OpenNlpDoccatIntentMatcher(DoccatModel model, Tokenizer tokenizer, double minMatch) {
     super();
     this.minMatch = minMatch;
     this.model = model;

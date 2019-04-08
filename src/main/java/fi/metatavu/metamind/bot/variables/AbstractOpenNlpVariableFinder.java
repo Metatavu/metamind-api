@@ -6,46 +6,44 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 
-import opennlp.tools.namefind.NameFinderME;
-import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.namefind.TokenNameFinder;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.util.Span;
 
 /**
- * Variable finder using OpenNLP token name finder
+ * Abstract base class for OpenNLP variable finders
  * 
  * @author Antti Leppä
  */
-public class OpenNlpVariableFinder implements VariableFinder {
+public abstract class AbstractOpenNlpVariableFinder implements VariableFinder {
 
-  private TokenNameFinderModel tokenNameFinderModel;
   private Tokenizer tokenizer;
+  private TokenNameFinder nameFinder;
 
   /**
-   * Variable finder using OpenNLP token name finder
+   * Constructor
    * 
-   * @param tokenNameFinderModel model
    * @param tokenizer tokenizer
+   * @param nameFinder name finder instance
    */
-  public OpenNlpVariableFinder(TokenNameFinderModel tokenNameFinderModel, Tokenizer tokenizer) {
+  public AbstractOpenNlpVariableFinder(Tokenizer tokenizer, TokenNameFinder nameFinder) {
     super();
-    this.tokenNameFinderModel = tokenNameFinderModel;
     this.tokenizer = tokenizer;
+    this.nameFinder = nameFinder;
   }
-  
+
   @Override
   public Map<UUID, String> findVariables(String text) {
-    NameFinderME nameFinder = new NameFinderME(tokenNameFinderModel);
     String[] tokens = tokenizer.tokenize(text);
     Span[] spans = nameFinder.find(tokens);
-    
+
     if (spans.length > 0) {
       Map<UUID, String> result = new HashMap<>();
-      
+
       String[] values = Span.spansToStrings(spans, tokens);
       for (int i = 0; i < spans.length; i++) {
         String value = values[i];
-        
+
         if (StringUtils.isNotEmpty(value)) {
           UUID variableId = UUID.fromString(spans[i].getType());
           if (0l != variableId.getLeastSignificantBits() || 0l == variableId.getMostSignificantBits()) {
@@ -53,7 +51,7 @@ public class OpenNlpVariableFinder implements VariableFinder {
           }
         }
       }
-      
+
       return result;
     }
 
