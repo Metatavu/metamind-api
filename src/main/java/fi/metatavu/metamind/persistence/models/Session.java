@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Cacheable
@@ -50,7 +50,6 @@ public class Session {
   private String visitor;
   
   @Lob
-  @NotNull
   @Column(nullable = false)
   private byte[] data;
 
