@@ -11,6 +11,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -131,4 +133,15 @@ public class TrainingMaterial {
     this.modifiedAt = modifiedAt;
   }
 
+  @PrePersist
+  public void onCreate() {
+    setCreatedAt(OffsetDateTime.now());
+    setModifiedAt(OffsetDateTime.now());
+  }
+
+  @PreUpdate
+  public void onUpdate() {
+    setModifiedAt(OffsetDateTime.now());
+  }
+  
 }
