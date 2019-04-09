@@ -1,0 +1,155 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: jgroups-kubeping-pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: jgroups-kubeping-api-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: jgroups-kubeping-pod-reader
+subjects:
+- kind: ServiceAccount
+  name: jgroups-kubeping-service-account
+  namespace: metamind
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metamind-api-db-config
+  namespace: metamind
+  labels:
+    app: mysql
+data:
+  metamind-api-db-auth: |
+    [mysqld]
+    default_authentication_plugin= mysql_native_password
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: metamind
+  labels:
+    app: metamind-api-db
+spec:
+  containers:
+    - name: metamind-api-db
+      image: mysql:8.0
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 3306
+          name: mysql
+      env:
+      - name: MYSQL_ROOT_PASSWORD
+        value: "root_password"
+      - name: MYSQL_DATABASE
+        value: "metamindapi"
+      - name: MYSQL_USER
+        value: "metamindapi"
+      - name: MYSQL_PASSWORD
+        value: "random"
+      volumeMounts:
+      - name: metamind-api-db-config-volume
+        mountPath: /etc/mysql/conf.d/default_auth.cnf
+        subPath: metamind-api-db-auth
+  volumes:
+    - name: metamind-api-db-config-volume
+      configMap:
+        name: metamind-api-db-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metamind-api-db
+  namespace: metamind
+spec:
+  ports:
+    - port: 3306
+      name: mysql
+  clusterIP: None
+  selector:
+    app: metamind-api-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metamind-api
+  namespace: metamind
+  labels:
+    app: metamind-api
+spec:
+  selector:
+    matchLabels:
+      app: metamind-api
+  replicas: 2
+  template: 
+    metadata:
+      labels:
+        app: metamind-api
+    spec:
+      serviceAccountName: jgroups-kubeping-service-account
+      containers:
+        - name: metamind-api
+          image: metatavu/metamind-api:develop
+          resources:
+            requests:
+              memory: 300Mi
+            limits:
+              memory: 800Mi
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+            - containerPort: 9990
+            - containerPort: 7600
+            - containerPort: 7601
+            - containerPort: 8888
+            - containerPort: 7800
+            - containerPort: 7801
+          env:
+            - name: METAMIND_API_HOST
+              value: "dev-api.metamind.fi"
+            - name: METAMIND_API_DB_HOST
+              value: "metamind-api-db"
+            - name: METAMIND_API_DB_PORT
+              value: "3306" 
+            - name: METAMIND_API_DB_NAME
+              value: "metamindapi"
+            - name: METAMIND_API_DB_USERNAME
+              value: "metamindapi"
+            - name: METAMIND_API_DB_PASSWORD
+              value: "random"
+            - name: METAMIND_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KUBERNETES_LABELS
+              value: "app=metamind-api"
+            - name: METAMIND_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: metamind-api
+  namespace: metamind
+spec:
+  selector:
+    app: metamind-api
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080

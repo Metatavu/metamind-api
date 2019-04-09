@@ -1,0 +1,4 @@
+embed-server --server-config=standalone-full-ha.xml
+/subsystem=datasources/jdbc-driver=mariadb:add(driver-name=mariadb, driver-module-name=com.mariadb.jdbc, xa-datasource-class=org.mariadb.jdbc.MySQLDataSource)
+/subsystem=datasources/jdbc-driver=mysql:add(driver-name=mysql, driver-module-name=com.mysql.jdbc, xa-datasource-class=com.mysql.jdbc.jdbc2.optional.MysqlXADataSource)
+data-source add --name=metamind-api --jndi-name=java:jboss/datasources/metamind-api --enabled=true --jta=true --use-ccm=true --connection-url=jdbc:mysql://${env.METAMIND_API_DB_HOST}:${env.METAMIND_API_DB_PORT}/${env.METAMIND_API_DB_NAME}?useUnicode=true&characterEncoding=UTF-8 --driver-name=mysql --user-name=${env.METAMIND_API_DB_USERNAME} --password=${env.METAMIND_API_DB_PASSWORD} --check-valid-connection-sql="SELECT 1" --validate-on-match=false --share-prepared-statements=false --max-pool-size=1000
