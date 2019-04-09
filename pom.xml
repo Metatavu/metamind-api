@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.metatavu.metamind</groupId>
   <artifactId>metamind</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>Metamind API</name>
   <description>insert description here.</description>
@@ -49,12 +49,13 @@
     
     <!-- Spec -->
     
-    <metamind-spec.version>0.0.11</metamind-spec.version>
+    <metamind-spec.version>2.0.1</metamind-spec.version>
        
     <!-- Maven -->
 
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <java.version>1.8</java.version>
+	<maven.compiler.source>${java.version}</maven.compiler.source>
+	<maven.compiler.target>${java.version}</maven.compiler.target>
     
     <!-- Wildfly -->
     
@@ -67,10 +68,6 @@
     <!-- Liquibase -->
     
     <liquibase.version>3.5.3</liquibase.version>
-    
-    <!-- Mutter -->
-    
-    <mutter.version>4.1.2</mutter.version>
     
     <!-- Sargue mailgun -->
     
@@ -194,14 +191,6 @@
   </build>
 
   <dependencies>
-
-    <dependency>
-      <groupId>fi.metatavu.kunta-api</groupId>
-      <artifactId>kunta-api-client</artifactId>
-      <version>0.0.2</version>
-      <scope>compile</scope>
-    </dependency>
-	
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_4.0_spec</artifactId>
@@ -235,7 +224,7 @@
 
     <dependency>
       <groupId>fi.metatavu.metamind</groupId>
-      <artifactId>metamind-spec</artifactId>
+      <artifactId>metamind-api-spec</artifactId>
       <version>${metamind-spec.version}</version>
     </dependency>
     
@@ -278,7 +267,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.4</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -345,37 +334,13 @@
       <version>${liquibase.version}</version>
     </dependency>
     
-    <!-- Mutter -->
+    <!-- OpenNPL -->
     
     <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-ink-bot</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-opennlp-intent</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-opennlp-ner</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-slots</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.rabidgremlin</groupId>
-      <artifactId>mutters-templated-intent</artifactId>
-      <version>${mutter.version}</version>
-    </dependency>
+	  <groupId>org.apache.opennlp</groupId>
+	  <artifactId>opennlp-tools</artifactId>
+	  <version>1.9.1</version>
+	</dependency>
     
     <!-- Sargue mailgun -->
 
@@ -384,23 +349,7 @@
       <artifactId>mailgun</artifactId>
       <version>${sargue-mailgun.version}</version>
     </dependency>
-    
-    <!-- Beer API -->
-    
-    <dependency>
-      <groupId>fi.metatavu.beer</groupId>
-      <artifactId>beer-api-client</artifactId>
-      <version>${beer-api-client.version}</version>
-    </dependency>
-    
-    <!-- Freemarker -->
-    
-    <dependency>
-      <groupId>org.freemarker</groupId>
-      <artifactId>freemarker</artifactId>
-      <version>${freemarker.version}</version>
-    </dependency>
-    
+
     <!-- Jsoup -->
     
     <dependency>

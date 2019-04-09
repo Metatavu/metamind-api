@@ -1,15 +1,13 @@
 package fi.metatavu.metamind.server.rest.translation;
 
-import java.util.UUID;
-
 import javax.enterprise.context.ApplicationScoped;
 
-import fi.metatavu.metamind.server.rest.model.Script;
+import fi.metatavu.metamind.rest.model.Script;
 
 /**
  * Translator for translating JPA script entities into REST entities
  * 
- * @author Heikki Kurhinen
+ * @author Antti Leppä
  */
 @ApplicationScoped
 public class ScriptTranslator {
@@ -25,14 +23,16 @@ public class ScriptTranslator {
       return null;
     }
   
-    Script script = new Script();
-    script.setId(UUID.fromString(jpaScript.getExternalId())); 
-    script.setName(jpaScript.getName());
-    script.setVersion(jpaScript.getVersion());
-    script.setLanguage(jpaScript.getLanguage());
-    script.setContent(jpaScript.getContent());
+    Script result = new Script();
+    result.setContent(jpaScript.getContent());
+    result.setCreatedAt(jpaScript.getCreatedAt());
+    result.setId(jpaScript.getId());
+    result.setLanguage(jpaScript.getLanguage());
+    result.setModifiedAt(jpaScript.getModifiedAt());
+    result.setName(jpaScript.getName());
+    result.setVersion(jpaScript.getVersion());
 
-    return script;
+    return result;
   }
   
 }

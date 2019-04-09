@@ -1,92 +1,74 @@
 package fi.metatavu.metamind.persistence.models;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotEmpty;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class Message {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private UUID id;
 
-  @NotNull
-  @NotEmpty
-  @Column(nullable = false)
-  private String externalId;
-  
-  @NotNull
-  @NotEmpty
-  @Column(nullable = false)
-  @Lob
-  private String content;
-  
-  @Column(nullable = true)
-  @Lob
-  private String response;
-  
-  @Column(nullable = true)
-  private String hint; 
-  
   @ManyToOne(optional = false)
   private Session session;
-  
-  @Column(nullable = false)
-  private OffsetDateTime created;
 
-  private String matchedIntent;
-  
-  private Double responseScore;
-  
-  public Long getId() {
+  @NotNull
+  @NotEmpty
+  @Lob
+  @Column(nullable = false)
+  private String content;
+
+  @Column(nullable = true)
+  private String hint;
+
+  @Column(nullable = false)
+  private Double confidence;
+
+  @ManyToOne
+  private Knot sourceKnot;
+
+  @ManyToOne
+  private Knot targetKnot;
+
+  @ManyToOne
+  private Intent matchedIntent;
+
+  @Column(nullable = false)
+  @NotNull
+  private UUID creatorId;
+
+  @Column(nullable = false)
+  @NotNull
+  private UUID lastModifierId;
+
+  @Column(nullable = false)
+  private OffsetDateTime createdAt;
+
+  @Column(nullable = false)
+  private OffsetDateTime modifiedAt;
+
+  public UUID getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
-  }
-
-  public String getExternalId() {
-    return externalId;
-  }
-
-  public void setExternalId(String externalId) {
-    this.externalId = externalId;
-  }
-
-  public String getContent() {
-    return content;
-  }
-
-  public void setContent(String content) {
-    this.content = content;
-  }
-
-  public String getResponse() {
-    return response;
-  }
-
-  public void setResponse(String response) {
-    this.response = response;
-  }
-
-  public String getHint() {
-    return hint;
-  }
-
-  public void setHint(String hint) {
-    this.hint = hint;
   }
 
   public Session getSession() {
@@ -97,33 +79,95 @@ public class Message {
     this.session = session;
   }
 
-  public OffsetDateTime getCreated() {
-    return created;
+  public String getContent() {
+    return content;
   }
 
-  public void setCreated(OffsetDateTime created) {
-    this.created = created;
+  public void setContent(String content) {
+    this.content = content;
+  }
+
+  public String getHint() {
+    return hint;
+  }
+
+  public void setHint(String hint) {
+    this.hint = hint;
+  }
+
+  public Double getConfidence() {
+    return confidence;
+  }
+
+  public void setConfidence(Double confidence) {
+    this.confidence = confidence;
+  }
+
+  public Knot getSourceKnot() {
+    return sourceKnot;
+  }
+
+  public void setSourceKnot(Knot sourceKnot) {
+    this.sourceKnot = sourceKnot;
   }
   
-  public String getMatchedIntent() {
+  public Knot getTargetKnot() {
+    return targetKnot;
+  }
+  
+  public void setTargetKnot(Knot targetKnot) {
+    this.targetKnot = targetKnot;
+  }
+
+  public Intent getMatchedIntent() {
     return matchedIntent;
   }
-  
-  public void setMatchedIntent(String matchedIntent) {
+
+  public void setMatchedIntent(Intent matchedIntent) {
     this.matchedIntent = matchedIntent;
   }
-  
-  public Double getResponseScore() {
-    return responseScore;
+
+  public UUID getCreatorId() {
+    return creatorId;
   }
-  
-  public void setResponseScore(Double responseScore) {
-    this.responseScore = responseScore;
+
+  public void setCreatorId(UUID creatorId) {
+    this.creatorId = creatorId;
+  }
+
+  public UUID getLastModifierId() {
+    return lastModifierId;
+  }
+
+  public void setLastModifierId(UUID lastModifierId) {
+    this.lastModifierId = lastModifierId;
+  }
+
+  public OffsetDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(OffsetDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public OffsetDateTime getModifiedAt() {
+    return modifiedAt;
+  }
+
+  public void setModifiedAt(OffsetDateTime modifiedAt) {
+    this.modifiedAt = modifiedAt;
   }
 
   @PrePersist
   public void onCreate() {
-    setCreated(OffsetDateTime.now());
+    setCreatedAt(OffsetDateTime.now());
+    setModifiedAt(OffsetDateTime.now());
   }
-  
+
+  @PreUpdate
+  public void onUpdate() {
+    setModifiedAt(OffsetDateTime.now());
+  }
+
 }

@@ -1,17 +1,20 @@
 package fi.metatavu.metamind.persistence.models;
 
+import java.time.OffsetDateTime;
+import java.util.Locale;
+import java.util.UUID;
+
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Cacheable
@@ -19,8 +22,7 @@ import javax.validation.constraints.NotEmpty;
 public class Story {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private UUID id;
 
   @NotNull
   @NotEmpty
@@ -28,25 +30,39 @@ public class Story {
   private String name;
 
   @NotNull
-  @NotEmpty
   @Column(nullable = false)
-  @Lob
-  private String storyJson;
+  private Locale locale;
 
+  @Column(nullable = false)
   @NotNull
-  @NotEmpty
-  @Column(nullable = false)
-  @Lob
-  private String configJson;
+  private UUID creatorId;
 
-  public Long getId() {
+  @Column(nullable = false)
+  @NotNull
+  private UUID lastModifierId;
+
+  @Column(nullable = false)
+  private OffsetDateTime createdAt;
+
+  @Column(nullable = false)
+  private OffsetDateTime modifiedAt;
+
+  public UUID getId() {
     return id;
   }
-
-  public void setId(Long id) {
+  
+  public void setId(UUID id) {
     this.id = id;
   }
-
+  
+  public Locale getLocale() {
+    return locale;
+  }
+  
+  public void setLocale(Locale locale) {
+    this.locale = locale;
+  }
+  
   public String getName() {
     return name;
   }
@@ -54,21 +70,48 @@ public class Story {
   public void setName(String name) {
     this.name = name;
   }
-
-  public void setStoryJson(String storyJson) {
-    this.storyJson = storyJson;
-  }
   
-  public String getStoryJson() {
-    return storyJson;
+  public UUID getCreatorId() {
+    return creatorId;
   }
 
-  public String getConfigJson() {
-    return configJson;
+  public void setCreatorId(UUID creatorId) {
+    this.creatorId = creatorId;
   }
 
-  public void setConfigJson(String configJson) {
-    this.configJson = configJson;
+  public UUID getLastModifierId() {
+    return lastModifierId;
   }
 
+  public void setLastModifierId(UUID lastModifierId) {
+    this.lastModifierId = lastModifierId;
+  }
+
+  public OffsetDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(OffsetDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public OffsetDateTime getModifiedAt() {
+    return modifiedAt;
+  }
+
+  public void setModifiedAt(OffsetDateTime modifiedAt) {
+    this.modifiedAt = modifiedAt;
+  }
+
+  @PrePersist
+  public void onCreate() {
+    setCreatedAt(OffsetDateTime.now());
+    setModifiedAt(OffsetDateTime.now());
+  }
+
+  @PreUpdate
+  public void onUpdate() {
+    setModifiedAt(OffsetDateTime.now());
+  }
+  	
 }

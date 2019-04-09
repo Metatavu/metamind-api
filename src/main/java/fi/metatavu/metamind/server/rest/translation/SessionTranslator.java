@@ -1,10 +1,8 @@
 package fi.metatavu.metamind.server.rest.translation;
 
-import java.util.UUID;
-
 import javax.enterprise.context.ApplicationScoped;
 
-import fi.metatavu.metamind.server.rest.model.Session;
+import fi.metatavu.metamind.rest.model.Session;
 
 /**
  * Translator for translating JPA entities into REST entities
@@ -26,12 +24,14 @@ public class SessionTranslator {
     }
     
     Session result = new Session();
-    result.setCreated(jpaSession.getCreated());
-    result.setId(UUID.fromString(jpaSession.getExternalId()));
+    result.setCreatedAt(jpaSession.getCreatedAt());
+    result.setId(jpaSession.getId());
     result.setLocale(jpaSession.getLocale());
-    result.setVisitor(jpaSession.getVisitor());
+    result.setModifiedAt(jpaSession.getModifiedAt());
+    result.setStoryId(jpaSession.getStory() != null ? jpaSession.getStory().getId() : null);
     result.setTimeZone(jpaSession.getTimeZone());
-    
+    result.setVisitor(jpaSession.getVisitor());
+        
     return result;
   }
   

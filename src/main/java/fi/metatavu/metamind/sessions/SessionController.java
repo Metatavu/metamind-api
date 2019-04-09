@@ -1,13 +1,20 @@
 package fi.metatavu.metamind.sessions;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import fi.metatavu.metamind.persistence.dao.MessageDAO;
 import fi.metatavu.metamind.persistence.dao.SessionDAO;
+import fi.metatavu.metamind.persistence.dao.SessionVariableValueDAO;
+import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.Message;
 import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.SessionVariableValue;
 import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.Variable;
 
 @ApplicationScoped
 public class SessionController {
@@ -15,77 +22,103 @@ public class SessionController {
   @Inject
   private SessionDAO sessionDAO;
 
+  @Inject
+  private MessageDAO messageDAO;
+
+  @Inject
+  private SessionVariableValueDAO sessionVariableValueDAO;
+  
   /**
    * Creates new session
-   * 
-   * @param locale session locale
-   * @param visitor visitor details
-   * @param data serialized session data
+   *
+   * @param story story
+   * @param locale locale
+   * @param timeZone timeZone
+   * @param visitor visitor
+   * @param creatorId creator's id
    * @return created session
    */
-  public Session createSession(Story story, String locale, String timeZone, String visitor, byte[] data) {
-    return sessionDAO.create(story, UUID.randomUUID().toString(), locale, timeZone, truncateString(visitor, 190), data);
+  public Session create(Story story, String locale, String timeZone, String visitor, UUID creatorId) {
+    return sessionDAO.create(UUID.randomUUID(), story, null, locale, timeZone, visitor, creatorId, creatorId);
   }
   
   /**
-   * Finds a session by an external id
+   * Finds a session by an id
    * 
-   * @param externalId 
+   * @param id 
    * @return
    */
-  public Session findSession(UUID externalId) {
-    if (externalId == null) {
+  public Session findSessionById(UUID id) {
+    if (id == null) {
       return null;
     }
     
-    return sessionDAO.findByExternalId(externalId.toString());
+    return sessionDAO.findById(id);
   }
   
   /**
-   * Finds a metamind session by bot session
-   * 
-   * @return metamind session
-   */
-  public Session findSessionFromBotSession(com.rabidgremlin.mutters.core.session.Session botSession) {
-    if (botSession == null) {
-      return null;
-    }
-    
-    Long sessionId = (Long) botSession.getLongTermAttribute(SessionConsts.METAMIND_SESSION_ID_ATTRIBUTE);
-    if (sessionId == null) {
-      return null;
-    }
-    
-    return sessionDAO.findById(sessionId);
-  }
-  
-  /**
-   * Updates session state
+   * Returns session variable value as string
    * 
    * @param session session
-   * @param data new session state serialized
-   * @return updated session
+   * @param variable variable
+   * @return session variable value as string or null if not found
    */
-  public Session updateSessionState(Session session, byte[] data) {
-    return sessionDAO.updateData(session, data);
+  public String getSessionVariableValue(Session session, Variable variable) {
+    SessionVariableValue sessionVariableValue = sessionVariableValueDAO.findBySessionAndVariable(session, variable);
+    if (sessionVariableValue == null) {
+      return null;
+    }
+    
+    return sessionVariableValue.getValue();
   }
   
   /**
-   * Truncates string
+   * Sets session variable value as string
    * 
-   * @param string string
-   * @param maxLength max length
-   * @return truncated string
+   * @param session session
+   * @param variable variable
+   * @param value value
+   * @return updated session variable value as null if removed
    */
-  private String truncateString(String string, int maxLength) {
-    if (string == null) {
-      return null;
+  public void setSessionVariableValue(Session session, Variable variable, String value) {
+    SessionVariableValue sessionVariableValue = sessionVariableValueDAO.findBySessionAndVariable(session, variable);
+    if (sessionVariableValue != null) {
+      sessionVariableValueDAO.delete(sessionVariableValue);
     }
-
-    if (string.length() > maxLength) {
-      return string.substring(0, maxLength);
+    
+    if (value != null) {
+      sessionVariableValueDAO.create(session, variable, value);
     }
-
-    return string;
   }
+
+  /**
+   * Updates currentKnot
+   *
+   * @param currentKnot currentKnot
+   * @param lastModifierId last modifier's id
+   * @return updated session
+   */
+  public Session updateSessionCurrentKnot(Session session, Knot currentKnot, UUID lastModifierId) {
+    return sessionDAO.updateCurrentKnot(session, currentKnot, lastModifierId);
+  }
+
+  /**
+   * Navigates back in session history and returns knot in given time.
+   * 
+   * Method returns null if the start of the story has been reached
+   * 
+   * @param session session
+   * @param steps how many steps to navigate back
+   * @return knot in given time or null if start of the story has been reached
+   */
+  public Knot getPreviousKnot(Session session, Integer steps) {
+    List<Message> messages = messageDAO.listBySession(session, steps, 1);
+    if (!messages.isEmpty()) {
+      Message message = messages.get(0);
+      return message.getTargetKnot();
+    }
+    
+    return null;
+  }
+  
 }

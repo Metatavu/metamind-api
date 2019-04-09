@@ -4,16 +4,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import fi.metatavu.metamind.persistence.dao.MessageDAO;
+import fi.metatavu.metamind.persistence.dao.MessageResponseDAO;
 import fi.metatavu.metamind.persistence.dao.QuickResponseDAO;
+import fi.metatavu.metamind.persistence.models.Intent;
+import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Message;
+import fi.metatavu.metamind.persistence.models.MessageResponse;
 import fi.metatavu.metamind.persistence.models.QuickResponse;
 import fi.metatavu.metamind.persistence.models.Session;
 
+/**
+ * Controller for messages
+ * 
+ * @author Antti Leppä
+ */
 @ApplicationScoped
 public class MessageController {
 
@@ -22,44 +32,66 @@ public class MessageController {
 
   @Inject
   private QuickResponseDAO quickResponseDAO;
+
+  @Inject
+  private MessageResponseDAO messageResponseDAO;
   
   /**
    * Creates new message
-   * 
-   * @param content message content
-   * @param session message session
+   *
+   * @param session session
+   * @param content content
+   * @param hint hint
+   * @param confidence confidence
+   * @param sourceKnot sourceKnot
+   * @param targetKnot targetKnot
+   * @param matchedIntent matchedIntent
+   * @param creatorId creator's id
    * @return created message
    */
-  public Message createMessage(String content, Session session) {
-    return messageDAO.create(content, UUID.randomUUID().toString(), session);
+  public Message createMessage(Session session, String content, String hint, Double confidence, Knot sourceKnot, Knot targetKnot, Intent matchedIntent, UUID creatorId) {
+    return messageDAO.create(UUID.randomUUID(), session, content, hint, confidence, sourceKnot, targetKnot, matchedIntent, creatorId, creatorId);
   }
 
   /**
-   * Lists all messages within a session
+   * Creates new message response
    * 
-   * @param session session
-   * @return all messages within a session
+   * @param message message
+   * @param text response text
+   * @return created message response
    */
-  public List<Message> listSessionMessages(fi.metatavu.metamind.persistence.models.Session session) {
-    return messageDAO.listByMessage(session); 
+  public MessageResponse createMessageResponse(Message message, String text) {
+    return messageResponseDAO.create(message, text);
   }
   
   /**
-   * Updates message with bot's responses
+   * Lists messages by a session
+   * 
+   * @param session session
+   * @return messages
+   */
+  public List<Message> listSessionMessages(Session session) {
+    return messageDAO.listBySession(session, null, null);
+  }
+  
+  /**
+   * Lists message responses
    * 
    * @param message message
-   * @param hint hint
-   * @param response response
-   * @param matchedIntent 
-   * @param responseScore 
-   * @return updated message
+   * @return responses
    */
-  public Message updateMessage(fi.metatavu.metamind.persistence.models.Message message, String hint, String response, String matchedIntent, Double responseScore) {
-    messageDAO.updateHint(message, hint);
-    messageDAO.updateResponse(message, response);
-    messageDAO.updateMatchedIntent(message, matchedIntent);
-    messageDAO.updateResponseScore(message, responseScore);
-    return message;
+  public List<MessageResponse> listMessageResponses(Message message) {
+    return messageResponseDAO.listByMessage(message);
+  }
+  
+  /**
+   * Returns message responses as a string
+   * 
+   * @param message message
+   * @return message responses as a string
+   */
+  public String getMessageResponse(Message message) {
+    return listMessageResponses(message).stream().map(MessageResponse::getText).collect(Collectors.joining("\n"));
   }
   
   /**
@@ -85,6 +117,18 @@ public class MessageController {
     }
     
     return result;
+  }
+  
+  /**
+   * Updates targetKnot
+   *
+   * @param message message
+   * @param targetKnot targetKnot
+   * @param lastModifierId last modifier's id
+   * @return updated message
+   */
+  public Message updateMessageTargetKnot(Message message, Knot targetKnot, UUID lastModifierId) {
+    return messageDAO.updateTargetKnot(message, targetKnot, lastModifierId);
   }
 
 }
