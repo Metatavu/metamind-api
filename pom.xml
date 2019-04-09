@@ -89,6 +89,10 @@
 
     <graalvm.version>1.0.0-rc9</graalvm.version>
     
+    <!-- StreamEx -->
+    
+    <streamex.version>0.6.8</streamex.version>
+    
     <!-- Test -->
     
     <deltaspike.version>1.7.2</deltaspike.version>
@@ -401,6 +405,14 @@
       <artifactId>chromeinspector</artifactId>
       <version>${graalvm.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    
+    <!-- StreamEx -->
+    
+    <dependency> 
+	  <groupId>one.util</groupId> 
+	  <artifactId>streamex</artifactId> 
+	  <version>${streamex.version}</version>
     </dependency>
 
     <!-- Test -->

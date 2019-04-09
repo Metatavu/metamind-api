@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -44,6 +45,7 @@ import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.utils.RegexUtils;
+import one.util.streamex.StreamEx;
 import opennlp.tools.doccat.BagOfWordsFeatureGenerator;
 import opennlp.tools.doccat.DoccatFactory;
 import opennlp.tools.doccat.DoccatModel;
@@ -157,20 +159,34 @@ public class TrainingMaterialController {
    * @return updated intent material or null if material is not defined
    */
   public IntentTrainingMaterial setIntentTrainingMaterial(Intent intent, TrainingMaterialType type, TrainingMaterial trainingMaterial) {
-    if (trainingMaterial == null) {
-      intentTrainingMaterialDAO.listByIntentAndType(intent, type).stream().forEach(intentTrainingMaterialDAO::delete);
-      return null;
-    } else {
+    List<Intent> updateIntents = new ArrayList<>(2);
+    
+    try {
       IntentTrainingMaterial existing = intentTrainingMaterialDAO.findByIntentAndType(intent, type);
-      if (existing != null) {
-        if (trainingMaterial.getId().equals(existing.getTrainingMaterial().getId())) {
-          return existing;
-        } else {
+
+      if (trainingMaterial == null) {
+        if (existing != null) {
+          updateIntents.add(existing.getIntent());
           intentTrainingMaterialDAO.delete(existing);
         }
+        
+        return null;
+      } else {
+        if (existing != null) {
+          if (trainingMaterial.getId().equals(existing.getTrainingMaterial().getId())) {
+            return existing;
+          } else {
+            updateIntents.add(existing.getIntent());
+            intentTrainingMaterialDAO.delete(existing);
+          }
+        }
+
+        updateIntents.add(intent);
+        
+        return intentTrainingMaterialDAO.create(intent, trainingMaterial);
       }
-      
-      return intentTrainingMaterialDAO.create(intent, trainingMaterial);
+    } finally {
+      requestTrainingMaterialUpdates(updateIntents);
     }
   }
 
@@ -526,6 +542,39 @@ public class TrainingMaterialController {
    * 
    * @param trainingMaterial training material
    */
+  private void requestTrainingMaterialUpdates(List<fi.metatavu.metamind.persistence.models.Intent> intents) {
+    List<Intent> globalIntents = new ArrayList<>();
+    List<Intent> localIntents = new ArrayList<>();
+    
+    for (Intent intent : intents) {
+      if (intent.getGlobal()) {
+        globalIntents.add(intent);
+      } else {
+        localIntents.add(intent);
+      }
+    }
+    
+    Set<Story> stories = StreamEx.of(globalIntents)
+      .map(Intent::getTargetKnot).map(Knot::getStory)
+      .distinct(Story::getId)
+      .collect(Collectors.toSet());
+    
+    Set<UUID> storyIds = stories.stream().map(Story::getId).collect(Collectors.toSet());
+    
+    localIntents.stream()
+      .filter(intent -> !storyIds.contains(intent.getTargetKnot().getStory().getId()))
+      .map(Intent::getSourceKnot)
+      .forEach(this::requestKnotTrainingMaterialUpdate);
+    
+    stories.stream()
+      .forEach(this::requestStoryTrainingMaterialUpdate);
+  }
+  
+  /**
+   * Requests training material updates
+   * 
+   * @param trainingMaterial training material
+   */
   private void requestTrainingMaterialUpdates(fi.metatavu.metamind.persistence.models.TrainingMaterial trainingMaterial) {
     requestKnotsTrainingMaterialUpdate(trainingMaterial);
     requestStoryGlobalTrainingMaterialUpdate(trainingMaterial);
@@ -542,14 +591,14 @@ public class TrainingMaterialController {
       // Material is not attached into global intents, no need to update everything
       
       for (Knot knot : intentTrainingMaterialDAO.listByTargetIntentTrainingMaterial(trainingMaterial)) {
-        knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(knot.getId()));
+        requestKnotTrainingMaterialUpdate(knot);
       }      
     } else {
       // Material is attached into global intents, we need to update all knots in related stories
       
-      List<UUID> knotIds = stories.stream().map(story -> knotDAO.listByStory(story)).flatMap(List::stream).map(Knot::getId).collect(Collectors.toList());
-      for (UUID knotId : knotIds) {
-        knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(knotId));
+      List<Knot> knots = stories.stream().map(story -> knotDAO.listByStory(story)).flatMap(List::stream).collect(Collectors.toList());
+      for (Knot knot : knots) {
+        requestKnotTrainingMaterialUpdate(knot);
       }
     }
   }
@@ -562,8 +611,26 @@ public class TrainingMaterialController {
   private void requestStoryGlobalTrainingMaterialUpdate(fi.metatavu.metamind.persistence.models.TrainingMaterial trainingMaterial) {
     List<Story> stories = intentTrainingMaterialDAO.listStoriesByTrainingMaterialAndGlobal(trainingMaterial, Boolean.TRUE);
     for (Story story : stories) {
-      storyGlobalTrainingMaterialUpdateRequestEvent.fire(new StoryGlobalTrainingMaterialUpdateRequestEvent(story.getId()));
+      requestStoryTrainingMaterialUpdate(story);
     }
+  }
+
+  /**
+   * Requests training material update for a knot
+   * 
+   * @param knot knot
+   */
+  private void requestKnotTrainingMaterialUpdate(Knot knot) {
+    knotTrainingMaterialUpdateRequestEvent.fire(new KnotTrainingMaterialUpdateRequestEvent(knot.getId()));
+  }
+
+  /**
+   * Requests training material update for a story
+   * 
+   * @param story story
+   */
+  private void requestStoryTrainingMaterialUpdate(Story story) {
+    storyGlobalTrainingMaterialUpdateRequestEvent.fire(new StoryGlobalTrainingMaterialUpdateRequestEvent(story.getId()));
   }
   
 }
