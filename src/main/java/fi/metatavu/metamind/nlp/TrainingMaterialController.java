@@ -43,6 +43,7 @@ import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import fi.metatavu.metamind.utils.RegexUtils;
 import opennlp.tools.doccat.BagOfWordsFeatureGenerator;
 import opennlp.tools.doccat.DoccatFactory;
 import opennlp.tools.doccat.DoccatModel;
@@ -280,9 +281,8 @@ public class TrainingMaterialController {
     return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
       TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
       String materialLines = trainingMaterial.getText();
-      Matcher matcher = OPENNLP_NER_REPLACE_PATTERN.matcher(materialLines);
       
-      return matcher.replaceAll((match) -> {
+      return RegexUtils.replaceAll(OPENNLP_NER_REPLACE_PATTERN, materialLines, match -> {
         String variableName = match.group(2);
         String cacheKey = String.format("%s-%s", story.getId(), variableName);
         
@@ -314,10 +314,8 @@ public class TrainingMaterialController {
     
     return getTrainingMaterialLines(intents, type, (intentTrainingMaterial) -> {
       TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
-      String materialLines = trainingMaterial.getText();
-      Matcher matcher = OPENNLP_REGEX_PATTERN.matcher(materialLines);
-      
-      return matcher.replaceAll((match) -> {
+      String materialLines = trainingMaterial.getText();      
+      return RegexUtils.replaceAll(OPENNLP_REGEX_PATTERN, materialLines, match -> {
         String variableName = match.group();
         String cacheKey = String.format("%s-%s", story.getId(), variableName);
         

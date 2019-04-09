@@ -23,6 +23,7 @@ import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Script;
 import fi.metatavu.metamind.polyglot.XMLHttpRequest;
 import fi.metatavu.metamind.scripts.ScriptController;
+import fi.metatavu.metamind.utils.RegexUtils;
 
 /**
  * Script processor 
@@ -79,8 +80,7 @@ public class ScriptProcessor {
    * @return processed text
    */
   private String processInlineScripts(String text) {
-    Matcher matcher = INLINE_PATTERN.matcher(text);   
-    return matcher.replaceAll((result) -> {
+    return RegexUtils.replaceAll(INLINE_PATTERN, text, result -> {
       String content = result.group(2);
       return processScript(new RunnableScript("js", content, "inline"), Collections.emptyMap());
     });
@@ -93,8 +93,7 @@ public class ScriptProcessor {
    * @return processed text
    */
   private String processNamedScripts(String text) {
-    Matcher matcher = NAMED_PATTERN.matcher(text);   
-    return matcher.replaceAll((result) -> {
+    return RegexUtils.replaceAll(NAMED_PATTERN, text, result -> {
       Map<String, String> params = parseNamedAttributes(StringUtils.trim(result.group(2)));
       String name = params.get("name");
       String version = params.get("version");
