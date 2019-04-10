@@ -6,9 +6,9 @@ import java.util.SortedMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import fi.metatavu.metamind.bot.tokenization.Tokenizer;
 import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.doccat.DocumentCategorizerME;
-import opennlp.tools.tokenize.Tokenizer;
 
 /**
  * Intent matcher that users OpenNPL

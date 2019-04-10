@@ -14,6 +14,7 @@ import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Knot_;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.rest.model.KnotType;
+import fi.metatavu.metamind.rest.model.TokenizerType;
 
 /**
  * DAO class for Knot
@@ -28,6 +29,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
    * 
    * @param id id
    * @param type type
+   * @param tokenizerType tokenizerType
    * @param name name
    * @param hint hint
    * @param content content
@@ -36,9 +38,10 @@ public class KnotDAO extends AbstractDAO<Knot> {
    * @param lastModifierId last modifier's id
    * @return created knot
    */
-  public Knot create(UUID id, KnotType type, String name, String content, String hint, Story story, UUID creatorId, UUID lastModifierId) {
+  public Knot create(UUID id, KnotType type, TokenizerType tokenizerType, String name, String hint, String content, Story story, UUID creatorId, UUID lastModifierId) {
     Knot knot = new Knot();
     knot.setType(type);
+    knot.setTokenizerType(tokenizerType);
     knot.setName(name);
     knot.setHint(hint);
     knot.setContent(content);
@@ -80,6 +83,19 @@ public class KnotDAO extends AbstractDAO<Knot> {
   public Knot updateType(Knot knot, KnotType type, UUID lastModifierId) {
     knot.setLastModifierId(lastModifierId);
     knot.setType(type);
+    return persist(knot);
+  }
+  
+  /**
+   * Updates tokenizerType
+   *
+   * @param tokenizerType tokenizerType
+   * @param lastModifierId last modifier's id
+   * @return updated knot
+   */
+  public Knot updateTokenizerType(Knot knot, TokenizerType tokenizerType, UUID lastModifierId) {
+    knot.setLastModifierId(lastModifierId);
+    knot.setTokenizerType(tokenizerType);
     return persist(knot);
   }
 

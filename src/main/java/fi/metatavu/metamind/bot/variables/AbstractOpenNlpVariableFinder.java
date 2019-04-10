@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import fi.metatavu.metamind.bot.tokenization.Tokenizer;
 import opennlp.tools.namefind.TokenNameFinder;
-import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.util.Span;
 
 /**
