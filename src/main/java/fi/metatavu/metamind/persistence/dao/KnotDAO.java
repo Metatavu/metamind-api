@@ -38,7 +38,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
    * @param lastModifierId last modifier's id
    * @return created knot
    */
-  public Knot create(UUID id, KnotType type, TokenizerType tokenizerType, String name, String hint, String content, Story story, UUID creatorId, UUID lastModifierId) {
+  public Knot create(UUID id, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, UUID lastModifierId) {
     Knot knot = new Knot();
     knot.setType(type);
     knot.setTokenizerType(tokenizerType);
