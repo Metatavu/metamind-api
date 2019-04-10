@@ -365,4 +365,8 @@
   
   </changeSet>
   
+  <changeSet id="intenttypes" author="Antti Leppä">
+    <sql>UPDATE intent set type = 'NORMAL' WHERE type in ('OPENNLP', 'TEMPLATE')</sql>
+  </changeSet>
+  
 </databaseChangeLog>
