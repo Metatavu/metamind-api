@@ -5,7 +5,7 @@ package fi.metatavu.metamind.bot.tokenization;
  * 
  * @author Antti Leppä
  */
-public class UntokenizerdTokenizer implements Tokenizer {
+public class UntokenizedTokenizer implements Tokenizer {
 
   @Override
   public String[] tokenize(String text) {

@@ -20,7 +20,7 @@ public class TokenizerFactory {
   public static Tokenizer createTokenizer(fi.metatavu.metamind.rest.model.TokenizerType type) {
     switch (type) {
       case UNTOKENIZED:
-        return new UntokenizerdTokenizer();
+        return new UntokenizedTokenizer();
       case WHITESPACE:
         return new WhitespaceTokenizer();
     }
