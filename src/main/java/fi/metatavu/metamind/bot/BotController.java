@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 
+import fi.metatavu.metamind.bot.match.AnyIntentMatcher;
 import fi.metatavu.metamind.bot.match.IntentMatch;
 import fi.metatavu.metamind.bot.match.IntentMatcher;
 import fi.metatavu.metamind.bot.match.OpenNlpDoccatIntentMatcher;
@@ -207,6 +209,13 @@ public class BotController {
       if (intentModel != null) {
         result.add(new RegexIntentMatcher(intentModel, tokenizer));
       }
+    }
+    
+    List<UUID> defaultIntentIds = intentDAO.listBySourceKnotAndType(sourceKnot, IntentType.DEFAULT).stream()
+      .map(Intent::getId).collect(Collectors.toList());
+    
+    if (!defaultIntentIds.isEmpty()) {
+      result.add(new AnyIntentMatcher(defaultIntentIds));
     }
     
     return result;

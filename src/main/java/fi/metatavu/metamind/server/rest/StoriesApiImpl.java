@@ -241,7 +241,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       
       botResponse.getVariableValues().entrySet().stream().forEach(entry -> {
         fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(entry.getKey());
-        sessionController.setSessionVariableValue(session, variable, entry.getValue());
+        if (variable != null) {
+          sessionController.setSessionVariableValue(session, variable, entry.getValue());
+        }
       });
       
       List<String> quickResponses = storyController.listKnotQuickResponses(currentKnot);
