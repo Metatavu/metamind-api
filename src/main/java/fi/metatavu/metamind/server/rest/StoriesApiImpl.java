@@ -55,6 +55,8 @@ import fi.metatavu.metamind.story.StoryController;
 @Produces({ "application/json;charset=utf-8" })
 public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
+  private static final int MAX_KNOT_REDIRECTS = 50;
+
   @Inject
   private SessionController sessionController;
 
@@ -217,9 +219,21 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       if (message == null) {
         return createInternalServerError("Could not create new message");
       }
-
+      
       for (String response : botRuntimeContext.getResponses()) {
         messageResponses.add(messageController.createMessageResponse(message, response));
+      }
+      
+      int redirects = 0;
+      fi.metatavu.metamind.persistence.models.Knot redirectKnot;
+      while ((redirectKnot = storyController.getSourceKnotRedirectKnot(currentKnot)) != null) {
+        messageResponses.add(messageController.createMessageResponse(message, scriptProcessor.processScripts(redirectKnot.getContent())));
+        currentKnot = redirectKnot;
+        redirects++;
+        
+        if (redirects >= MAX_KNOT_REDIRECTS) {
+          return createInternalServerError("Knot is redirecting incorrectly");
+        }
       }
  
       messageController.updateMessageTargetKnot(message, currentKnot, loggedUserId);

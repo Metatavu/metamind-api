@@ -202,6 +202,17 @@ public class StoryController {
   }
 
   /**
+   * Returns redirect target knot for a source knot if redirect intent is defined
+   * 
+   * @param sourceKnot source knot
+   * @return target redirect knot or null if knot should not be redirected
+   */
+  public Knot getSourceKnotRedirectKnot(Knot sourceKnot) {
+    List<Intent> redirectKnots = intentDAO.listBySourceKnotAndType(sourceKnot, IntentType.REDIRECT);
+    return redirectKnots.isEmpty() ? null : redirectKnots.get(0).getTargetKnot();
+  }
+
+  /**
    * Updates an intent
    *   
    * @param intent intent
