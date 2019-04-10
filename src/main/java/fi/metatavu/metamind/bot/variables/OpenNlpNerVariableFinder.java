@@ -1,8 +1,8 @@
 package fi.metatavu.metamind.bot.variables;
 
+import fi.metatavu.metamind.bot.tokenization.Tokenizer;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.tokenize.Tokenizer;
 
 /**
  * Variable finder using OpenNLP token name finder

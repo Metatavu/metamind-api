@@ -49,7 +49,7 @@
     
     <!-- Spec -->
     
-    <metamind-spec.version>2.0.3-SNAPSHOT</metamind-spec.version>
+    <metamind-spec.version>2.0.3</metamind-spec.version>
        
     <!-- Maven -->
 

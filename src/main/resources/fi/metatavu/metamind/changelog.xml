@@ -369,4 +369,14 @@
     <sql>UPDATE intent set type = 'NORMAL' WHERE type in ('OPENNLP', 'TEMPLATE')</sql>
   </changeSet>
   
+  <changeSet id="tokenizer" author="Antti Leppä">
+    <addColumn tableName="knot">
+      <column name="tokenizertype" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    
+    <sql>UPDATE knot set tokenizertype = 'WHITESPACE'</sql>
+  </changeSet>
+  
 </databaseChangeLog>

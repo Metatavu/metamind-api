@@ -20,6 +20,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import fi.metatavu.metamind.rest.model.KnotType;
+import fi.metatavu.metamind.rest.model.TokenizerType;
 
 @Entity
 @Cacheable
@@ -32,6 +33,10 @@ public class Knot {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private KnotType type;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private TokenizerType tokenizerType;
 
   @NotNull
   @NotEmpty
@@ -77,6 +82,14 @@ public class Knot {
 
   public void setType(KnotType type) {
     this.type = type;
+  }
+  
+  public void setTokenizerType(TokenizerType tokenizerType) {
+    this.tokenizerType = tokenizerType;
+  }
+  
+  public TokenizerType getTokenizerType() {
+    return tokenizerType;
   }
 
   public String getName() {

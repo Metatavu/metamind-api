@@ -27,6 +27,8 @@ import fi.metatavu.metamind.bot.match.IntentMatch;
 import fi.metatavu.metamind.bot.match.IntentMatcher;
 import fi.metatavu.metamind.bot.match.OpenNlpDoccatIntentMatcher;
 import fi.metatavu.metamind.bot.match.RegexIntentMatcher;
+import fi.metatavu.metamind.bot.tokenization.Tokenizer;
+import fi.metatavu.metamind.bot.tokenization.TokenizerFactory;
 import fi.metatavu.metamind.bot.variables.OpenNlpNerVariableFinder;
 import fi.metatavu.metamind.bot.variables.OpenNlpRegExVariableFinder;
 import fi.metatavu.metamind.bot.variables.VariableFinder;
@@ -40,11 +42,10 @@ import fi.metatavu.metamind.persistence.models.Session;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.rest.model.IntentType;
+import fi.metatavu.metamind.rest.model.TokenizerType;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 /**
  * Bot controller
@@ -158,7 +159,7 @@ public class BotController {
     // TODO: Story settings: Tokenizer, Strategy, minMatch?
     
     List<IntentMatcher> result = new ArrayList<>();
-    Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer(TokenizerType.WHITESPACE);
     
     StoryGlobalIntentModel intentModel = storyGlobalIntentModelDAO.findByStory(story);
     if (intentModel != null) {
@@ -187,7 +188,7 @@ public class BotController {
     // TODO: Knot settings: Tokenizer, Strategy, minMatch?
     
     List<IntentMatcher> result = new ArrayList<>();
-    Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer(sourceKnot.getTokenizerType());
     
     KnotIntentModel knotIntentDoccatModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.INTENTOPENNLPDOCCAT);
     if (knotIntentDoccatModel != null) {
@@ -285,7 +286,7 @@ public class BotController {
     // TODO: Knot settings: Tokenizer
     
     List<VariableFinder> result = new ArrayList<>();
-    Tokenizer tokenizer = WhitespaceTokenizer.INSTANCE;
+    Tokenizer tokenizer = TokenizerFactory.createTokenizer(sourceKnot.getTokenizerType());
     KnotIntentModel knotIntentNerModel = knotIntentModelDAO.findByKnotAndType(sourceKnot, TrainingMaterialType.VARIABLEOPENNLPNER);
     if (knotIntentNerModel != null) {
       try {

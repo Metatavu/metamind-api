@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import opennlp.tools.tokenize.Tokenizer;
+import fi.metatavu.metamind.bot.tokenization.Tokenizer;
 
 /**
  * Intent matcher that uses Regex patterns for matching

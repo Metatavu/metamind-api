@@ -170,7 +170,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getName(), body.getContent(), body.getHint(), story, loggedUserId)));
+    return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), story, loggedUserId)));
   }
 
   @Override
@@ -582,7 +582,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
     
-    return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getName(), body.getContent(), body.getHint(), loggedUserId)));
+    return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), loggedUserId)));
   }
 
   @Override

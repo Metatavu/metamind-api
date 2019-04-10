@@ -19,6 +19,7 @@ import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
+import fi.metatavu.metamind.rest.model.TokenizerType;
 import fi.metatavu.metamind.rest.model.VariableType;
 import jersey.repackaged.com.google.common.base.Objects;
 
@@ -90,6 +91,7 @@ public class StoryController {
    * Creates new Knot
    * 
    * @param type type
+   * @param tokenizerType type of tokenizer
    * @param name name
    * @param content content
    * @param hint hint
@@ -97,8 +99,8 @@ public class StoryController {
    * @param creatorId creator's id
    * @return created knot
    */
-  public Knot createKnot(KnotType type, String name, String content, String hint, Story story, UUID creatorId) {
-    return knotDAO.create(UUID.randomUUID(), type, name, content, hint, story, creatorId, creatorId);
+  public Knot createKnot(KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId) {
+    return knotDAO.create(UUID.randomUUID(), type, tokenizerType, name, content, hint, story, creatorId, creatorId);
   }
   
   /**
@@ -235,6 +237,7 @@ public class StoryController {
     intentDAO.updateSourceKnot(intent, sourceKnot, lastModifierId);
     intentDAO.updateTargetKnot(intent, targetKnot, lastModifierId);
     intentDAO.updateType(intent, type, lastModifierId);
+    intentDAO.updateType(intent, type, lastModifierId);
     intentDAO.updateName(intent, name, lastModifierId);
     intentDAO.updateQuickResponse(intent, quickResponse, lastModifierId);
     
@@ -250,16 +253,18 @@ public class StoryController {
    * 
    * @param knot knot
    * @param type type
+   * @param tokenizerType type of tokenizer
    * @param name name
    * @param content content
    * @param hint hint
    * @param lastModifierId last modifier's id
    * @return updated knot
    */
-  public Knot updateKnot(Knot knot, KnotType type, String name, String content, String hint, UUID lastModifierId) {
+  public Knot updateKnot(Knot knot, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, UUID lastModifierId) {
     knot = knotDAO.updateContent(knot, content, lastModifierId);
     knot = knotDAO.updateName(knot, name, lastModifierId);
     knot = knotDAO.updateType(knot, type, lastModifierId);
+    knot = knotDAO.updateTokenizerType(knot, tokenizerType, lastModifierId);
     knot = knotDAO.updateHint(knot, hint, lastModifierId);
     return knot;
   }
