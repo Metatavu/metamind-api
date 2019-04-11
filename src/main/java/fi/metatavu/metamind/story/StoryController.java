@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import fi.metatavu.metamind.bot.KnotTrainingMaterialUpdateRequestEvent;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
+import fi.metatavu.metamind.persistence.dao.IntentTrainingMaterialDAO;
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
 import fi.metatavu.metamind.persistence.dao.StoryDAO;
 import fi.metatavu.metamind.persistence.dao.VariableDAO;
@@ -42,6 +43,9 @@ public class StoryController {
 
   @Inject
   private VariableDAO variableDAO;
+
+  @Inject
+  private IntentTrainingMaterialDAO intentTrainingMaterialDAO;
 
   @Inject
   private Event<KnotTrainingMaterialUpdateRequestEvent> knotTrainingMaterialUpdateRequestEvent;
@@ -325,6 +329,7 @@ public class StoryController {
    * @param intent intent
    */
   public void deleteIntent(Intent intent) {
+    intentTrainingMaterialDAO.listByIntent(intent).stream().forEach(intentTrainingMaterialDAO::delete);
     intentDAO.delete(intent);
   }
   
