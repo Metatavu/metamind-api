@@ -154,5 +154,24 @@ public class IntentTrainingMaterialDAO extends AbstractDAO<IntentTrainingMateria
     
     return entityManager.createQuery(criteria).getResultList();
   }
+
+  /**
+   * List by intent
+   * 
+   * @param intent intent
+   * @return list of intent training materials
+   */
+  public List<IntentTrainingMaterial> listByIntent(Intent intent) {
+    EntityManager entityManager = getEntityManager();
+    
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<IntentTrainingMaterial> criteria = criteriaBuilder.createQuery(IntentTrainingMaterial.class);
+    Root<IntentTrainingMaterial> root = criteria.from(IntentTrainingMaterial.class);
+    
+    criteria.select(root);
+    criteria.where(criteriaBuilder.equal(root.get(IntentTrainingMaterial_.intent), intent));
+    
+    return entityManager.createQuery(criteria).getResultList();
+  }
   
 }
