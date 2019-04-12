@@ -6,6 +6,7 @@ ADD --chown=jboss ./docker/host.cli /opt/docker/host.cli
 ADD --chown=jboss ./docker/kubernets-jgroups.cli /opt/docker/kubernets-jgroups.cli
 ADD --chown=jboss ./docker/jdbc.cli /opt/docker/jdbc.cli
 ADD --chown=jboss ./docker/interfaces.cli /opt/docker/interfaces.cli
+ADD --chown=jboss ./docker/jboss-cli.properties /opt/docker/jboss-cli.properties
 ADD --chown=jboss ./docker/keycloak.cli /opt/docker/keycloak.cli
 RUN chmod a+x /opt/docker/entrypoint.sh
 
