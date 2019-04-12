@@ -6,7 +6,32 @@
 
   <display-name>Metamind API</display-name>
   <description>Metamind API</description>
-  <module-name>metamind</module-name>
+  <module-name>metamind-api</module-name>
   <distributable/>
+
+  <login-config>
+    <auth-method>KEYCLOAK</auth-method>
+  </login-config>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>ping</web-resource-name>
+      <url-pattern>/v2/system/ping</url-pattern>
+    </web-resource-collection>
+  </security-constraint>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>api</web-resource-name>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>*</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <security-role>
+    <role-name>admin</role-name>
+  </security-role>
 
 </web-app>

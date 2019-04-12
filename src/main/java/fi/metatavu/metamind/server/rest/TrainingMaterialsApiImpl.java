@@ -3,6 +3,7 @@ package fi.metatavu.metamind.server.rest;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -10,6 +11,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.jboss.ejb3.annotation.SecurityDomain;
+
+import fi.metatavu.metamind.authentication.Roles;
 import fi.metatavu.metamind.nlp.TrainingMaterialController;
 import fi.metatavu.metamind.rest.api.TrainingMaterialsApi;
 import fi.metatavu.metamind.rest.model.TrainingMaterial;
@@ -26,6 +30,7 @@ import fi.metatavu.metamind.story.StoryController;
 @Stateful
 @Consumes({ "application/json;charset=utf-8" })
 @Produces({ "application/json;charset=utf-8" })
+@SecurityDomain("keycloak")
 public class TrainingMaterialsApiImpl extends AbstractRestApi implements TrainingMaterialsApi {
 
   @Inject
@@ -38,6 +43,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
   private StoryController storyController;
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response createTrainingMaterial(TrainingMaterial body) {
     // TODO: Permission check
     
@@ -54,6 +60,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response deleteTrainingMaterial(UUID trainingMaterialId) {
     // TODO: Check permissions
     
@@ -68,6 +75,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response findTrainingMaterial(UUID trainingMaterialId) {
     // TODO: Check permissions
     
@@ -80,6 +88,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
   }
   
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response listTrainingMaterials(UUID storyId, TrainingMaterialType type) {
     // TODO: Check permissions
     
@@ -94,6 +103,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response updateTrainingMaterial(TrainingMaterial body, UUID trainingMaterialId) {
     // TODO: Check permissions
     

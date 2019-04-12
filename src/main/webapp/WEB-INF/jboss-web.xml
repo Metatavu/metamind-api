@@ -6,5 +6,5 @@
    
   <context-root></context-root>
   <virtual-host>metamind-api</virtual-host>
-  
+  <security-domain>keycloak</security-domain> 
 </jboss-web>

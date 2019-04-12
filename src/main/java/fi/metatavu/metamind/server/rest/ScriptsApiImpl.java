@@ -3,6 +3,7 @@ package fi.metatavu.metamind.server.rest;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -11,7 +12,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.ejb3.annotation.SecurityDomain;
 
+import fi.metatavu.metamind.authentication.Roles;
 import fi.metatavu.metamind.rest.api.ScriptsApi;
 import fi.metatavu.metamind.rest.model.Script;
 import fi.metatavu.metamind.scripts.ScriptController;
@@ -27,6 +30,7 @@ import fi.metatavu.metamind.server.rest.translation.ScriptTranslator;
 @Stateful
 @Consumes({ "application/json;charset=utf-8" })
 @Produces({ "application/json;charset=utf-8" })
+@SecurityDomain("keycloak")
 public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
 
   @Inject
@@ -36,6 +40,7 @@ public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
   private ScriptTranslator scriptTranslator;
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response createScript(Script body) {
     // TODO: Permission checks
     
@@ -61,6 +66,7 @@ public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response deleteScript(UUID scriptId) {
     // TODO: Permission checks
     
@@ -75,6 +81,7 @@ public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response findScript(UUID scriptId) {
     // TODO: Permission checks
     
@@ -87,11 +94,13 @@ public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response listScripts() {
     return createOk(scriptController.listScripts().stream().map(scriptTranslator::translateScript).collect(Collectors.toList()));
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response updateScript(Script body, UUID scriptId) {
     fi.metatavu.metamind.persistence.models.Script script = scriptController.findScriptById(scriptId);
     if (script == null) {

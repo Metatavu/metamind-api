@@ -7,6 +7,8 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -16,7 +18,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.ejb3.annotation.SecurityDomain;
 
+import fi.metatavu.metamind.authentication.Roles;
 import fi.metatavu.metamind.bot.BotController;
 import fi.metatavu.metamind.bot.BotResponse;
 import fi.metatavu.metamind.bot.BotRuntimeContext;
@@ -53,6 +57,7 @@ import fi.metatavu.metamind.story.StoryController;
 @Stateful
 @Consumes({ "application/json;charset=utf-8" })
 @Produces({ "application/json;charset=utf-8" })
+@SecurityDomain("keycloak")
 public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   private static final int MAX_KNOT_REDIRECTS = 50;
@@ -97,6 +102,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   private BotRuntimeContext botRuntimeContext;
   
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response createIntent(Intent body, UUID storyId) {
     fi.metatavu.metamind.persistence.models.Knot sourceKnot = body.getSourceKnotId() != null ? storyController.findKnotById(body.getSourceKnotId()) : null;
     if (body.getSourceKnotId() != null && sourceKnot == null) {
@@ -160,6 +166,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response createKnot(Knot body, UUID storyId) {
     UUID loggedUserId = getLoggerUserId();
     
@@ -174,6 +181,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @PermitAll
   public Response createMessage(fi.metatavu.metamind.rest.model.Message body, UUID storyId) {
     Session session = sessionController.findSessionById(body.getSessionId());
     if (session == null) {
@@ -256,6 +264,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @PermitAll
   public Response createSession(fi.metatavu.metamind.rest.model.Session body, UUID storyId) {
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -274,6 +283,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response createStory(Story body) {
     UUID loggedUserId = getLoggerUserId();
     Locale locale = LocaleUtils.toLocale(body.getLocale());
@@ -284,6 +294,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response createVariable(Variable body, UUID storyId) {
     UUID loggedUserId = getLoggerUserId();
     
@@ -298,6 +309,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response deleteIntent(UUID storyId, UUID intentId) {
     // TODO: Permission check
     
@@ -321,6 +333,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response deleteKnot(UUID storyId, UUID knotId) {
     // TODO: Permission check
     
@@ -344,6 +357,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response deleteStory(UUID storyId) {
     // TODO: Permission check
     
@@ -358,6 +372,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response deleteVariable(UUID storyId, UUID variableId) {
     // TODO: Permission check
     
@@ -381,6 +396,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response findIntent(UUID storyId, UUID intentId) {
     // TODO: Permission check
     
@@ -402,6 +418,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response findKnot(UUID storyId, UUID knotId) {
     // TODO: Permission check
     
@@ -423,6 +440,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response findStory(UUID storyId) {
     // TODO: Permission check
     
@@ -435,6 +453,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response findVariable(UUID storyId, UUID variableId) {
     // TODO: Permission check
     
@@ -456,6 +475,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response listIntents(UUID storyId) {
     // TODO: Permission check
     
@@ -470,6 +490,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response listKnots(UUID storyId) {
     // TODO: Permission check
     
@@ -484,6 +505,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response listStories() {
     // TODO: Permission check
     
@@ -493,6 +515,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response listVariables(UUID storyId) {
     // TODO: Permission check
     
@@ -507,6 +530,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response updateIntent(Intent body, UUID storyId, UUID intentId) {
     fi.metatavu.metamind.persistence.models.Knot sourceKnot = body.getSourceKnotId() != null ? storyController.findKnotById(body.getSourceKnotId()) : null;
     if (body.getSourceKnotId() != null && sourceKnot == null) {
@@ -563,6 +587,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response updateKnot(Knot body, UUID storyId, UUID knotId) {
     UUID loggedUserId = getLoggerUserId();
     
@@ -601,6 +626,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
+  @RolesAllowed({Roles.ADMIN})
   public Response updateVariable(Variable body, UUID storyId, UUID variableId) {
     UUID loggedUserId = getLoggerUserId();
     // TODO: Permission check
