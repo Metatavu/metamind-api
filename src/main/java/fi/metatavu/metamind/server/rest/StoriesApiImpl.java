@@ -264,7 +264,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
-  @PermitAll
+  @RolesAllowed({Roles.BOT})
   public Response createSession(fi.metatavu.metamind.rest.model.Session body, UUID storyId) {
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -283,7 +283,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   }
 
   @Override
-  @RolesAllowed({Roles.ADMIN})
+  @RolesAllowed({Roles.BOT})
   public Response createStory(Story body) {
     UUID loggedUserId = getLoggerUserId();
     Locale locale = LocaleUtils.toLocale(body.getLocale());

@@ -22,22 +22,6 @@
 
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>sessioncreate</web-resource-name>
-      <url-pattern>/v2/stories/*/sessions</url-pattern>
-      <http-method>POST</http-method>
-    </web-resource-collection>
-  </security-constraint>
-
-  <security-constraint>
-    <web-resource-collection>
-      <web-resource-name>messagecreate</web-resource-name>
-      <url-pattern>/v2/stories/*/messages</url-pattern>
-      <http-method>POST</http-method>
-    </web-resource-collection>
-  </security-constraint>
-
-  <security-constraint>
-    <web-resource-collection>
       <web-resource-name>api</web-resource-name>
       <url-pattern>/*</url-pattern>
     </web-resource-collection>
@@ -48,6 +32,10 @@
 
   <security-role>
     <role-name>admin</role-name>
+  </security-role>
+
+  <security-role>
+    <role-name>bot</role-name>
   </security-role>
 
 </web-app>

@@ -9,6 +9,7 @@ package fi.metatavu.metamind.authentication;
 public class Roles {
 
   public static final String ADMIN = "admin";
+  public static final String BOT = "bot";
   
   private Roles() {
     // Private constructor
