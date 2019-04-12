@@ -49,7 +49,6 @@ public class MessageDAO extends AbstractDAO<Message> {
     return persist(message);
   }
 
-  
   /**
    * Lists messages by session
    * 
@@ -82,6 +81,25 @@ public class MessageDAO extends AbstractDAO<Message> {
     }
     
     return query.getResultList();
+  }
+
+  /**
+   * Lists messages by matched intent
+   * 
+   * @param matchedIntent matched intent
+   * @return List of messages
+   */
+  public List<Message> listByMatchedIntent(Intent matchedIntent) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Message> criteria = criteriaBuilder.createQuery(Message.class);
+    Root<Message> root = criteria.from(Message.class);
+
+    criteria.select(root);
+    criteria.where(criteriaBuilder.equal(root.get(Message_.matchedIntent), matchedIntent));
+    
+    return entityManager.createQuery(criteria).getResultList();
   }
   
   /**
