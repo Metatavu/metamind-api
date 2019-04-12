@@ -65,6 +65,16 @@ public class MessageController {
   }
   
   /**
+   * Lists messages by matched intent
+   * 
+   * @param matchedIntent matched intent
+   * @return messages
+   */
+  public List<Message> listMessagedByMatchedIntent(Intent matchedIntent) {
+    return messageDAO.listByMatchedIntent(matchedIntent);
+  }
+  
+  /**
    * Lists messages by a session
    * 
    * @param session session
@@ -129,6 +139,17 @@ public class MessageController {
    */
   public Message updateMessageTargetKnot(Message message, Knot targetKnot, UUID lastModifierId) {
     return messageDAO.updateTargetKnot(message, targetKnot, lastModifierId);
+  }
+  
+  /**
+   * Deletes a message among with it's contents and quick replies
+   * 
+   * @param message message
+   */
+  public void deleteMessage(Message message) {
+	  messageResponseDAO.listByMessage(message).stream().forEach(messageResponseDAO::delete);
+	  quickResponseDAO.listByMessage(message).stream().forEach(quickResponseDAO::delete);
+	  messageDAO.delete(message);
   }
 
 }
