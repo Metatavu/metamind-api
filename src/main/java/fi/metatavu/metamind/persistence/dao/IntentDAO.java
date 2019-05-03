@@ -212,13 +212,13 @@ public class IntentDAO extends AbstractDAO<Intent> {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<String> criteria = criteriaBuilder.createQuery(String.class);
     Root<Intent> root = criteria.from(Intent.class);
-    Join<Intent, Knot> sourceKnotJoin = root.join(Intent_.targetKnot);
+    Join<Intent, Knot> targetKnotJoin = root.join(Intent_.targetKnot);
 
     criteria.select(root.get(Intent_.quickResponse));
     criteria.where(
       criteriaBuilder.isNotNull(root.get(Intent_.quickResponse)),
       criteriaBuilder.isNull(root.get(Intent_.sourceKnot)),
-      criteriaBuilder.equal(sourceKnotJoin.get(Knot_.story), story),
+      criteriaBuilder.equal(targetKnotJoin.get(Knot_.story), story),
       criteriaBuilder.equal(root.get(Intent_.global), global)
     );
     
