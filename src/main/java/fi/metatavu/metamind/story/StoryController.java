@@ -212,6 +212,15 @@ public class StoryController {
   }
 
   /**
+   * Lists story global quick responses
+   * @param story story
+   * @return story global quick responses
+   */
+  public List<String> listStoryGlobalQuickResponses(Story story) {
+    return intentDAO.listQuickResponsesByStoryAndGlobal(story, Boolean.TRUE);
+  }
+
+  /**
    * Returns redirect target knot for a source knot if redirect intent is defined
    * 
    * @param sourceKnot source knot
