@@ -181,7 +181,7 @@ public class IntentDAO extends AbstractDAO<Intent> {
    * Lists intent quick responses by sourceKnot
    * 
    * @param sourceKnot sourceKnot
-   * @return List of intents
+   * @return List of quick responses
    */
   public List<String> listQuickResponsesBySourceKnot(Knot sourceKnot) {
     EntityManager entityManager = getEntityManager();
@@ -194,6 +194,32 @@ public class IntentDAO extends AbstractDAO<Intent> {
     criteria.where(
       criteriaBuilder.isNotNull(root.get(Intent_.quickResponse)),
       criteriaBuilder.equal(root.get(Intent_.sourceKnot), sourceKnot)
+    );
+    
+    return entityManager.createQuery(criteria).getResultList();
+  }
+
+  /**
+   * Lists intent quick responses by story and global
+   * 
+   * @param story story
+   * @param global global
+   * @return List of quick responses
+   */
+  public List<String> listQuickResponsesByStoryAndGlobal(Story story, Boolean global) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<String> criteria = criteriaBuilder.createQuery(String.class);
+    Root<Intent> root = criteria.from(Intent.class);
+    Join<Intent, Knot> targetKnotJoin = root.join(Intent_.targetKnot);
+
+    criteria.select(root.get(Intent_.quickResponse));
+    criteria.where(
+      criteriaBuilder.isNotNull(root.get(Intent_.quickResponse)),
+      criteriaBuilder.isNull(root.get(Intent_.sourceKnot)),
+      criteriaBuilder.equal(targetKnotJoin.get(Knot_.story), story),
+      criteriaBuilder.equal(root.get(Intent_.global), global)
     );
     
     return entityManager.createQuery(criteria).getResultList();
