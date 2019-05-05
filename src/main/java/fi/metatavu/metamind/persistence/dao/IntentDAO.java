@@ -35,7 +35,7 @@ public class IntentDAO extends AbstractDAO<Intent> {
    * @param lastModifierId last modifier's id
    * @return created intent
    */
-  public Intent create(UUID id, IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, String quickResponse, UUID creatorId, UUID lastModifierId) {
+  public Intent create(UUID id, IntentType type, String name, Knot sourceKnot, Knot targetKnot, Boolean global, String quickResponse, Integer quickResponseOrder, UUID creatorId, UUID lastModifierId) {
     Intent intent = new Intent();
     intent.setType(type);
     intent.setName(name);
@@ -44,6 +44,7 @@ public class IntentDAO extends AbstractDAO<Intent> {
     intent.setGlobal(global);
     intent.setId(id);
     intent.setQuickResponse(quickResponse);
+    intent.setQuickResponseOrder(quickResponseOrder);
     intent.setCreatorId(creatorId);
     intent.setLastModifierId(lastModifierId);
     return persist(intent);
@@ -196,6 +197,8 @@ public class IntentDAO extends AbstractDAO<Intent> {
       criteriaBuilder.equal(root.get(Intent_.sourceKnot), sourceKnot)
     );
     
+    criteria.orderBy(criteriaBuilder.asc(root.get(Intent_.quickResponseOrder)));
+    
     return entityManager.createQuery(criteria).getResultList();
   }
 
@@ -221,6 +224,8 @@ public class IntentDAO extends AbstractDAO<Intent> {
       criteriaBuilder.equal(targetKnotJoin.get(Knot_.story), story),
       criteriaBuilder.equal(root.get(Intent_.global), global)
     );
+    
+    criteria.orderBy(criteriaBuilder.asc(root.get(Intent_.quickResponseOrder)));
     
     return entityManager.createQuery(criteria).getResultList();
   }
@@ -303,4 +308,17 @@ public class IntentDAO extends AbstractDAO<Intent> {
     return persist(intent);
   }
 
+  /**
+   * Updates quickResponseOrder
+   *
+   * @param quickResponseOrder quickResponseOrder
+   * @param lastModifierId last modifier's id
+   * @return updated intent
+   */
+  public Intent updateQuickResponseOrder(Intent intent, Integer quickResponseOrder, UUID lastModifierId) {
+    intent.setLastModifierId(lastModifierId);
+    intent.setQuickResponseOrder(quickResponseOrder);
+    return persist(intent);
+  }
+  
 }

@@ -49,6 +49,9 @@ public class Intent {
   private String quickResponse;
 
   @Column(nullable = false)
+  private Integer quickResponseOrder;
+
+  @Column(nullable = false)
   @NotNull
   private UUID creatorId;
 
@@ -116,6 +119,14 @@ public class Intent {
   
   public void setQuickResponse(String quickResponse) {
     this.quickResponse = quickResponse;
+  }
+  
+  public Integer getQuickResponseOrder() {
+    return quickResponseOrder;
+  }
+  
+  public void setQuickResponseOrder(Integer quickResponseOrder) {
+    this.quickResponseOrder = quickResponseOrder;
   }
 
   public UUID getCreatorId() {
