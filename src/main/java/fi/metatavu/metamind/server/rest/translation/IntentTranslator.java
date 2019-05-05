@@ -98,6 +98,7 @@ public class IntentTranslator {
     result.setName(jpaIntent.getName());
     result.setTrainingMaterials(trainingMaterials);
     result.setQuickResponse(jpaIntent.getQuickResponse());
+    result.setQuickResponseOrder(jpaIntent.getQuickResponseOrder());
     
     return result;
   }

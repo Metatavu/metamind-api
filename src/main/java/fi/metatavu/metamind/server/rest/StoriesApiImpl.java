@@ -125,9 +125,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     Boolean global = body.isisGlobal();
     String quickResponse = body.getQuickResponse();
+    Integer quickResponseOrder = body.getQuickResponseOrder();
+    if (quickResponseOrder == null) {
+      quickResponseOrder = 0;
+    }
     
     UUID loggedUserId = getLoggerUserId();
-    fi.metatavu.metamind.persistence.models.Intent intent = storyController.createIntent(body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, loggedUserId);
+    fi.metatavu.metamind.persistence.models.Intent intent = storyController.createIntent(body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, quickResponseOrder, loggedUserId);
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
     
@@ -525,6 +529,11 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     Boolean global = body.isisGlobal();
     String quickResponse = body.getQuickResponse();
+    Integer quickResponseOrder = body.getQuickResponseOrder();
+    if (quickResponseOrder == null) {
+      quickResponseOrder = 0;
+    }
+    
     UUID loggedUserId = getLoggerUserId();
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
@@ -554,7 +563,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     IntentTrainingMaterial intentRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.INTENTREGEX, intentRegexMaterial);
     IntentTrainingMaterial variableOpenNlpRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPREGEX, variableOpenNlpRegexMaterial);
     
-    return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, loggedUserId), 
+    return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, quickResponseOrder, loggedUserId), 
       intentOpenNlpDocatTrainingMaterial, 
       variableOpenNlpNerTrainingMaterial, 
       intentRegexTrainingMaterial, 

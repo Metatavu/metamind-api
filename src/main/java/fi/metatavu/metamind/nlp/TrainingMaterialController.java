@@ -368,18 +368,33 @@ public class TrainingMaterialController {
    * @return training material lines
    */
   private String getTrainingMaterialLines(List<Intent> intents, TrainingMaterialType type, Function<IntentTrainingMaterial, String> translator) {
-    return intents.stream()
+    return getIntentsTrainingMaterials(intents, type).stream()
+      .map(intentTrainingMaterial -> {
+        return translator.apply(intentTrainingMaterial);        
+      })
+      .distinct()
+      .collect(Collectors.joining("\n"));
+  }
+  
+  /**
+   * Returns training materials for given intents without duplicate training materials
+   * 
+   * @param intents intents
+   * @param type type
+   * @return training materials for given intents 
+   */
+  private List<IntentTrainingMaterial> getIntentsTrainingMaterials(List<Intent> intents, TrainingMaterialType type) {
+    return StreamEx.of(intents)
       .map(intent -> {
         return intentTrainingMaterialDAO.findByIntentAndType(intent, type);
       })
       .filter(Objects::nonNull)
+      .distinct(intent -> intent.getTrainingMaterial().getId())
       .filter(intentTrainingMaterial -> {
         TrainingMaterial trainingMaterial = intentTrainingMaterial.getTrainingMaterial();
         return trainingMaterial != null && StringUtils.isNotBlank(trainingMaterial.getText()); 
       })
-      .map(intentTrainingMaterial -> {
-        return translator.apply(intentTrainingMaterial);        
-      }).collect(Collectors.joining("\n"));
+      .collect(Collectors.toList());
   }
   
   /**
