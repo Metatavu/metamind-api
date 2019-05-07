@@ -7,3 +7,4 @@
 .factorypath
 /.cargo
 /keycloak*
+/.DS_Store
