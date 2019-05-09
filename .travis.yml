@@ -8,7 +8,7 @@ cache:
   
 addons:
   hosts:
-    -api-itest.metamind.fi
+    - api-itest.metamind.fi
   apt:
     packages:
       - oracle-java8-installer
