@@ -7,14 +7,19 @@ cache:
   - $HOME/.m2
   
 addons:
+  hosts:
+    -api-itest.metamind.fi
   apt:
     packages:
       - oracle-java8-installer
-      
+  mariadb: '10.3'    
 install: true
 
 before_script:
-  - . travis-before-script.sh
+  - echo -e "[mysqld]\nlower-case-table-names = 1" | sudo tee -a /etc/mysql/my.cnf
+  - sudo service mysql restart
+  - mysql -u root < scripts/setup-db.sql
+  - scripts/start-keycloak.sh
   
 script:
   - . travis.sh
