@@ -353,7 +353,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
-      return createBadRequest(String.format("Story %s not found", storyId)); 
+      return createNotFound(String.format("Story %s not found", storyId)); 
     }
     
     storyController.deleteStory(story);
@@ -432,7 +432,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
-      return createBadRequest(String.format("Story %s not found", storyId)); 
+      return createNotFound(String.format("Story %s not found", storyId)); 
     }
     
     return createOk(storyTranslator.translateStory(story));
