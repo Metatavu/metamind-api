@@ -59,7 +59,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       builder.admin().stories().assertStoriesEqual(createdStory, builder.admin().stories().findStory(createdStory.getId()));
 
       Story updateStory = new Story();
-      updateStory.setName(createdStory.getName());
+      updateStory = builder.admin().stories().findStory(createdStory.getId());
       builder.admin().stories().updateStory(updateStory);
       builder.admin().stories().assertStoriesEqual(updateStory, builder.admin().stories().findStory(createdStory.getId()));
 
