@@ -16,19 +16,17 @@ import fi.metatavu.metamind.test.functional.builder.auth.TestBuilderAuthenticati
  * @author Antti Leppä
  */
 public class TestBuilder implements AutoCloseable {
-  
+
   private static final String REALM = "test";
   private static final String CLIENT_ID = "ui";
   private static final String ADMIN_USER = "admin@example.com";
   private static final String ADMIN_PASSWORD = "test";
-  private static final String MANAGER_USER = "manager@example.com";
-  private static final String MANAGER_PASSWORD = "test";
-  
+
   private TestBuilderAuthentication admin;
   private TestBuilderAuthentication invalid;
   private TestBuilderAuthentication anonymous;
   private List<CloseableResource<?, ?>> closables = new ArrayList<>();
-  
+
   /**
    * Returns admin authenticated authentication resource
    * 
@@ -38,23 +36,10 @@ public class TestBuilder implements AutoCloseable {
     if (admin != null) {
       return admin;
     }
-    
+
     return admin = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, null));
   }
 
-  /**
-   * Returns manager authenticated authentication resource
-   * 
-   * @return manager authenticated authentication resource
-   */
-  public TestBuilderAuthentication manager() {
-    if (admin != null) {
-      return admin;
-    }
-    
-    return admin = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, MANAGER_USER, MANAGER_PASSWORD, null));
-  }
-  
   /**
    * Returns authentication resource with invalid token
    * 
@@ -64,7 +49,7 @@ public class TestBuilder implements AutoCloseable {
     if (invalid != null) {
       return invalid;
     }
-    
+
     return invalid = new TestBuilderAuthentication(this, new InvalidAccessTokenProvider());
   }
 
@@ -77,10 +62,10 @@ public class TestBuilder implements AutoCloseable {
     if (anonymous != null) {
       return anonymous;
     }
-    
+
     return anonymous = new TestBuilderAuthentication(this, new NullAccessTokenProvider());
   }
-  
+
   /**
    * Adds closable to clean queue
    * 
@@ -91,19 +76,18 @@ public class TestBuilder implements AutoCloseable {
     closables.add(closable);
     return closable;
   }
-  
+
   /**
    * Removes a closable from clean queue
    * 
    * @param predicate filter predicate
    */
   protected <T> void removeCloseable(Predicate<? super T> predicate) {
-    closables = closables.stream()
-      .filter((closeable) -> {
-        @SuppressWarnings("unchecked") T resource = (T) closeable.getResource();
-        return predicate.test(resource);
-      })
-      .collect(Collectors.toList());
+    closables = closables.stream().filter((closeable) -> {
+      @SuppressWarnings("unchecked")
+      T resource = (T) closeable.getResource();
+      return predicate.test(resource);
+    }).collect(Collectors.toList());
   }
 
   @Override
@@ -111,7 +95,7 @@ public class TestBuilder implements AutoCloseable {
     for (int i = closables.size() - 1; i >= 0; i--) {
       closables.get(i).close();
     }
-    
+
     admin = null;
   }
 
