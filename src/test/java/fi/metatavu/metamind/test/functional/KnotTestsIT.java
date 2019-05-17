@@ -40,7 +40,8 @@ public class KnotTestsIT extends AbstractFunctionalTest {
       assertNotNull(story);
       
       Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
-      builder.admin().knots().assertFindFailStatus(story, 404, UUID.randomUUID());
+      builder.admin().knots().assertFindFailStatus(story.getId(), 404, UUID.randomUUID());
+      builder.admin().knots().assertFindFailStatus(UUID.randomUUID(), 404, createdKnot.getId());
       Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
       builder.admin().knots().assertKnotsEqual(createdKnot, foundKnot);
       
