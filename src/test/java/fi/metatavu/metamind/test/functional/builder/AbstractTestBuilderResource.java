@@ -69,7 +69,7 @@ public abstract class AbstractTestBuilderResource <T, A extends Api> implements 
    * 
    * @param predicate filter predicate
    */
-  public void removeCloseable(Predicate<? super T> predicate) {
+  public void removeCloseable(Predicate<Object> predicate) {
     testBuilder.removeCloseable(predicate);
   }
 

@@ -73,15 +73,34 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
     return getApi().updateKnot(knot, story.getId(), knot.getId());
   }
 
+  /**
+   * Deletes knot
+   * 
+   * @param story
+   * @param knot
+   */
   public void delete(Story story, Knot knot) {
     getApi().deleteKnot(story.getId(), knot.getId());
-    removeCloseable(closable -> !closable.getId().equals(knot.getId()));
+    removeCloseable(closable -> {
+      if (closable instanceof Knot) {
+        return !((Knot) closable).getId().equals(knot.getId());
+      }
+
+      return false;
+    });
   }
 
-  public void assertCreateFailStatus(int expectedStatus, String content, String name) {
+  /**
+   * Asserts create status fails with given status code
+   * 
+   * @param expectedStatus
+   * @param content
+   * @param name
+   * @param story
+   */
+  public void assertCreateFailStatus(int expectedStatus, String content, String name, Story story) {
     try {
       Knot knot = new Knot();
-      Story story = new Story();
       knot.setContent(content);
       knot.setName(name);
       getApi().createKnot(knot, story.getId());
@@ -100,13 +119,20 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
    */
   public void assertFindFailStatus(Story story, int expectedStatus, UUID knotId) {
     try {
-      //Story story = new Story();
       getApi().findKnot(story.getId(), knotId);
       fail(String.format("Expected find to fail with status %d", expectedStatus));
     } catch (FeignException e) {
       assertEquals(expectedStatus, e.status());
     }
   }
+
+  /**
+   * Asserts update status fails with given status code
+   *
+   * @param story
+   * @param expectedStatus
+   * @param knot
+   */
 
   public void assertUpdateFailStatus(Story story, int expectedStatus, Knot knot) {
     try {
@@ -117,9 +143,26 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
     }
   }
 
+  /**
+   * Asserts knots are equal
+   * 
+   * @param expected
+   * @param actual
+   * @throws IOException
+   * @throws JSONException
+   */
+
   public void assertKnotsEqual(Knot expected, Knot actual) throws IOException, JSONException {
     assertJsonsEqual(expected, actual);
   }
+
+  /**
+   * Asserts delete status fails with given status code
+   * 
+   * @param story
+   * @param expectedStatus
+   * @param knot
+   */
 
   public void assertDeleteFailStatus(Story story, int expectedStatus, Knot knot) {
     try {

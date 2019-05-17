@@ -72,7 +72,13 @@ public class StoryTestBuilderResource extends AbstractTestBuilderResource<Story,
    */
   public void delete(Story story) {
     getApi().deleteStory(story.getId());  
-    removeCloseable(closable -> !closable.getId().equals(story.getId()));
+    removeCloseable(closable -> {
+      if (closable instanceof Story) {
+        return !((Story) closable).getId().equals(story.getId());
+      }
+      
+      return false;
+    });
   }
   
   /**
