@@ -38,10 +38,10 @@ public abstract class AbstractTestBuilderAuthentication {
   }
   
   /**
-   * Added by Daniil for knots
+   * Returns test builder resource for knots
    * 
-   * @return
-   * @throws IOException
+   * @return test builder resource for products
+   * @throws IOException thrown when authentication fails
    */
   
   public KnotTestBuilderResource knots() throws IOException {
