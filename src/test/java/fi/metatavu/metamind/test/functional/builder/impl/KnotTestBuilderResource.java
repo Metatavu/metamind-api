@@ -118,9 +118,9 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
    * @param expectedStatus status code
    * @param knotId knotId UUID
    */
-  public void assertFindFailStatus(UUID story, int expectedStatus, UUID knotId) {
+  public void assertFindFailStatus(UUID storyId, int expectedStatus, UUID knotId) {
     try {
-      getApi().findKnot(story, knotId);
+      getApi().findKnot(storyId, knotId);
       fail(String.format("Expected find to fail with status %d", expectedStatus));
     } catch (FeignException e) {
       assertEquals(expectedStatus, e.status());
