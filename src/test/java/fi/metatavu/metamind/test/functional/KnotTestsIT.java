@@ -22,12 +22,14 @@ public class KnotTestsIT extends AbstractFunctionalTest {
       assertNotNull(builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content"));
     }
   }
-
+  
+//TODO uncomment when permissions are added
 //  @Test
 //  public void testCreateKnotPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      builder.invalid().knots().assertCreateFailStatus(403, "Content", "Test");
-//      builder.anonymous().knots().assertCreateFailStatus(401, "Content", "Test");
+//      Story story = builder.admin().stories().create("en", "test story");
+//      builder.invalid().knots().assertCreateFailStatus(403, "Content", "Test", story);
+//      builder.anonymous().knots().assertCreateFailStatus(401, "Content", "Test", story);
 //    }
 //  }
 
@@ -45,62 +47,69 @@ public class KnotTestsIT extends AbstractFunctionalTest {
     }
   }
 
+//TODO uncomment when permissions are added  
 //  @Test
 //  public void testFindKnotPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Knot createdKnot = builder.admin().knots().create(KnotType.TEXT, "Test", "Content");
-//      assertNotNull(builder.admin().knots().findKnot(createdKnot.getId()));
-//      builder.invalid().knots().assertFindFailStatus(403, createdKnot.getId());
-//      builder.anonymous().knots().assertFindFailStatus(401, createdKnot.getId());
-//    }
-//  }
-
-//  @Test
-//  public void testUpdateKnot() throws Exception {
-//    try (TestBuilder builder = new TestBuilder()) {
 //      Story story = builder.admin().stories().create("en", "test story");
 //      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
-//      builder.admin().knots().assertKnotsEqual(createdKnot, builder.admin().knots().findKnot(story, createdKnot));
-//
-//      Knot updateKnot = builder.admin().knots().findKnot(story, createdKnot);
-//      updateKnot.setName("updated knot");
-//      Knot updatedKnot = builder.admin().knots().updateKnot(story, updateKnot);
-//      assertEquals(createdKnot.getId(), updatedKnot.getId());
-//      assertEquals(updateKnot.getName(), updatedKnot.getName());
-//      Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
-//      assertEquals(createdKnot.getId(), foundKnot.getId());
-//      assertEquals(updateKnot.getName(), foundKnot.getName());
+//      assertNotNull(builder.admin().knots().findKnot(story, createdKnot));
+//      builder.invalid().knots().assertFindFailStatus(story, 403, createdKnot.getId());
+//      builder.anonymous().knots().assertFindFailStatus(story, 401, createdKnot.getId());
 //    }
 //  }
 
+  @Test
+  public void testUpdateKnot() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story story = builder.admin().stories().create("en", "test story");
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+      builder.admin().knots().assertKnotsEqual(createdKnot, builder.admin().knots().findKnot(story, createdKnot));
+
+      Knot updateKnot = builder.admin().knots().findKnot(story, createdKnot);
+      updateKnot.setName("updated knot");
+      Knot updatedKnot = builder.admin().knots().updateKnot(story, updateKnot);
+      assertEquals(createdKnot.getId(), updatedKnot.getId());
+      assertEquals(updateKnot.getName(), updatedKnot.getName());
+      Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
+      assertEquals(createdKnot.getId(), foundKnot.getId());
+      assertEquals(updateKnot.getName(), foundKnot.getName());
+    }
+  }
+  
+//TODO uncomment when permissions are added
 //  @Test
 //  public void testUpdateKnotPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Knot createdKnot = builder.admin().knots().create(KnotType.TEXT, "Test", "Content");
-//
-//      builder.anonymous().knots().assertUpdateFailStatus(401, createdKnot);
-//      builder.invalid().knots().assertUpdateFailStatus(403, createdKnot);
-//    }
-//  }
-
-//  @Test
-//  public void testDeleteKnot() throws Exception {
-//    try (TestBuilder builder = new TestBuilder()) {
 //      Story story = builder.admin().stories().create("en", "test story");
 //      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
-//      Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
-//      assertEquals(createdKnot.getId(), foundKnot.getId());
-//      builder.admin().knots().delete(story, createdKnot);
-//      builder.admin().knots().assertDeleteFailStatus(404, createdKnot);
+//
+//      builder.anonymous().knots().assertUpdateFailStatus(story, 401, createdKnot);
+//      builder.invalid().knots().assertUpdateFailStatus(story, 403, createdKnot);
 //    }
 //  }
 
+  @Test
+  public void testDeleteKnot() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story story = builder.admin().stories().create("en", "test story");
+      assertNotNull(story);
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+      Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
+      assertEquals(createdKnot.getId(), foundKnot.getId());
+      builder.admin().knots().delete(story, createdKnot);
+      builder.admin().knots().assertDeleteFailStatus(story, 404, createdKnot);
+    }
+  }
+  
+//TODO uncomment when permissions are added
 //  @Test
 //  public void testDeleteKnotPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Knot createdKnot = builder.admin().knots().create(KnotType.TEXT, "Test", "Content");
-//      builder.anonymous().knots().assertDeleteFailStatus(401, createdKnot);
-//      builder.invalid().knots().assertDeleteFailStatus(403, createdKnot);
+//      Story story = builder.admin().stories().create("en", "test story");
+//      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+//      builder.anonymous().knots().assertDeleteFailStatus(story, 401, createdKnot);
+//      builder.invalid().knots().assertDeleteFailStatus(story, 403, createdKnot);
 //    }
 //  }
 
