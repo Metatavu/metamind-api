@@ -32,11 +32,12 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   }
 
   /**
-   * Creates a new Knot
+   * Creates a new knot
    * 
-   * @param type
-   * @param name
-   * @param body
+   * @param story story
+   * @param type knot type
+   * @param name knot name 
+   * @param content knot content
    * @return
    */
   public Knot create(Story story, KnotType type, String name, String content) {
@@ -50,11 +51,10 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   }
 
   /**
-   * Finds a Knot
+   * Finds a story knot
    * 
-   * @param type
-   * @param name
-   * @param knotId
+   * @param story story
+   * @param knot knot content
    * @return
    */
   public Knot findKnot(Story story, Knot knot) {
@@ -62,10 +62,10 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   }
 
   /**
-   * Updates knot
+   * Updates a story knot
    * 
-   * @param knotId
-   * @param body
+   * @param story story
+   * @param knot knot content
    * @return
    */
 
@@ -74,10 +74,10 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   }
 
   /**
-   * Deletes knot
+   * Deletes a story knot
    * 
-   * @param story
-   * @param knot
+   * @param story story
+   * @param knot knot
    */
   public void delete(Story story, Knot knot) {
     getApi().deleteKnot(story.getId(), knot.getId());
@@ -93,10 +93,10 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   /**
    * Asserts create status fails with given status code
    * 
-   * @param expectedStatus
-   * @param content
-   * @param name
-   * @param story
+   * @param expectedStatus status code
+   * @param content knot content
+   * @param name knot name
+   * @param story story
    */
   public void assertCreateFailStatus(int expectedStatus, String content, String name, Story story) {
     try {
@@ -114,8 +114,9 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   /**
    * Asserts find status fails with given status code
    * 
-   * @param expectedStatus
-   * @param knotId
+   * @param story story
+   * @param expectedStatus status code
+   * @param knotId UUID knot
    */
   public void assertFindFailStatus(Story story, int expectedStatus, UUID knotId) {
     try {
@@ -128,10 +129,10 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
 
   /**
    * Asserts update status fails with given status code
-   *
-   * @param story
-   * @param expectedStatus
-   * @param knot
+   * 
+   * @param story story
+   * @param expectedStatus status code
+   * @param knot knot
    */
 
   public void assertUpdateFailStatus(Story story, int expectedStatus, Knot knot) {
@@ -146,8 +147,8 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   /**
    * Asserts knots are equal
    * 
-   * @param expected
-   * @param actual
+   * @param expected knot
+   * @param actual knot
    * @throws IOException
    * @throws JSONException
    */
@@ -159,9 +160,9 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   /**
    * Asserts delete status fails with given status code
    * 
-   * @param story
-   * @param expectedStatus
-   * @param knot
+   * @param story story
+   * @param expectedStatus status code
+   * @param knot knot
    */
 
   public void assertDeleteFailStatus(Story story, int expectedStatus, Knot knot) {
