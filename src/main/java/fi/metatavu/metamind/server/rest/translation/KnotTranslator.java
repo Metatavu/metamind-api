@@ -31,7 +31,7 @@ public class KnotTranslator {
     result.setModifiedAt(jpaKnot.getModifiedAt());
     result.setContent(jpaKnot.getContent());
     result.setName(jpaKnot.getName());
-    result.setStoryId(jpaKnot.getStory() != null ? jpaKnot.getId() : null);
+    result.setStoryId(jpaKnot.getStory() != null ? jpaKnot.getStory().getId() : null);
     result.setType(jpaKnot.getType());
     result.setHint(jpaKnot.getHint());
     result.setTokenizer(jpaKnot.getTokenizerType());

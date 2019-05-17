@@ -82,11 +82,16 @@ public class TestBuilder implements AutoCloseable {
    * 
    * @param predicate filter predicate
    */
-  protected <T> void removeCloseable(Predicate<? super T> predicate) {
+  protected <T> void removeCloseable(Predicate<Object> predicate) {
     closables = closables.stream().filter((closeable) -> {
-      @SuppressWarnings("unchecked")
-      T resource = (T) closeable.getResource();
-      return predicate.test(resource);
+//      if (closeable.getResource().getClass().isInstance(clazz)) {
+//        T resource = (T) ;
+//      return predicate.test(resource);
+//      }
+//      return false;
+//      
+//      
+      return predicate.test(closeable.getResource());
     }).collect(Collectors.toList());
   }
 

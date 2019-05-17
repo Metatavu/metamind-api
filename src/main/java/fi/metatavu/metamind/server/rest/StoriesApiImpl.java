@@ -330,16 +330,16 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
-      return createBadRequest(String.format("Story %s not found", storyId)); 
+      return createNotFound(String.format("Story %s not found", storyId)); 
     }
     
     fi.metatavu.metamind.persistence.models.Knot knot = storyController.findKnotById(knotId);
     if (knot == null) {
-      return createBadRequest(String.format("Knot %s not found", knotId)); 
+      return createNotFound(String.format("Knot %s not found", knotId)); 
     }
     
     if (!isKnotFromStory(knot, story)) {
-      return createBadRequest(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
+      return createNotFound(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
     
     storyController.deleteKnot(knot);
@@ -411,16 +411,16 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
-      return createBadRequest(String.format("Story %s not found", storyId)); 
+      return createNotFound(String.format("Story %s not found", storyId)); 
     }
     
     fi.metatavu.metamind.persistence.models.Knot knot = storyController.findKnotById(knotId);
     if (knot == null) {
-      return createBadRequest(String.format("Knot %s not found", knotId)); 
+      return createNotFound(String.format("Knot %s not found", knotId)); 
     }
 
     if (!isKnotFromStory(knot, story)) {
-      return createBadRequest(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
+      return createNotFound(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
     
     return createOk(knotTranslator.translateKnot(knot));
