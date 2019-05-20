@@ -54,6 +54,13 @@ public abstract class AbstractTestBuilderAuthentication {
     return new KnotTestBuilderResource(testBuilder, createClient());
   }
   
+  /**
+   * Returns test builder resource for intents
+   * 
+   * @return test builder resource for products
+   * @throws IOException thrown when authentication fails
+   */
+  
   public IntentTestBuilderResource intents() throws IOException {
     if (intents != null) {
       return intents;
