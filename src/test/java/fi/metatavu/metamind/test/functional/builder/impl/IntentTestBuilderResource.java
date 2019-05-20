@@ -50,7 +50,7 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
    * @return
    */
 
-  public Intent create(UUID storyId, Knot sourceKnot, Knot targetKnot, String name, IntentType type, boolean global, String quickresponse, int qrorder ) {
+  public Intent create(UUID storyId, Knot sourceKnot, Knot targetKnot, String name, IntentType type, boolean global, String quickResponse, int quickResponseOrder ) {
     IntentTrainingMaterials intentTrainingMaterials = new IntentTrainingMaterials();
     
     Intent intent = new Intent();
@@ -59,8 +59,8 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
     intent.setName(name);
     intent.setType(type);
     intent.setGlobal(global);
-    intent.setQuickResponse(quickresponse);
-    intent.setQuickResponseOrder(qrorder);
+    intent.setQuickResponse(quickResponse);
+    intent.setQuickResponseOrder(quickResponseOrder);
     intent.setTrainingMaterials(intentTrainingMaterials);
     Intent createdIntent = getApi().createIntent(intent, storyId);
     intentStoryMap.put(createdIntent.getId(), storyId);
