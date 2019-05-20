@@ -12,6 +12,7 @@ import java.util.UUID;
 import javax.ws.rs.DELETE;
 
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryCreated;
+import org.infinispan.security.actions.GetCacheGlobalComponentRegistryAction;
 import org.json.JSONException;
 
 import com.sun.tools.corba.se.idl.constExpr.Not;
@@ -49,17 +50,17 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
    * @return
    */
 
-  public Intent create(UUID storyId, Knot sourceKnot, Knot targetKnot, String name) {
+  public Intent create(UUID storyId, Knot sourceKnot, Knot targetKnot, String name, IntentType type, boolean global, String quickresponse, int qrorder ) {
     IntentTrainingMaterials intentTrainingMaterials = new IntentTrainingMaterials();
     
     Intent intent = new Intent();
     intent.setSourceKnotId(sourceKnot.getId());
     intent.setTargetKnotId(targetKnot.getId());
     intent.setName(name);
-    intent.setType(IntentType.NORMAL);
-    intent.setGlobal(false);
-    intent.setQuickResponse("Quick response");
-    intent.setQuickResponseOrder(1);
+    intent.setType(type);
+    intent.setGlobal(global);
+    intent.setQuickResponse(quickresponse);
+    intent.setQuickResponseOrder(qrorder);
     intent.setTrainingMaterials(intentTrainingMaterials);
     Intent createdIntent = getApi().createIntent(intent, storyId);
     intentStoryMap.put(createdIntent.getId(), storyId);
