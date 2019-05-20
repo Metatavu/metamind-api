@@ -5,6 +5,7 @@ import java.io.IOException;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.model.Knot;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
+import fi.metatavu.metamind.test.functional.builder.impl.IntentTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.impl.KnotTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.impl.StoryTestBuilderResource;
 
@@ -18,6 +19,7 @@ public abstract class AbstractTestBuilderAuthentication {
   private TestBuilder testBuilder;
   private StoryTestBuilderResource stories;
   private KnotTestBuilderResource knots;
+  private IntentTestBuilderResource intents;
   
   protected AbstractTestBuilderAuthentication(TestBuilder testBuilder) {
     this.testBuilder = testBuilder;
@@ -50,6 +52,14 @@ public abstract class AbstractTestBuilderAuthentication {
     }
     
     return new KnotTestBuilderResource(testBuilder, createClient());
+  }
+  
+  public IntentTestBuilderResource intents() throws IOException {
+    if (intents != null) {
+      return intents;
+    }
+    
+    return new IntentTestBuilderResource(testBuilder, createClient());
   }
   
   /**
