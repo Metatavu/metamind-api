@@ -307,16 +307,16 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
-      return createBadRequest(String.format("Story %s not found", storyId)); 
+      return createNotFound(String.format("Story %s not found", storyId)); 
     }
     
     fi.metatavu.metamind.persistence.models.Intent intent = storyController.findIntentById(intentId);
     if (intent == null) {
-      return createBadRequest(String.format("Intent %s not found", intentId)); 
+      return createNotFound(String.format("Intent %s not found", intentId)); 
     }
     
     if (!isIntentFromStory(intent, story)) {
-      return createBadRequest(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
+      return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
     }
     
     storyController.deleteIntent(intent);
@@ -390,16 +390,16 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
-      return createBadRequest(String.format("Story %s not found", storyId)); 
+      return createNotFound(String.format("Story %s not found", storyId)); 
     }
     
     fi.metatavu.metamind.persistence.models.Intent intent = storyController.findIntentById(intentId);
     if (intent == null) {
-      return createBadRequest(String.format("Intent %s not found", intentId)); 
+      return createNotFound(String.format("Intent %s not found", intentId)); 
     }
     
     if (!isIntentFromStory(intent, story)) {
-      return createBadRequest(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
+      return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
     }
     
     return createOk(intentTranslator.translateIntent(intent, trainingMaterialController.listTrainingMaterialByIntent(intent)));
