@@ -82,8 +82,8 @@ public class StoryController {
    * @param creatorId creator's id
    * @return created story
    */
-  public Story createStory(Locale locale, String name, UUID creatorId) {
-    return storyDAO.create(UUID.randomUUID(), locale, name, creatorId, creatorId);
+  public Story createStory(Locale locale, String name, String defaultHint, UUID creatorId) {
+    return storyDAO.create(UUID.randomUUID(), locale, name, defaultHint, creatorId, creatorId);
   }
 
   /**
@@ -296,9 +296,10 @@ public class StoryController {
    * @param lastModifierId last modifier's id
    * @return updated story
    */
-  public Story updateStory(Story story, Locale locale, String name, UUID lastModifierId) {
+  public Story updateStory(Story story, Locale locale, String name, String defaultHint, UUID lastModifierId) {
     story = storyDAO.updateLocale(story, locale, lastModifierId);
     story = storyDAO.updateName(story, name, lastModifierId);
+    story = storyDAO.updateDefaultHint(story, defaultHint, lastModifierId);
     return story;
   }
   
