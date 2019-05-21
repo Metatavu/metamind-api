@@ -17,7 +17,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   @Test
   public void testCreateKnot() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      Story story = builder.admin().stories().create("en", "test story");
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
 
       assertNotNull(builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content"));
     }
@@ -36,7 +36,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   @Test
   public void testFindKnot() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      Story story = builder.admin().stories().create("en", "test story");
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       assertNotNull(story);
       
       Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
@@ -63,7 +63,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   @Test
   public void testUpdateKnot() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      Story story = builder.admin().stories().create("en", "test story");
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
       builder.admin().knots().assertKnotsEqual(createdKnot, builder.admin().knots().findKnot(story, createdKnot));
 
@@ -93,7 +93,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   @Test
   public void testDeleteKnot() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      Story story = builder.admin().stories().create("en", "test story");
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       assertNotNull(story);
       Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
       Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
