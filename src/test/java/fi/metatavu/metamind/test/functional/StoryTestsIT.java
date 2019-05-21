@@ -16,7 +16,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
   @Test
   public void testCreateStory() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      assertNotNull(builder.admin().stories().create("en", "test story"));
+      assertNotNull(builder.admin().stories().create("en", "test story", "Enter your answer"));
     }
   }
   // TODO Uncomment test when permissions are done
@@ -31,7 +31,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
   @Test
   public void testFindStory() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      Story createdStory = builder.admin().stories().create("en", "test story");
+      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
       builder.admin().stories().assertFindFailStatus(404, UUID.randomUUID());
       Story foundStory = builder.admin().stories().findStory(createdStory.getId());
       builder.admin().stories().assertStoriesEqual(createdStory, foundStory);
@@ -55,17 +55,20 @@ public class StoryTestsIT extends AbstractFunctionalTest {
   @Test
   public void testUpdateStory() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      Story createdStory = builder.admin().stories().create("en", "test story");
+      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
       builder.admin().stories().assertStoriesEqual(createdStory, builder.admin().stories().findStory(createdStory.getId()));
 
       Story updateStory = builder.admin().stories().findStory(createdStory.getId());
       updateStory.setName("updated story");
+      updateStory.setDafaultHint("Enter your phone number here");
       Story updatedStory = builder.admin().stories().updateStory(updateStory);
       assertEquals(createdStory.getId(), updatedStory.getId());
       assertEquals(updateStory.getName(), updatedStory.getName());
+      assertEquals(updateStory.getDafaultHint(), updatedStory.getDafaultHint());
       Story foundStory = builder.admin().stories().findStory(createdStory.getId());
       assertEquals(createdStory.getId(), foundStory.getId());
       assertEquals(updateStory.getName(), foundStory.getName());
+      assertEquals(updateStory.getDafaultHint(), foundStory.getDafaultHint());
      
     }
   }
@@ -84,7 +87,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
   @Test
   public void testDeleteStory() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      Story createdStory = builder.admin().stories().create("en", "test story");
+      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
       Story foundStory = builder.admin().stories().findStory(createdStory.getId());
       assertEquals(createdStory.getId(), foundStory.getId());
       builder.admin().stories().delete(createdStory);
