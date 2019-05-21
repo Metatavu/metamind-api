@@ -46,6 +46,9 @@ public class Story {
 
   @Column(nullable = false)
   private OffsetDateTime modifiedAt;
+  
+  @Column(nullable = false)
+  private String defaultHint;
 
   public UUID getId() {
     return id;
@@ -69,6 +72,14 @@ public class Story {
 
   public void setName(String name) {
     this.name = name;
+  }
+  
+  public String getDefaultHint() {
+    return defaultHint;
+  }
+  
+  public void setDefaultHint(String defaultHint) {
+    this.defaultHint = defaultHint;
   }
   
   public UUID getCreatorId() {
