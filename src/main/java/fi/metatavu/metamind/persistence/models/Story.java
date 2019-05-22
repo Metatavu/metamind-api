@@ -47,7 +47,7 @@ public class Story {
   @Column(nullable = false)
   private OffsetDateTime modifiedAt;
   
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String defaultHint;
 
   public UUID getId() {
