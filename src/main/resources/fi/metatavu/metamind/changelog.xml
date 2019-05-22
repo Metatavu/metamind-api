@@ -389,8 +389,8 @@
   
   <changeSet id="default-hint-for-story" author="Daniil Smirnov">
     <addColumn tableName="story">
-      <column name="defaultHint" type="varchar(191)">
-        <constraints nullable="false"/>
+      <column name="defaulthint" type="varchar(191)">
+        <constraints nullable="true"/>
       </column>
     </addColumn>
   </changeSet>
