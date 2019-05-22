@@ -33,7 +33,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
 //  @Test
 //  public void testCreateIntentPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Story story = builder.admin().stories().create("en", "test story");
+//      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
 //      Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
 //      Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
 //      
@@ -62,7 +62,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
 //  @Test
 //  public void testFindIntentPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Story story = builder.admin().stories().create("en", "test story");
+//      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
 //      Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
 //      Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
 //      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);
@@ -102,7 +102,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
 //  @Test
 //  public void testUpdateIntentPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Story story = builder.admin().stories().create("en", "test story");
+//      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
 //      Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
 //      Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
 //      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);
@@ -131,7 +131,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
 //  @Test
 //  public void testDeleteIntentPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Story story = builder.admin().stories().create("en", "test story");
+//      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
 //      Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
 //      Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
 //      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);

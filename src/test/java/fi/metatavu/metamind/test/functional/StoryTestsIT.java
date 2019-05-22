@@ -42,7 +42,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
 //  @Test
 //  public void testFindStoryPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Story createdStory = builder.admin().stories().create("en", "test story");
+//      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
 //
 //      assertNotNull(builder.admin().stories().findStory(createdStory.getId()));
 //
@@ -77,7 +77,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
 //  @Test
 //  public void testUpdateStoryPermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Story testStory = builder.admin().stories().create("en", "test story");
+//      Story testStory = builder.admin().stories().create("en", "test story", "Enter your answer");
 //
 //      builder.anonymous().stories().assertUpdateFailStatus(401, testStory);
 //      builder.invalid().stories().assertUpdateFailStatus(403, testStory);
@@ -98,7 +98,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
 //  @Test
 //  public void testDeleteStorypermissions() throws Exception {
 //    try (TestBuilder builder = new TestBuilder()) {
-//      Story createdStory = builder.admin().stories().create("en", "test story");
+//      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
 //      builder.anonymous().stories().assertDeleteFailStatus(401, createdStory);
 //      builder.invalid().stories().assertDeleteFailStatus(403, createdStory);
 //    }
