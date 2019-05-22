@@ -39,10 +39,11 @@ public class StoryTestBuilderResource extends AbstractTestBuilderResource<Story,
    * @param name name
    * @return created story
    */
-  public Story create(String locale, String name) {
+  public Story create(String locale, String name, String hintMessage) {
     Story story = new Story();
     story.setLocale(locale);
     story.setName(name);
+    story.setDafaultHint(hintMessage);
     return addClosable(getApi().createStory(story));
   }
 

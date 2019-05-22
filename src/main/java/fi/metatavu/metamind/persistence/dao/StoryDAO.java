@@ -29,10 +29,11 @@ public class StoryDAO extends AbstractDAO<Story> {
    * @param lastModifierId last modifier's id
    * @return created story
    */
-  public Story create(UUID id, Locale locale, String name, UUID creatorId, UUID lastModifierId) {
+  public Story create(UUID id, Locale locale, String name, String defaultHint, UUID creatorId, UUID lastModifierId) {
     Story story = new Story();
     story.setLocale(locale);
     story.setName(name);
+    story.setDefaultHint(defaultHint);
     story.setId(id);
     story.setCreatorId(creatorId);
     story.setLastModifierId(lastModifierId);
@@ -81,6 +82,20 @@ public class StoryDAO extends AbstractDAO<Story> {
   public Story updateName(Story story, String name, UUID lastModifierId) {
     story.setLastModifierId(lastModifierId);
     story.setName(name);
+    return persist(story);
+  }
+  
+  /**
+   * Updates defaultHint
+   * 
+   * @param story story
+   * @param defaultHint string defaultHint
+   * @param lastModifiedId UUID lastModifiedId
+   * @return updated story
+   */
+  public Story updateDefaultHint(Story story, String defaultHint, UUID lastModifiedId) {
+    story.setLastModifierId(lastModifiedId);
+    story.setDefaultHint(defaultHint);
     return persist(story);
   }
 

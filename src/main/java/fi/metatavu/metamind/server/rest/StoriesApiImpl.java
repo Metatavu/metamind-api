@@ -284,7 +284,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     // TODO: Permission check
 
-    return createOk(storyTranslator.translateStory(storyController.createStory(locale, body.getName(), loggedUserId)));
+    return createOk(storyTranslator.translateStory(storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId)));
   }
 
   @Override
@@ -606,7 +606,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    return createOk(storyTranslator.translateStory(storyController.updateStory(story, locale, body.getName(), loggedUserId)));
+    return createOk(storyTranslator.translateStory(storyController.updateStory(story, locale, body.getName(), body.getDafaultHint(), loggedUserId)));
   }
 
   @Override

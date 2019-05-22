@@ -35,6 +35,7 @@ public class StoryTranslator {
     result.setId(jpaStory.getId());
     result.setModifiedAt(jpaStory.getModifiedAt());
     result.setName(jpaStory.getName());
+    result.setDafaultHint(jpaStory.getDefaultHint());
     result.setLocale(jpaStory.getLocale() != null ? jpaStory.getLocale().getLanguage() : null);
     result.setQuickResponses(storyController.listStoryGlobalQuickResponses(jpaStory));
     
