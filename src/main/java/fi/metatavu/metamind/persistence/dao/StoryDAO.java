@@ -85,8 +85,16 @@ public class StoryDAO extends AbstractDAO<Story> {
     return persist(story);
   }
   
-  public Story updateDefaultHint(Story story, String defaultHint, UUID lastModified) {
-    story.setLastModifierId(lastModified);
+  /**
+   * Updates defaultHint
+   * 
+   * @param story story
+   * @param defaultHint string defaultHint
+   * @param lastModifiedId UUID lastModifiedId
+   * @return updated story
+   */
+  public Story updateDefaultHint(Story story, String defaultHint, UUID lastModifiedId) {
+    story.setLastModifierId(lastModifiedId);
     story.setDefaultHint(defaultHint);
     return persist(story);
   }
