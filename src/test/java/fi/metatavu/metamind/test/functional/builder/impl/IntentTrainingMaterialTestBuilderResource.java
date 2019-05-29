@@ -16,6 +16,11 @@ import fi.metatavu.metamind.client.TrainingMaterialsApi;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
+/**
+ * Test builder resource for intent training material
+ * 
+ * @author Daniil Smirnov
+ */
 public class IntentTrainingMaterialTestBuilderResource extends AbstractTestBuilderResource<TrainingMaterial, TrainingMaterialsApi> {
 
   public IntentTrainingMaterialTestBuilderResource(TestBuilder testBuilder, ApiClient apiClient) {
@@ -30,7 +35,7 @@ public class IntentTrainingMaterialTestBuilderResource extends AbstractTestBuild
    * @param text text
    * @return
    */
-  public TrainingMaterial Create(UUID storyId, TrainingMaterialType type, String name, String text) {
+  public TrainingMaterial create(UUID storyId, TrainingMaterialType type, String name, String text) {
     TrainingMaterial trainingMaterial = new TrainingMaterial();
     trainingMaterial.setName(name);
     trainingMaterial.setStoryId(storyId);
