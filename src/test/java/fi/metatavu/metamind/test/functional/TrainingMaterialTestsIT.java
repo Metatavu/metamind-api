@@ -1,6 +1,7 @@
 package fi.metatavu.metamind.test.functional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.UUID;
@@ -23,7 +24,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       
-      assertNotNull(builder.admin().trainingMaterial().Create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test"));
+      assertNotNull(builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test"));
     }
   }
   
@@ -42,7 +43,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
   public void testFindTrainingMaterial() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().Create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
       
       builder.admin().trainingMaterial().assertFindFailStatus(404, UUID.randomUUID());
       TrainingMaterial foundTrainingMaterial = builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial);
@@ -68,12 +69,12 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
   public void testUpdateTrainingMaterial() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().Create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
 
-      TrainingMaterial updateTrainingMaterial = builder.admin().trainingMaterial().updateTrainingMaterial(createdTrainingMaterial);
+      TrainingMaterial updateTrainingMaterial = builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial);
       updateTrainingMaterial.setName("Updated training material");
       updateTrainingMaterial.setType(TrainingMaterialType.INTENTOPENNLPDOCCAT);
-      updateTrainingMaterial.setText("Hey!");
+      updateTrainingMaterial.setText("value");
       
       TrainingMaterial updatedTrainingMaterial = builder.admin().trainingMaterial().updateTrainingMaterial(updateTrainingMaterial);
       assertEquals(createdTrainingMaterial.getId(), updatedTrainingMaterial.getId());
@@ -82,6 +83,8 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
       assertEquals(updateTrainingMaterial.getText(), updatedTrainingMaterial.getText());
       TrainingMaterial foundTrainingMaterial = builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial);
       assertEquals(createdTrainingMaterial.getId(), foundTrainingMaterial.getId());
+      assertEquals(updateTrainingMaterial.getType(), foundTrainingMaterial.getType());
+      assertEquals(updateTrainingMaterial.getText(), foundTrainingMaterial.getText());
       assertEquals(updateTrainingMaterial.getName(), foundTrainingMaterial.getName());
     }
   }
@@ -103,7 +106,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
  
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().Create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
       TrainingMaterial foundTrainingMaterial = builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial);
       assertEquals(createdTrainingMaterial.getId(), foundTrainingMaterial.getId());
       builder.admin().trainingMaterial().delete(createdTrainingMaterial);
