@@ -20,10 +20,39 @@ public class RecommendationData {
 	Instances trainingSet;
 	Instances recommendationSet;
 	
+	/**
+	 * 
+	 * @param items - All rated and unrated items
+	 */
 	public RecommendationData(WekaRecommendationItem[] items) {
 		this.items = items;
 	}
 	
+	/**
+	 * Converts text attributes to an integer array of 0s and 1s
+	 */
+	void convertAttributes() {
+		ArrayList<String> attributes = new ArrayList<String>();
+		for(WekaRecommendationItem item:items) {
+			for(String attribute:item.attributes) {
+				if(!attributes.contains(attribute)) {
+					attributes.add(attribute);
+				}
+			}
+		}
+		int i = 0;
+		for(WekaRecommendationItem item:items) {
+			int[] convertedAttributes = new int[attributes.size()];
+			for(String attribute:item.attributes) {
+				int index = attributes.indexOf(attribute);
+				convertedAttributes[index] = 1;
+				
+			}
+			item.convertedAttributes = convertedAttributes;
+			items[i] = item;
+			i++;
+		}	
+	}
 	/**
 	 * Splits items into training set and recommendation set
 	 * Recommendation set contains items that have not been yet rated by the user
