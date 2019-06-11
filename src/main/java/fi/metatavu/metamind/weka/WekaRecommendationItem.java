@@ -5,7 +5,7 @@ package fi.metatavu.metamind.weka;
  * 
  * @author Simeon Platonov
  */
-public class WekaRecommendationItem {
+public class WekaRecommendationItem implements Comparable<WekaRecommendationItem>{
 	public Object rating = null;
 	public int id;
 	public String[] attributes;
@@ -21,5 +21,13 @@ public class WekaRecommendationItem {
 		this.attributes = attributes;
 		this.rating = rating;
 	}
+
+	@Override
+	public int compareTo(WekaRecommendationItem item) {
+		double compareRating = (double) item.rating;
+		double comparison = (compareRating-(double) this.rating)*100000;
+		return (int) comparison;
+	}
+	
 	
 }

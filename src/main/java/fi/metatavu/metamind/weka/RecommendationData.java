@@ -61,7 +61,7 @@ public class RecommendationData {
 		 trainingItems = new ArrayList<WekaRecommendationItem>();
 		 itemsToRecommend = new ArrayList<WekaRecommendationItem>();
 		for(WekaRecommendationItem item:items) {
-			if(item.rating!=null) {
+			if(item.rating==null) {
 				itemsToRecommend.add(item);
 			}else {
 				trainingItems.add(item);
@@ -86,11 +86,11 @@ public class RecommendationData {
 	void createDatasets() {
 		trainingSet = new Instances("trainingSet",attributeInfo,0);
 		recommendationSet = new Instances("recommendationSet",attributeInfo,0);
-		trainingSet.setClassIndex(attributeInfo.size());
-		recommendationSet.setClassIndex(attributeInfo.size());
+		trainingSet.setClassIndex(attributeInfo.size()-1);
+		recommendationSet.setClassIndex(attributeInfo.size()-1);
 		
 		for(WekaRecommendationItem item:trainingItems) {
-			Instance instance = new DenseInstance(item.convertedAttributes.length);
+			Instance instance = new DenseInstance(item.convertedAttributes.length+1);
 			for(int i=0;i<item.convertedAttributes.length;i++) {	
 				instance.setValue(i,item.convertedAttributes[i]);
 			}
