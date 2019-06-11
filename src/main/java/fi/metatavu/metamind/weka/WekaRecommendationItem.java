@@ -6,7 +6,7 @@ package fi.metatavu.metamind.weka;
  * @author Simeon Platonov
  */
 public class WekaRecommendationItem {
-	public float rating;
+	public Object rating = null;
 	public int id;
 	public String[] attributes;
 	public int[] convertedAttributes;
@@ -16,7 +16,7 @@ public class WekaRecommendationItem {
 		this.attributes = attributes;
 	}
 	
-	public WekaRecommendationItem(int id,String[] attributes,float rating) {
+	public WekaRecommendationItem(int id,String[] attributes,double rating) {
 		this.id = id;
 		this.attributes = attributes;
 		this.rating = rating;
