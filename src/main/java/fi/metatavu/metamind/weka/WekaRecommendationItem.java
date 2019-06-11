@@ -9,6 +9,7 @@ public class WekaRecommendationItem {
 	public float rating;
 	public int id;
 	public String[] attributes;
+	public int[] convertedAttributes;
 	
 	public WekaRecommendationItem(int id,String[] attributes) {
 		this.id = id;
@@ -20,6 +21,5 @@ public class WekaRecommendationItem {
 		this.attributes = attributes;
 		this.rating = rating;
 	}
-	
 	
 }
