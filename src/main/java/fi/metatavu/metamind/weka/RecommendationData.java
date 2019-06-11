@@ -72,11 +72,12 @@ public class RecommendationData {
 	/**
 	 * Creates attribute info that is required by the weka.core.Instances class
 	 */
-	void createAttributes() {
+	void createAttributeInfo() {
 		attributeInfo = new ArrayList<Attribute>();
 		for(int i=0;i<items[0].convertedAttributes.length;i++) {
 			attributeInfo.add(new Attribute(""+i));
 		}
+		attributeInfo.add(new Attribute("rating"));
 	}
 
 	/**

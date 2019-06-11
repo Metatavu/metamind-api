@@ -1,12 +1,8 @@
 package fi.metatavu.metamind.weka;
 
-import java.util.ArrayList;
-
 import weka.classifiers.functions.LinearRegression;
-import weka.core.Attribute;
-import weka.core.DenseInstance;
 import weka.core.Instance;
-import weka.core.Instances;
+
 
 /**
  * Functionality from Weka framework
@@ -20,17 +16,30 @@ public class WekaController {
 	/**
 	 * Gets recommendations
 	 * @param items items
+	 * @return 
 	 * @return recommendations recommendations
+	 * @throws Exception 
 	 */
 	
-	public int[] getRecommendations(WekaRecommendationItem[] items) {
+	public double[] getRecommendations(WekaRecommendationItem[] items) throws Exception {
 		RecommendationData data = new RecommendationData(items);
 		data.convertAttributes();
 		data.splitData();
-		data.createAttributes();
+		data.createAttributeInfo();
 		data.createDatasets();
+		double[] recommendations = new double[data.itemsToRecommend.size()];
+		LinearRegression model = new LinearRegression();
+		model.buildClassifier(data.trainingSet);
 		
-		return new int[0];
+		for(int i = 0;i<data.recommendationSet.size();i++) {
+					recommendations[i] = recommend(data.recommendationSet.get(i),model);	 
+		}
+		return recommendations;
+	}
+	
+	double recommend(Object instanceItem,LinearRegression model) throws Exception {
+		Instance instance = (Instance) instanceItem;
+		return model.classifyInstance(instance);
 	}
 	
 	
