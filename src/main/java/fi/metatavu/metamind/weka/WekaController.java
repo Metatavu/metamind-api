@@ -2,7 +2,6 @@ package fi.metatavu.metamind.weka;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
@@ -19,12 +18,12 @@ public class WekaController {
 	}
 	/**
 	 * Returns item iDs for unrated items, sorted by the recommendation algorithm
+	 * 
 	 * @param items items
 	 * @return recommendations recommendations
-	 * @throws Exception 
 	 */
 	
-	public int[] getRecommendations(WekaRecommendationItem[] items) {
+	public String[] getRecommendations(WekaRecommendationItem[] items) {
 		RecommendationData data = new RecommendationData(items);
 		data.convertAttributes();
 		data.splitData();
@@ -43,7 +42,7 @@ public class WekaController {
 					try {
 						double estimatedRating = recommend(data.recommendationSet.get(i),model);
 						WekaRecommendationItem item = data.itemsToRecommend.get(i);
-						item.rating = estimatedRating;
+						item.setRating(estimatedRating);
 						recommendedItems.add(item);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -51,9 +50,9 @@ public class WekaController {
 					}
 		}
 		Collections.sort(recommendedItems);
-		int[] ids = new int[recommendedItems.size()];
+		String[] ids = new String[recommendedItems.size()];
 		for(int i=0;i<recommendedItems.size();i++) {
-			ids[i]=recommendedItems.get(i).id;
+			ids[i]=recommendedItems.get(i).getId();
 		}
 		
 		return ids;

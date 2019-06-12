@@ -34,7 +34,7 @@ public class RecommendationData {
 	void convertAttributes() {
 		ArrayList<String> attributes = new ArrayList<String>();
 		for(WekaRecommendationItem item:items) {
-			for(String attribute:item.attributes) {
+			for(String attribute:item.getAttributes()) {
 				if(!attributes.contains(attribute)) {
 					attributes.add(attribute);
 				}
@@ -43,12 +43,12 @@ public class RecommendationData {
 		int i = 0;
 		for(WekaRecommendationItem item:items) {
 			int[] convertedAttributes = new int[attributes.size()];
-			for(String attribute:item.attributes) {
+			for(String attribute:item.getAttributes()) {
 				int index = attributes.indexOf(attribute);
 				convertedAttributes[index] = 1;
 				
 			}
-			item.convertedAttributes = convertedAttributes;
+			item.setConvertedAttributes(convertedAttributes);
 			items[i] = item;
 			i++;
 		}	
@@ -61,7 +61,7 @@ public class RecommendationData {
 		 trainingItems = new ArrayList<WekaRecommendationItem>();
 		 itemsToRecommend = new ArrayList<WekaRecommendationItem>();
 		for(WekaRecommendationItem item:items) {
-			if(item.rating==null) {
+			if(item.getRating()==null) {
 				itemsToRecommend.add(item);
 			}else {
 				trainingItems.add(item);
@@ -74,7 +74,7 @@ public class RecommendationData {
 	 */
 	void createAttributeInfo() {
 		attributeInfo = new ArrayList<Attribute>();
-		for(int i=0;i<items[0].convertedAttributes.length;i++) {
+		for(int i=0;i<items[0].getConvertedAttributes().length;i++) {
 			attributeInfo.add(new Attribute(""+i));
 		}
 		attributeInfo.add(new Attribute("rating"));
@@ -90,17 +90,17 @@ public class RecommendationData {
 		recommendationSet.setClassIndex(attributeInfo.size()-1);
 		
 		for(WekaRecommendationItem item:trainingItems) {
-			Instance instance = new DenseInstance(item.convertedAttributes.length+1);
-			for(int i=0;i<item.convertedAttributes.length;i++) {	
-				instance.setValue(i,item.convertedAttributes[i]);
+			Instance instance = new DenseInstance(item.getConvertedAttributes().length+1);
+			for(int i=0;i<item.getConvertedAttributes().length;i++) {	
+				instance.setValue(i,item.getConvertedAttributes()[i]);
 			}
-			instance.setValue(item.convertedAttributes.length,(double) item.rating);
+			instance.setValue(item.getConvertedAttributes().length,(double) item.getRating());
 			trainingSet.add(instance);
 		}
 		for(WekaRecommendationItem item:itemsToRecommend) {
-			Instance instance = new DenseInstance(item.convertedAttributes.length);
-			for(int i=0;i<item.convertedAttributes.length;i++) {	
-				instance.setValue(i,item.convertedAttributes[i]);
+			Instance instance = new DenseInstance(item.getConvertedAttributes().length);
+			for(int i=0;i<item.getConvertedAttributes().length;i++) {	
+				instance.setValue(i,item.getConvertedAttributes()[i]);
 			}
 			recommendationSet.add(instance);
 		}

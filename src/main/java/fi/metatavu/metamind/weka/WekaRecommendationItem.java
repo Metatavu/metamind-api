@@ -6,21 +6,35 @@ package fi.metatavu.metamind.weka;
  * @author Simeon Platonov
  */
 public class WekaRecommendationItem implements Comparable<WekaRecommendationItem>{
-	public Object rating = null;
-	public int id;
-	public String[] attributes;
-	public int[] convertedAttributes;
+	private Double rating = null;
+	private String id;
+	private String[] attributes;
+	private int[] convertedAttributes;
 	
-	public WekaRecommendationItem(int id,String[] attributes) {
-		this.id = id;
-		this.attributes = attributes;
+	public String getId() {
+	  return this.id;
 	}
-	
-	public WekaRecommendationItem(int id,String[] attributes,double rating) {
-		this.id = id;
-		this.attributes = attributes;
-		this.rating = rating;
-	}
+	public void setId(String id) {
+    this.id=id;
+  }
+	public Double getRating() {
+    return this.rating;
+  }
+  public void setRating(double rating) {
+    this.rating=rating;
+  }
+  public String[] getAttributes() {
+    return this.attributes;
+  }
+  public void setAttributes(String[] attributes) {
+    this.attributes = attributes;
+  }
+  public int[] getConvertedAttributes() {
+    return this.convertedAttributes;
+  }
+  public void setConvertedAttributes(int[] convertedAttributes) {
+    this.convertedAttributes = convertedAttributes;
+  }
 
 	@Override
 	public int compareTo(WekaRecommendationItem item) {
