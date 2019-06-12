@@ -18,29 +18,38 @@ public class WekaController {
 		
 	}
 	/**
-	 * Gets recommendations
+	 * Returns item iDs for unrated items, sorted by the recommendation algorithm
 	 * @param items items
 	 * @return recommendations recommendations
 	 * @throws Exception 
 	 */
 	
-	public int[] getRecommendations(WekaRecommendationItem[] items) throws Exception {
+	public int[] getRecommendations(WekaRecommendationItem[] items) {
 		RecommendationData data = new RecommendationData(items);
 		data.convertAttributes();
 		data.splitData();
 		data.createAttributeInfo();
 		data.createDatasets();
 		LinearRegression model = new LinearRegression();
-		model.buildClassifier(data.trainingSet);
-		
+		try {
+			model.buildClassifier(data.trainingSet);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		ArrayList<WekaRecommendationItem> recommendedItems = new ArrayList<WekaRecommendationItem>();
 		for(int i = 0;i<data.recommendationSet.size();i++) {
-					double estimatedRating = recommend(data.recommendationSet.get(i),model);
-					WekaRecommendationItem item = data.itemsToRecommend.get(i);
-					item.rating = estimatedRating;
-					recommendedItems.add(item);
+				
+					try {
+						double estimatedRating = recommend(data.recommendationSet.get(i),model);
+						WekaRecommendationItem item = data.itemsToRecommend.get(i);
+						item.rating = estimatedRating;
+						recommendedItems.add(item);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 		}
-
 		Collections.sort(recommendedItems);
 		int[] ids = new int[recommendedItems.size()];
 		for(int i=0;i<recommendedItems.size();i++) {

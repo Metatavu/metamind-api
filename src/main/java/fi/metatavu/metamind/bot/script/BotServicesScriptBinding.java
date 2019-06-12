@@ -16,6 +16,9 @@ public class BotServicesScriptBinding {
   
   @Inject
   private BotNgramServiceScriptBinding ngram;
+  
+  @Inject
+  private BotWekaServiceScriptBinding weka;
 
   /**
    * Returns email service
@@ -33,6 +36,15 @@ public class BotServicesScriptBinding {
    */
   public BotNgramServiceScriptBinding ngram() {
     return ngram;
+  }
+  
+  /**
+   * Returns weka services
+   * 
+   * @return weka services
+   */
+  public BotWekaServiceScriptBinding weka() {
+    return weka;
   }
 
 }
