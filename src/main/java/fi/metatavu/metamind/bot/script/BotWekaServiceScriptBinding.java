@@ -8,7 +8,7 @@ import fi.metatavu.metamind.weka.WekaRecommendationItem;
 
 /**
  * Bot script binding for Weka service
- * @author Siemon Platonov
+ * @author Simeon Platonov
  *
  */
 @ApplicationScoped
