@@ -480,8 +480,24 @@
       <scope>test</scope>
     </dependency>
     
+    <!-- Weka -->
+     <dependency>
+       <groupId>nz.ac.waikato.cms.weka</groupId>
+       <artifactId>weka-stable</artifactId>
+       <version>3.8.3</version>
+	</dependency>
+<<<<<<< HEAD
+	<!-- https://mvnrepository.com/artifact/org.json/json -->
+	<dependency>
+    	<groupId>org.json</groupId>
+    	<artifactId>json</artifactId>
+    	<version>20180813</version>
+	</dependency> 
+=======
+>>>>>>> 0ea4ecda4ae229ca6ecb6f167b2cd29183144f42
   </dependencies>
   
+
   <profiles>
     <profile>
       <id>itests</id>
