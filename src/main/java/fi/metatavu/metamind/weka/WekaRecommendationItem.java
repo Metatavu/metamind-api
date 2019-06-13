@@ -1,12 +1,12 @@
 package fi.metatavu.metamind.weka;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-=======
->>>>>>> 0ea4ecda4ae229ca6ecb6f167b2cd29183144f42
+
 /**
  * Class for recommendation items
  * 
@@ -27,11 +27,10 @@ public class WekaRecommendationItem implements Comparable<WekaRecommendationItem
 	public Double getRating() {
     return this.rating;
   }
-<<<<<<< HEAD
+
   public void setRating(Double rating) {
-=======
-  public void setRating(double rating) {
->>>>>>> 0ea4ecda4ae229ca6ecb6f167b2cd29183144f42
+
+
     this.rating=rating;
   }
   public String[] getAttributes() {

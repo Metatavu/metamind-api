@@ -1,24 +1,20 @@
 package fi.metatavu.metamind.bot.script;
 
-<<<<<<< HEAD
+
 
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
-=======
+
 import java.io.IOException;
->>>>>>> 0ea4ecda4ae229ca6ecb6f167b2cd29183144f42
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-<<<<<<< HEAD
-import org.graalvm.polyglot.Value;
-import org.json.JSONObject;
 
-=======
->>>>>>> 0ea4ecda4ae229ca6ecb6f167b2cd29183144f42
+import org.graalvm.polyglot.Value;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -48,7 +44,7 @@ public class BotWekaServiceScriptBinding {
 	 * @throws JsonMappingException 
 	 * @throws JsonParseException 
 	 */
-<<<<<<< HEAD
+
 	public String[] getRecommendations(Value[] items) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException {
 	  WekaRecommendationItem[] wekaItems = new WekaRecommendationItem[items.length];
 	  //int i=0;
@@ -88,17 +84,5 @@ public class BotWekaServiceScriptBinding {
 	}
 
   
-=======
-	public String[] getRecommendations(Object[] items) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException {
-	  ObjectMapper objectMapper = new ObjectMapper();  
 
-	  System.out.println(objectMapper.writeValueAsString(items));
-
-    return getWekaRecommendations(objectMapper.readValue(objectMapper.writeValueAsBytes(items), WekaRecommendationItem[].class));
-	}
-
-  private String[] getWekaRecommendations(WekaRecommendationItem[] items) {
-    return wekaController.getRecommendations(items);
-  }
->>>>>>> 0ea4ecda4ae229ca6ecb6f167b2cd29183144f42
 }
