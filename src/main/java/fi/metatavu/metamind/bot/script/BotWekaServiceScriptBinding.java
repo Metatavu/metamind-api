@@ -47,11 +47,6 @@ public class BotWekaServiceScriptBinding {
 
 	public String[] getRecommendations(Value[] items) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException {
 	  WekaRecommendationItem[] wekaItems = new WekaRecommendationItem[items.length];
-	  //int i=0;
-	  //for(Value item:items) {
-	  //  wekaItems[i] = translateWekaRecommendationItem(item);
-	  //  i++;
-	  //}
 	  
 	  wekaItems = Arrays.stream(items)
 	      .map(this::translateWekaRecommendationItem)
