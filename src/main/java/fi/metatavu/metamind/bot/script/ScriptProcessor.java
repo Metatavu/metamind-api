@@ -157,6 +157,7 @@ public class ScriptProcessor {
       bindings.putMember("args", scriptArgs);
       
       Source source = Source.newBuilder(script.getLanguage(), script.getContent(), script.getName()).build();
+  
       Value returnValue = scriptingContext.eval(source);
       
       if (returnValue.isString()) {      
