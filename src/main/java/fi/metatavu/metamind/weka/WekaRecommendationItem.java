@@ -1,7 +1,6 @@
 package fi.metatavu.metamind.weka;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -13,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * @author Simeon Platonov
  */
 public class WekaRecommendationItem implements Comparable<WekaRecommendationItem>{
-	private Double rating = null;
-	private String id;
+  private Double rating = null;
+  private String id;
 	private String[] attributes;
 	private int[] convertedAttributes;
 	
