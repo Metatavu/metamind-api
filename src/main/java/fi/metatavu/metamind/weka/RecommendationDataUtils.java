@@ -71,7 +71,7 @@ public class RecommendationDataUtils {
   */
   public void createAttributeInfo() {
     attributeInfo = new ArrayList<Attribute>();
-    for(int i=0;i<items[0].getConvertedAttributes().length;i++) {
+    for( int i = 0 ; i < items[0].getConvertedAttributes().length ; i++ ) {
       attributeInfo.add(new Attribute(""+i));
     }
     attributeInfo.add(new Attribute("rating"));
@@ -86,7 +86,7 @@ public class RecommendationDataUtils {
     recommendationSet.setClassIndex(attributeInfo.size()-1);
     for ( WekaRecommendationItem item:trainingItems ) {
       Instance instance = new DenseInstance(item.getConvertedAttributes().length+1);
-      for(int i = 0; i < item.getConvertedAttributes().length; i++ ) {	
+      for( int i = 0 ; i < item.getConvertedAttributes().length ; i++ ) {	
         instance.setValue(i,item.getConvertedAttributes()[i]);
       }
       instance.setValue(item.getConvertedAttributes().length,(double) item.getRating());
