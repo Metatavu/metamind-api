@@ -19,7 +19,6 @@ public class RecommendationDataUtils {
 	WekaRecommendationItem[] items;
 	Instances trainingSet;
 	Instances recommendationSet;
-	
 	/**
 	 * 
 	 * @param items - All rated and unrated items
