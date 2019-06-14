@@ -49,7 +49,10 @@ public class BotWekaServiceScriptBinding {
   }
 	
   private WekaRecommendationItem translateWekaRecommendationItem(Value item) {
-    if( !item.hasMember("id") || !item.hasMember("attributes") || item.getMember("id").isNull() || item.getMember("attributes").isNull() ) {
+    if( !item.hasMember("id") || !item.hasMember("attributes") ) {
+      return null;
+    }
+    if( item.getMember("id").isNull() || item.getMember("attributes").isNull() ) {
       return null;
     }
     String id = item.getMember("id").asString();
