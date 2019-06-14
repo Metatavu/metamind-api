@@ -22,10 +22,10 @@ import fi.metatavu.metamind.weka.WekaRecommendationItem;
 @ApplicationScoped
 public class BotWekaServiceScriptBinding {
 
-	@Inject
-	private WekaController wekaController;
+  @Inject
+  private WekaController wekaController;
 	
-	/**
+  /**
 	 * Returns item iDs for unrated items, sorted by the recommendation algorithm
 	 * 
 	 * @param items items
