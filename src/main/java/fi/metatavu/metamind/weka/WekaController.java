@@ -2,8 +2,11 @@ package fi.metatavu.metamind.weka;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+
+import javax.inject.Inject;
+
+import org.apache.logging.log4j.Logger;
 
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
@@ -15,7 +18,8 @@ import weka.core.Instance;
  * @author Simeon Platonov
  */
 public class WekaController {
-  private static final Logger LOGGER = Logger.getLogger( WekaController.class.getName() );
+  @Inject 
+  private Logger logger;
   public WekaController() {
   }
   /**
@@ -34,7 +38,7 @@ public class WekaController {
     try {
       model.buildClassifier(dataUtils.trainingSet);
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE,e.toString(), e);
+      logger.error(e);
     }
     ArrayList<WekaRecommendationItem> recommendedItems = new ArrayList<WekaRecommendationItem>();
     for(int i = 0;i<dataUtils.recommendationSet.size();i++) {
@@ -44,7 +48,7 @@ public class WekaController {
         item.setRating(estimatedRating);
         recommendedItems.add(item);
       } catch (Exception e) {
-        LOGGER.log(Level.SEVERE,e.toString(), e);
+        logger.error(e);
       }
     }
     Collections.sort(recommendedItems);
