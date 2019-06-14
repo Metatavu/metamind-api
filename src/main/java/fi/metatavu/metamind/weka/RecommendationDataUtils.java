@@ -12,7 +12,7 @@ import weka.core.Instances;
  * 
  * @author Simeon Platonov
  */
-public class RecommendationData {
+public class RecommendationDataUtils {
 	ArrayList<WekaRecommendationItem> trainingItems;
 	ArrayList<WekaRecommendationItem> itemsToRecommend;
 	ArrayList<Attribute> attributeInfo;
@@ -24,7 +24,7 @@ public class RecommendationData {
 	 * 
 	 * @param items - All rated and unrated items
 	 */
-	public RecommendationData(WekaRecommendationItem[] items) {
+	public RecommendationDataUtils(WekaRecommendationItem[] items) {
 		this.items = items;
 	}
 	
