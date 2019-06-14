@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class WekaRecommendationItem implements Comparable<WekaRecommendationItem>{
   private Double rating = null;
   private String id;
-	private String[] attributes;
+  private String[] attributes;
 	private int[] convertedAttributes;
 	
 	public String getId() {
