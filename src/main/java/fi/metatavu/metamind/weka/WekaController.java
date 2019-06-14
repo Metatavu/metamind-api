@@ -38,7 +38,7 @@ public class WekaController {
     try {
       model.buildClassifier(dataUtils.trainingSet);
     } catch (Exception e) {
-      logger.error(e);
+      logger.error("Error running script",e);
     }
     ArrayList<WekaRecommendationItem> recommendedItems = new ArrayList<WekaRecommendationItem>();
     for(int i = 0;i<dataUtils.recommendationSet.size();i++) {
@@ -48,7 +48,7 @@ public class WekaController {
         item.setRating(estimatedRating);
         recommendedItems.add(item);
       } catch (Exception e) {
-        logger.error(e);
+        logger.error("Error running script",e);
       }
     }
     Collections.sort(recommendedItems);
