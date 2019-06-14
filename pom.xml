@@ -98,6 +98,9 @@
     <!-- StreamEx -->
     
     <streamex.version>0.6.8</streamex.version>
+
+    <!-- Weka -->
+    <weka.version>3.8.3</weka.version>
     
     <!-- Test -->
     
@@ -480,8 +483,16 @@
       <scope>test</scope>
     </dependency>
     
+    <!-- Weka -->
+    <dependency>
+      <groupId>nz.ac.waikato.cms.weka</groupId>
+      <artifactId>weka-stable</artifactId>
+      <version>${weka.version}</version>
+    </dependency>
+
   </dependencies>
   
+
   <profiles>
     <profile>
       <id>itests</id>
