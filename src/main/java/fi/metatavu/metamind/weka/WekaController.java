@@ -24,24 +24,24 @@ public class WekaController {
 	 */
 	
 	public String[] getRecommendations(WekaRecommendationItem[] items) {
-		RecommendationData data = new RecommendationData(items);
-		data.convertAttributes();
-		data.splitData();
-		data.createAttributeInfo();
-		data.createDatasets();
+		RecommendationDataUtils dataUtils = new RecommendationDataUtils(items);
+		dataUtils.convertAttributes();
+		dataUtils.splitData();
+		dataUtils.createAttributeInfo();
+		dataUtils.createDatasets();
 		LinearRegression model = new LinearRegression();
 		try {
-			model.buildClassifier(data.trainingSet);
+			model.buildClassifier(dataUtils.trainingSet);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		ArrayList<WekaRecommendationItem> recommendedItems = new ArrayList<WekaRecommendationItem>();
-		for(int i = 0;i<data.recommendationSet.size();i++) {
+		for(int i = 0;i<dataUtils.recommendationSet.size();i++) {
 				
 					try {
-						double estimatedRating = recommend(data.recommendationSet.get(i),model);
-						WekaRecommendationItem item = data.itemsToRecommend.get(i);
+						double estimatedRating = recommend(dataUtils.recommendationSet.get(i),model);
+						WekaRecommendationItem item = dataUtils.itemsToRecommend.get(i);
 						item.setRating(estimatedRating);
 						recommendedItems.add(item);
 					} catch (Exception e) {
