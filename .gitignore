@@ -8,4 +8,4 @@
 /.cargo
 /keycloak*
 /.DS_Store
-.metadata
+/.metadata/
