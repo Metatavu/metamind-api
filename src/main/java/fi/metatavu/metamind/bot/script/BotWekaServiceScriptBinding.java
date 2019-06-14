@@ -49,6 +49,9 @@ public class BotWekaServiceScriptBinding {
   }
 	
   private WekaRecommendationItem translateWekaRecommendationItem(Value item) {
+    if( !item.hasMember("id") || !item.hasMember("attributes") || item.getMember("id").isNull() || item.getMember("attributes").isNull() ) {
+      return null;
+    }
     String id = item.getMember("id").asString();
     Value attributes = item.getMember("attributes");
     if(!attributes.hasArrayElements()){
@@ -60,7 +63,7 @@ public class BotWekaServiceScriptBinding {
       attrs[i] = attributes.getArrayElement(i).asString();
     }
     Value ratingValue = item.getMember("rating");
-    Double rating = ratingValue.fitsInDouble()?ratingValue.asDouble():null;
+    Double rating = ratingValue.isNumber()?ratingValue.asDouble():null;
     WekaRecommendationItem wekaItem = new WekaRecommendationItem();
     wekaItem.setId(id);
     wekaItem.setAttributes(attrs);
