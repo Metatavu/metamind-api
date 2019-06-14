@@ -16,7 +16,7 @@ public class WekaRecommendationItem implements Comparable<WekaRecommendationItem
   private String id;
   private String[] attributes;
   private int[] convertedAttributes;
-	public String getId() {
+  public String getId() {
     return this.id;
   }
   public void setId(String id) {
