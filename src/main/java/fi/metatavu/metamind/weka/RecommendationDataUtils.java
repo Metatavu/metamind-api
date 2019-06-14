@@ -32,7 +32,7 @@ public class RecommendationDataUtils {
   public void convertAttributes() {
     ArrayList<String> attributes = new ArrayList<String>();
     for(WekaRecommendationItem item:items) {
-      for(String attribute:item.getAttributes()) {
+      for( String attribute : item.getAttributes() ) {
         if(!attributes.contains(attribute)) {
           attributes.add(attribute);
         }
@@ -41,7 +41,7 @@ public class RecommendationDataUtils {
     int i = 0;
     for(WekaRecommendationItem item:items) {
       int[] convertedAttributes = new int[attributes.size()];
-      for(String attribute:item.getAttributes()) {
+      for( String attribute : item.getAttributes() ) {
         int index = attributes.indexOf(attribute);
         convertedAttributes[index] = 1;
       }
@@ -57,7 +57,7 @@ public class RecommendationDataUtils {
   public void splitData() {
     trainingItems = new ArrayList<WekaRecommendationItem>();
     itemsToRecommend = new ArrayList<WekaRecommendationItem>();
-    for(WekaRecommendationItem item:items) {
+    for( WekaRecommendationItem item : items ) {
       if( item.getRating() == null) {
         itemsToRecommend.add(item);
       } else {
@@ -84,7 +84,7 @@ public class RecommendationDataUtils {
     recommendationSet = new Instances("recommendationSet",attributeInfo,0);
     trainingSet.setClassIndex(attributeInfo.size()-1);
     recommendationSet.setClassIndex(attributeInfo.size()-1);
-    for ( WekaRecommendationItem item:trainingItems ) {
+    for ( WekaRecommendationItem item : trainingItems ) {
       Instance instance = new DenseInstance(item.getConvertedAttributes().length+1);
       for( int i = 0 ; i < item.getConvertedAttributes().length ; i++ ) {	
         instance.setValue(i,item.getConvertedAttributes()[i]);

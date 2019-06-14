@@ -41,7 +41,7 @@ public class WekaController {
       logger.error("Error running script",e);
     }
     ArrayList<WekaRecommendationItem> recommendedItems = new ArrayList<WekaRecommendationItem>();
-    for(int i = 0;i<dataUtils.recommendationSet.size();i++) {
+    for( int i = 0; i < dataUtils.recommendationSet.size() ; i++ ) {
       try {
         double estimatedRating = recommend(dataUtils.recommendationSet.get(i),model);
         WekaRecommendationItem item = dataUtils.itemsToRecommend.get(i);
@@ -53,7 +53,7 @@ public class WekaController {
     }
     Collections.sort(recommendedItems);
     String[] ids = new String[recommendedItems.size()];
-    for ( int i = 0; i < recommendedItems.size(); i++ ) {
+    for ( int i = 0 ; i < recommendedItems.size() ; i++ ) {
       ids[i]=recommendedItems.get(i).getId();
     }
     return ids;
