@@ -58,8 +58,4 @@ public class WekaController {
     Instance instance = (Instance) instanceItem;
     return model.classifyInstance(instance);
   }
-	
-	
-	
-
 }
