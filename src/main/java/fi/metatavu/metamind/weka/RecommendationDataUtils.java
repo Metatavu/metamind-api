@@ -31,7 +31,7 @@ public class RecommendationDataUtils {
 	/**
 	 * Converts text attributes to an integer array of 0s and 1s
 	 */
-	void convertAttributes() {
+	public void convertAttributes() {
 		ArrayList<String> attributes = new ArrayList<String>();
 		for(WekaRecommendationItem item:items) {
 			for(String attribute:item.getAttributes()) {
@@ -57,7 +57,7 @@ public class RecommendationDataUtils {
 	 * Splits items into training set and recommendation set
 	 * Recommendation set contains items that have not been yet rated by the user
 	 */
-	void splitData() {
+	public void splitData() {
 		 trainingItems = new ArrayList<WekaRecommendationItem>();
 		 itemsToRecommend = new ArrayList<WekaRecommendationItem>();
 		for(WekaRecommendationItem item:items) {
@@ -72,7 +72,7 @@ public class RecommendationDataUtils {
 	/**
 	 * Creates attribute info that is required by the weka.core.Instances class
 	 */
-	void createAttributeInfo() {
+	public void createAttributeInfo() {
 		attributeInfo = new ArrayList<Attribute>();
 		for(int i=0;i<items[0].getConvertedAttributes().length;i++) {
 			attributeInfo.add(new Attribute(""+i));
@@ -83,7 +83,7 @@ public class RecommendationDataUtils {
 	/**
 	 * Creates objects that Weka models can accept
 	 */
-	void createDatasets() {
+	public void createDatasets() {
 		trainingSet = new Instances("trainingSet",attributeInfo,0);
 		recommendationSet = new Instances("recommendationSet",attributeInfo,0);
 		trainingSet.setClassIndex(attributeInfo.size()-1);
