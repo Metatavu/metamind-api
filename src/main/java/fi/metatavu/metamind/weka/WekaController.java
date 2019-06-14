@@ -2,6 +2,8 @@ package fi.metatavu.metamind.weka;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
@@ -13,6 +15,7 @@ import weka.core.Instance;
  * @author Simeon Platonov
  */
 public class WekaController {
+  private static final Logger LOGGER = Logger.getLogger( WekaController.class.getName() );
 	public WekaController() {
 		
 	}
@@ -32,22 +35,19 @@ public class WekaController {
 		LinearRegression model = new LinearRegression();
 		try {
 			model.buildClassifier(dataUtils.trainingSet);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (Exception e) {
+		  LOGGER.log(Level.SEVERE,e.toString(), e);
 		}
 		ArrayList<WekaRecommendationItem> recommendedItems = new ArrayList<WekaRecommendationItem>();
 		for(int i = 0;i<dataUtils.recommendationSet.size();i++) {
-				
-					try {
-						double estimatedRating = recommend(dataUtils.recommendationSet.get(i),model);
-						WekaRecommendationItem item = dataUtils.itemsToRecommend.get(i);
-						item.setRating(estimatedRating);
-						recommendedItems.add(item);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+			try {
+				double estimatedRating = recommend(dataUtils.recommendationSet.get(i),model);
+				WekaRecommendationItem item = dataUtils.itemsToRecommend.get(i);
+				item.setRating(estimatedRating);
+				recommendedItems.add(item);
+			} catch (Exception e) {
+					LOGGER.log(Level.SEVERE,e.toString(), e);
+			}
 		}
 		Collections.sort(recommendedItems);
 		String[] ids = new String[recommendedItems.size()];
