@@ -28,8 +28,6 @@ public class WekaRecommendationItem implements Comparable<WekaRecommendationItem
   }
 
   public void setRating(Double rating) {
-
-
     this.rating=rating;
   }
   public String[] getAttributes() {
