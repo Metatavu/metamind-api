@@ -15,18 +15,16 @@ public class WekaRecommendationItem implements Comparable<WekaRecommendationItem
   private Double rating = null;
   private String id;
   private String[] attributes;
-	private int[] convertedAttributes;
-	
+  private int[] convertedAttributes;
 	public String getId() {
-	  return this.id;
-	}
-	public void setId(String id) {
+    return this.id;
+  }
+  public void setId(String id) {
     this.id=id;
   }
-	public Double getRating() {
+  public Double getRating() {
     return this.rating;
   }
-
   public void setRating(Double rating) {
     this.rating=rating;
   }
@@ -42,13 +40,10 @@ public class WekaRecommendationItem implements Comparable<WekaRecommendationItem
   public void setConvertedAttributes(int[] convertedAttributes) {
     this.convertedAttributes = convertedAttributes;
   }
-
-	@Override
-	public int compareTo(WekaRecommendationItem item) {
-		double compareRating = (double) item.rating;
-		double comparison = (compareRating-(double) this.rating)*100000;
-		return (int) comparison;
-	}
-	
-	
+  @Override
+  public int compareTo(WekaRecommendationItem item) {
+    double compareRating = (double) item.rating;
+    double comparison = (compareRating-(double) this.rating)*100000;
+    return (int) comparison;
+  }
 }
