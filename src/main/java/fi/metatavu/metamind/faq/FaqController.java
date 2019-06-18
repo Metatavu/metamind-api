@@ -83,8 +83,6 @@ public class FaqController {
    */
   public JSONArray getResponseJSONArray(URL url){
     try {
-      HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-      int responseCode = connection.getResponseCode();
            
       Scanner scanner = new Scanner(url.openStream());
       String inline = "";
