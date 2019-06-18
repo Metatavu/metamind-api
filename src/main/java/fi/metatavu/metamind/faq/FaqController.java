@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.inject.Inject;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
 
 /**
  * Controller for FAQ-functionality
@@ -18,6 +20,8 @@ import org.json.simple.parser.ParseException;
  *
  */
 public class FaqController {
+  @Inject
+  private Logger logger;
   /**
    * Gets answers to the question
    * 
@@ -27,25 +31,27 @@ public class FaqController {
    * @throws IOException 
    * @throws ParseException 
    */
-  public String[] getAnswers(String searchText) throws IOException, ParseException {
-    return getAnswers(searchText,null);
-  }
-  
-  public String[] getAnswers(String searchText,String filterCategoryId) throws IOException, ParseException{
  
-    URL url = new URL("http://localhost/api.php?action=search&lang=fi&q="+searchText);
-    JSONArray jsonArray = getResponseJSONArray(url);
-    List<String> answersList = new ArrayList<String>();
-      
-    for ( int i = 0 ; i < jsonArray.size() ; i++ ) {
-      JSONObject result = (JSONObject) jsonArray.get(i);
-      String categoryId = result.get("category_id").toString();
-      if( filterCategoryId == null || filterCategoryId.equals(categoryId) ) {
-        answersList.add(result.get("answer").toString());
-      } 
+  public String[] getAnswers(String searchText,String filterCategoryId){
+    try {
+      URL url = new URL("http://localhost/api.php?action=search&lang=fi&q="+searchText);
+      JSONArray jsonArray = getResponseJSONArray(url);
+      List<String> answersList = new ArrayList<String>();
+        
+      for ( int i = 0 ; i < jsonArray.size() ; i++ ) {
+        JSONObject result = (JSONObject) jsonArray.get(i);
+        String categoryId = result.get("category_id").toString();
+        if( filterCategoryId == null || filterCategoryId.equals(categoryId) ) {
+          answersList.add(result.get("answer").toString());
+        } 
+      }
+      String[] answers = (String[]) answersList.toArray();
+      return answers;
+    } catch (Exception e) {
+      logger.error("Error running script",e);
+      return new String[0];
     }
-    String[] answers = (String[]) answersList.toArray();
-    return answers;
+
   }
   
   /**
@@ -55,10 +61,16 @@ public class FaqController {
    * @throws ParseException
    * @throws IOException
    */
-  public String getCategories() throws ParseException, IOException {
-    URL url = new URL("http://localhost/api.php?action=getCategories&lang=fi");
-    JSONArray jsonArray = getResponseJSONArray(url);
-    return jsonArray.toJSONString();
+  public String getCategories() {
+    try {
+      URL url = new URL("http://localhost/api.php?action=getCategories&lang=fi");
+      JSONArray jsonArray = getResponseJSONArray(url);
+      return jsonArray.toJSONString();
+    } catch (Exception e) {
+      logger.error("Error running script",e);
+      return "";
+    }
+
   }
   
   /**
@@ -69,25 +81,27 @@ public class FaqController {
    * @throws ParseException
    * @throws IOException
    */
-  public JSONArray getResponseJSONArray(URL url) throws ParseException, IOException {
-    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-    int responseCode = connection.getResponseCode();
-      
-    if ( responseCode != 200 ) {
+  public JSONArray getResponseJSONArray(URL url){
+    try {
+      HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+      int responseCode = connection.getResponseCode();
+           
+      Scanner scanner = new Scanner(url.openStream());
+      String inline = "";
+        
+      while ( scanner.hasNext() ) {
+        inline+=scanner.nextLine();
+      }
+        
+      scanner.close();
+      JSONParser parser = new JSONParser();
+      JSONArray jsonArray = (JSONArray) parser.parse(inline);
+      return jsonArray;
+    } catch (Exception e) {
+      logger.error("Error running script",e);
       return new JSONArray();
     }
-        
-    Scanner scanner = new Scanner(url.openStream());
-    String inline = "";
-      
-    while ( scanner.hasNext() ) {
-      inline+=scanner.nextLine();
-    }
-      
-    scanner.close();
-    JSONParser parser = new JSONParser();
-    JSONArray jsonArray = (JSONArray) parser.parse(inline);
-    return jsonArray;
+
   }
 }
   

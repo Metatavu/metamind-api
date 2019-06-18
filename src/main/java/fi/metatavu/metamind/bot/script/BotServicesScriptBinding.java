@@ -19,6 +19,9 @@ public class BotServicesScriptBinding {
   
   @Inject
   private BotWekaServiceScriptBinding weka;
+  
+  @Inject
+  private BotFaqServiceScriptBinding faq;
 
   /**
    * Returns email service
@@ -45,6 +48,15 @@ public class BotServicesScriptBinding {
    */
   public BotWekaServiceScriptBinding weka() {
     return weka;
+  }
+  
+  /**
+   * Returns faq services
+   * 
+   * @return faq services
+   */
+  public BotFaqServiceScriptBinding faq() {
+    return faq;
   }
 
 }
