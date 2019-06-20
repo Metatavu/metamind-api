@@ -27,14 +27,15 @@ public class FaqController {
    * 
    * @param searchString
    * @param category
+   * @param baseAPIURL
    * @return searchResults
    * @throws IOException 
    * @throws ParseException 
    */
  
-  public String getAnswers(String searchText,String filterCategoryId){
+  public String getAnswers(String baseAPIURL, String searchText,String filterCategoryId){
     try {
-      URIBuilder builder = new URIBuilder("http://localhost/phpmyfaq/api.php");
+      URIBuilder builder = new URIBuilder(baseAPIURL);
       builder.addParameter("action", "search");
       builder.addParameter("q", searchText);
       JSONArray answers = getResponseJSONArray(builder.build());
@@ -58,13 +59,14 @@ public class FaqController {
   /**
    * Gets all FAQ-categories in JSON format
    * 
+   * @param baseAPIURL
    * @return returns categories
    * @throws ParseException
    * @throws IOException
    */
-  public String getCategories() {
+  public String getCategories(String baseAPIURL) {
     try {
-      URIBuilder builder = new URIBuilder("http://localhost/phpmyfaq/api.php");
+      URIBuilder builder = new URIBuilder(baseAPIURL);
       builder.addParameter("action", "getCategories");
       JSONArray jsonArray = getResponseJSONArray(builder.build());
       return jsonArray.toJSONString();
@@ -78,12 +80,13 @@ public class FaqController {
   /**
    * Gets a single answer
    * 
+   * @param baseAPIURL
    * @param id
    * @return answer
    */
-  public String getSingleAnswer(String id) {
+  public String getSingleAnswer(String baseAPIURL, String id) {
     try {
-      URIBuilder builder = new URIBuilder("http://localhost/phpmyfaq/api.php");
+      URIBuilder builder = new URIBuilder(baseAPIURL);
       builder.addParameter("action", "getFaq");
       builder.addParameter("recordId", id);
       JSONArray jsonArray = getResponseJSONArray(builder.build());
