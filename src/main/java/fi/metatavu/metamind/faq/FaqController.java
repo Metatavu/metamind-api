@@ -1,8 +1,6 @@
 package fi.metatavu.metamind.faq;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import javax.inject.Inject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -25,7 +23,7 @@ public class FaqController {
   @Inject
   private Logger logger;
   /**
-   * Gets answers to the question
+   * Gets answers to the question in JSON format
    * 
    * @param searchString
    * @param category
@@ -34,37 +32,33 @@ public class FaqController {
    * @throws ParseException 
    */
  
-  public String[] getAnswers(String searchText,String filterCategoryId){
+  public String getAnswers(String searchText,String filterCategoryId){
     try {
       URIBuilder builder = new URIBuilder("http://localhost/phpmyfaq/api.php");
       builder.addParameter("action", "search");
       builder.addParameter("q", searchText);
-      JSONArray jsonArray = getResponseJSONArray(builder.build());
-      List<String> answersList = new ArrayList<String>();
+      JSONArray answers = getResponseJSONArray(builder.build());
+      JSONArray filteredAnswers = new JSONArray();
         
-      for ( int i = 0 ; i < jsonArray.size() ; i++ ) {
-        JSONObject result = (JSONObject) jsonArray.get(i);
+      for ( int i = 0 ; i < answers.size() ; i++ ) {
+        JSONObject result = (JSONObject) answers.get(i);
         String categoryId = result.get("category_id").toString();
         if( filterCategoryId == null || filterCategoryId.equals(categoryId) ) {
-          answersList.add(result.get("answer").toString());
+          filteredAnswers.add(result);
         } 
       }
-      String[] answers = new String[answersList.size()];
-      for( int i = 0 ; i < answersList.size() ; i++ ) {
-        answers[i] = answersList.get(i);
-      }
-      return answers;
+      return filteredAnswers.toJSONString();
     } catch (Exception e) {
       logger.error("Error running script",e);
-      return new String[0];
+      return "";
     }
 
   }
   
   /**
-   * Gets all FAQ-categories
+   * Gets all FAQ-categories in JSON format
    * 
-   * @return returns categories in JSON format
+   * @return returns categories
    * @throws ParseException
    * @throws IOException
    */
@@ -82,10 +76,30 @@ public class FaqController {
   }
   
   /**
+   * Gets a single answer
+   * 
+   * @param id
+   * @return answer
+   */
+  public String getSingleAnswer(String id) {
+    try {
+      URIBuilder builder = new URIBuilder("http://localhost/phpmyfaq/api.php");
+      builder.addParameter("action", "getFaq");
+      builder.addParameter("recordId", id);
+      JSONArray jsonArray = getResponseJSONArray(builder.build());
+      String answer = jsonArray.toJSONString();
+      return answer;
+    } catch (Exception e) {
+      logger.error("Error running script",e);
+      return "";
+    }
+  };
+  
+  /**
    * Sends a get request and returns the response body in JSON-array format 
    * 
    * @param url
-   * @return
+   * @return response body in JSON-array format
    * @throws ParseException
    * @throws IOException
    */
@@ -96,7 +110,15 @@ public class FaqController {
       CloseableHttpResponse response = httpclient.execute(httpGet);  
       String inline = EntityUtils.toString(response.getEntity());
       JSONParser parser = new JSONParser();
-      JSONArray jsonArray = (JSONArray) parser.parse(inline);
+      JSONArray jsonArray;
+      try {
+        jsonArray = (JSONArray) parser.parse(inline);
+      } catch (Exception e) {
+        JSONObject tempObject = (JSONObject) parser.parse(inline);
+        jsonArray = new JSONArray();
+        jsonArray.add(tempObject);
+      }
+      
       return jsonArray;
     } catch (Exception e) {
       logger.error("Error running script",e);
