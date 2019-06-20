@@ -1,13 +1,15 @@
 package fi.metatavu.metamind.faq;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-
 import javax.inject.Inject;
-import javax.net.ssl.HttpsURLConnection;
-
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,8 +36,10 @@ public class FaqController {
  
   public String[] getAnswers(String searchText,String filterCategoryId){
     try {
-      URL url = new URL("http://localhost/api.php?action=search&lang=fi&q="+searchText);
-      JSONArray jsonArray = getResponseJSONArray(url);
+      URIBuilder builder = new URIBuilder("http://localhost/phpmyfaq/api.php");
+      builder.addParameter("action", "search");
+      builder.addParameter("q", searchText);
+      JSONArray jsonArray = getResponseJSONArray(builder.build());
       List<String> answersList = new ArrayList<String>();
         
       for ( int i = 0 ; i < jsonArray.size() ; i++ ) {
@@ -45,7 +49,10 @@ public class FaqController {
           answersList.add(result.get("answer").toString());
         } 
       }
-      String[] answers = (String[]) answersList.toArray();
+      String[] answers = new String[answersList.size()];
+      for( int i = 0 ; i < answersList.size() ; i++ ) {
+        answers[i] = answersList.get(i);
+      }
       return answers;
     } catch (Exception e) {
       logger.error("Error running script",e);
@@ -63,8 +70,9 @@ public class FaqController {
    */
   public String getCategories() {
     try {
-      URL url = new URL("http://localhost/api.php?action=getCategories&lang=fi");
-      JSONArray jsonArray = getResponseJSONArray(url);
+      URIBuilder builder = new URIBuilder("http://localhost/phpmyfaq/api.php");
+      builder.addParameter("action", "getCategories");
+      JSONArray jsonArray = getResponseJSONArray(builder.build());
       return jsonArray.toJSONString();
     } catch (Exception e) {
       logger.error("Error running script",e);
@@ -81,17 +89,12 @@ public class FaqController {
    * @throws ParseException
    * @throws IOException
    */
-  public JSONArray getResponseJSONArray(URL url){
+  public JSONArray getResponseJSONArray(URI uri){
     try {
-           
-      Scanner scanner = new Scanner(url.openStream());
-      String inline = "";
-        
-      while ( scanner.hasNext() ) {
-        inline+=scanner.nextLine();
-      }
-        
-      scanner.close();
+      HttpGet httpGet = new HttpGet(uri);
+      CloseableHttpClient httpclient = HttpClients.custom().build();
+      CloseableHttpResponse response = httpclient.execute(httpGet);  
+      String inline = EntityUtils.toString(response.getEntity());
       JSONParser parser = new JSONParser();
       JSONArray jsonArray = (JSONArray) parser.parse(inline);
       return jsonArray;

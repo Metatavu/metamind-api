@@ -3,6 +3,8 @@ package fi.metatavu.metamind.bot.script;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.graalvm.polyglot.Value;
+
 import fi.metatavu.metamind.faq.FaqController;
 
 /**
@@ -23,11 +25,21 @@ public class BotFaqServiceScriptBinding {
   * @param category
   * @return searchResults
   */
-  public String[] getAnswers(String searchText) {
-    return getAnswers(searchText,null);
+  public String[] getAnswers(Value searchText) {
+    if ( !searchText.isString() ) {
+      return new String[0];
+    }
+    return faqController.getAnswers(searchText.asString(), null);
   }
-  public String[] getAnswers(String searchText,String filterCategoryId) {
-    return faqController.getAnswers(searchText, filterCategoryId);
+  public String[] getAnswers(Value searchText,Value filterCategoryId) {
+    if ( !searchText.isString() ) {
+      return new String[0];
+    }
+    String category = null;
+    if ( filterCategoryId.isString() ) {
+      category = filterCategoryId.asString();
+    }
+    return faqController.getAnswers(searchText.asString(), category);
   }
   
   /**
