@@ -4,6 +4,7 @@
 
   <persistence-unit name="metamind" transaction-type="JTA">
     <jta-data-source>java:jboss/datasources/metamind-api</jta-data-source>
+    <class>fi.metatavu.metamind.images.ImagesServlet</class>
     <properties>
     
       <!-- Connection -->
