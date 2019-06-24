@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -79,6 +80,18 @@ public class ImagesServlet extends HttpServlet{
       logger.error("Upload failed on internal server error", e);
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
+  }
+  
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    setCorsHeaders(resp);
+    String fileRef = req.getPathInfo();
+    if (fileRef == null) {
+      resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+    
+    getFile(resp, fileRef);
   }
   
   /**
