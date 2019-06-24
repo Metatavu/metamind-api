@@ -150,5 +150,18 @@ public class KnotDAO extends AbstractDAO<Knot> {
     knot.setStory(story);
     return persist(knot);
   }
+  
+  /**
+   * Updates image filename
+   * 
+   * @param imageFileName image file name
+   * @param lastModifierId last modifier's id
+   * @return updated knot
+   */
+  public Knot updateImageFileName(Knot knot, String imageFileName, UUID lastModifierId) {
+    knot.setLastModifierId(lastModifierId);
+    knot.setImageFileName(imageFileName);
+    return persist(knot);
+  }
 
 }
