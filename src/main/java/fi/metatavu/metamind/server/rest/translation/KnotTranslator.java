@@ -35,7 +35,7 @@ public class KnotTranslator {
     result.setType(jpaKnot.getType());
     result.setHint(jpaKnot.getHint());
     result.setTokenizer(jpaKnot.getTokenizerType());
-      
+     
     return result;
   }
 

@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.images;
 
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,18 +18,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @RequestScoped
 @MultipartConfig
 @WebServlet (urlPatterns = { "/images", "/images/*" })
 public class ImagesServlet extends HttpServlet{
 
+  private static final long serialVersionUID = -5737983422302604984L;
 
-  private static final long serialVersionUID = 4209609403222008762L;
-  
   @Inject
   private Logger logger;
 
@@ -56,6 +58,7 @@ public class ImagesServlet extends HttpServlet{
       InputStream inputStream = file.getInputStream();
 
       FileWriter writer = new FileWriter("images/"+knotId+".jpg");
+      
       while(inputStream.available()>0) {
         writer.write(inputStream.read());
       }
@@ -77,6 +80,26 @@ public class ImagesServlet extends HttpServlet{
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
+  
+  /**
+   * Outputs file data
+   * 
+   * @param resp response object
+   * @param fileRef file ref
+   */
+  private void getFile(HttpServletResponse resp, String knotId) {
+    setCorsHeaders(resp);
+    try {
+      ServletOutputStream servletOutputStream = resp.getOutputStream();
+      try (InputStream data = new FileInputStream("images/"+knotId+".jpg")) {
+        IOUtils.copy(data, servletOutputStream);
+      } finally {
+        servletOutputStream.flush();
+      }
+    } catch (IOException e) {
+      logger.warn("Failed to send response", e);
+    }
+}
   
 
 }

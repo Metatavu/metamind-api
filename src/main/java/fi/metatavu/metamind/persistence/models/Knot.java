@@ -67,8 +67,6 @@ public class Knot {
 
   @Column(nullable = false)
   private OffsetDateTime modifiedAt;
-  
-  private String imageFileName;
 
   public UUID getId() {
     return id;
@@ -158,13 +156,6 @@ public class Knot {
     this.modifiedAt = modifiedAt;
   }
   
-  public void setImageFileName(String imageFileName) {
-    this.imageFileName = imageFileName;
-  }
-  
-  public String getImageFileName(String getImageFileName) {
-    return imageFileName;
-  }
 
   @PrePersist
   public void onCreate() {
