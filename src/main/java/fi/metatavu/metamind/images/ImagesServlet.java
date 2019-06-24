@@ -1,12 +1,12 @@
 package fi.metatavu.metamind.images;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -41,13 +41,10 @@ public class ImagesServlet extends HttpServlet{
     resp.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
   }
   
-
-  
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     try {
       Part file = req.getPart("file");
-      String knotId = req.getPart("knotId").toString();
       if (file == null) {
         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         return;
@@ -55,10 +52,13 @@ public class ImagesServlet extends HttpServlet{
       
       setCorsHeaders(resp);
       String contentType = file.getContentType();
+      String knotId = req.getPart("knotId").toString();
+      String extension = file.getSubmittedFileName().substring(file.getSubmittedFileName().lastIndexOf("."));
  
       InputStream inputStream = file.getInputStream();
+      
 
-      FileWriter writer = new FileWriter("images/"+knotId+".jpg");
+      FileWriter writer = new FileWriter("images/"+knotId+extension);
       
       while(inputStream.available()>0) {
         writer.write(inputStream.read());
@@ -66,7 +66,7 @@ public class ImagesServlet extends HttpServlet{
       writer.close();
       
       Map<String, String> result = new HashMap<>();
-      result.put("fileName", knotId+".jpg");
+      result.put("fileName", knotId+extension);
 
       resp.setContentType("application/json");
       ServletOutputStream servletOutputStream = resp.getOutputStream();
@@ -103,8 +103,10 @@ public class ImagesServlet extends HttpServlet{
   private void getFile(HttpServletResponse resp, String knotId) {
     setCorsHeaders(resp);
     try {
+      File dir = new File("images/");
+      String path = dir.listFiles((d,name)->name.startsWith(knotId))[0].getPath();
       ServletOutputStream servletOutputStream = resp.getOutputStream();
-      try (InputStream data = new FileInputStream("images/"+knotId+".jpg")) {
+      try (InputStream data = new FileInputStream(path)) {
         IOUtils.copy(data, servletOutputStream);
       } finally {
         servletOutputStream.flush();
