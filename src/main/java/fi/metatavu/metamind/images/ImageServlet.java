@@ -4,6 +4,7 @@ package fi.metatavu.metamind.images;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -30,7 +31,7 @@ import fi.metatavu.metamind.persistence.models.Knot;
 
 @RequestScoped
 @MultipartConfig
-@WebServlet (urlPatterns = { "/images", "/images/*" })
+@WebServlet (urlPatterns = { "/v2/images", "/v2/images/*" })
 public class ImageServlet extends HttpServlet{
 
   private static final long serialVersionUID = -5737983422302604984L;
@@ -47,8 +48,9 @@ public class ImageServlet extends HttpServlet{
     resp.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
   }
   @Override 
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp){
-    System.out.println("Get request");
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+    PrintWriter out = resp.getWriter();
+    out.println("Hello World");
   }
   
   @Override
