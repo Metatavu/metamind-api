@@ -2,11 +2,14 @@ package fi.metatavu.metamind.images;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import javax.enterprise.context.RequestScoped;
@@ -72,9 +75,23 @@ public class ImageServlet extends HttpServlet{
         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
+      
       String extension = file.getSubmittedFileName().substring(file.getSubmittedFileName().lastIndexOf("."));
       String fileURL = "images/"+knotId.toString()+extension;
+      InputStream fileInputStream = file.getInputStream();
       
+      File dir = new File("images");
+      if( !dir.exists()) {
+        dir.mkdir();
+      }
+      
+      File imageFile = new File(fileURL);
+      if(!imageFile.exists()) {
+        imageFile.createNewFile();
+      }
+      
+      Files.copy(fileInputStream, imageFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
+      fileInputStream.close();
     } catch (IOException | ServletException e) {
       logger.error("Upload failed on internal server error", e);
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
