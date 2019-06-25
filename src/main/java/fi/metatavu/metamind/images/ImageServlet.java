@@ -55,7 +55,7 @@ public class ImageServlet extends HttpServlet{
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
     setCorsHeaders(resp);
     String fileURL = req.getPathInfo();
-    File file = new File("images/"+fileURL);
+    File file = new File(System.getProperty("metamind.imagedir")+"/"+fileURL);
     if(!file.exists()) {
       resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return;
@@ -77,7 +77,7 @@ public class ImageServlet extends HttpServlet{
   protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException{
     setCorsHeaders(resp);
     String fileURL = req.getPathInfo();
-    File file = new File("images/"+fileURL);
+    File file = new File(System.getProperty("metamind.imagedir")+"/"+fileURL);
     if(!file.exists()) {
       resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return;
@@ -112,12 +112,12 @@ public class ImageServlet extends HttpServlet{
       }
       
       String extension = file.getSubmittedFileName().substring(file.getSubmittedFileName().lastIndexOf("."));
-      String fileURL = "images/"+knotId.toString()+extension;
+      String fileURL = System.getProperty("metamind.imagedir")+"/"+knotId.toString()+extension;
       InputStream fileInputStream = file.getInputStream();
       
-      File dir = new File("images");
+      File dir = new File(System.getProperty("metamind.imagedir"));
       if( !dir.exists()) {
-        dir.mkdir();
+        dir.mkdirs();
       }
       File[] files = dir.listFiles();
       for ( File listedFile : files ) {
@@ -133,7 +133,7 @@ public class ImageServlet extends HttpServlet{
       
       Map<String, String> result = new HashMap<>();
       
-      result.put("fileUrl", fileURL);
+      result.put("filename", knotId.toString()+extension);
 
       resp.setContentType("application/json");
       ServletOutputStream servletOutputStream = resp.getOutputStream();
