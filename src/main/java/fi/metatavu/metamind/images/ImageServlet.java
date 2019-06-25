@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -27,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,12 +105,15 @@ public class ImageServlet extends HttpServlet{
       if( !dir.exists()) {
         dir.mkdir();
       }
-      
-      File imageFile = new File(fileURL);
-      if(!imageFile.exists()) {
-        imageFile.createNewFile();
+      File[] files = dir.listFiles();
+      for ( File listedFile : files ) {
+        if ( listedFile.getName().startsWith(knotId.toString()) ) {
+          listedFile.delete();
+        }
       }
-      
+
+      File imageFile = new File(fileURL);
+      imageFile.createNewFile(); 
       Files.copy(fileInputStream, imageFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
       fileInputStream.close();
       
