@@ -19,13 +19,13 @@ public class BotFaqServiceScriptBinding {
 
   
   /**
-  * Gets answers to the question in JSON format
-  * 
-  * @param searchString
-  * @param category
-  * @param baseAPIURL
-  * @return searchResults
-  */
+   * Gets answers to a question in JSON-format
+   * 
+   * @param baseAPIURL url of the faq server
+   * @param searchText search text
+   * @param filterCategoryId category id if you want answers from a specific category
+   * @return answers in JSON-format
+   */
   public String getAnswers(Value baseAPIURL, Value searchText) {
     if ( !searchText.isString() || !baseAPIURL.isString() ) {
       return "";

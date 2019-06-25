@@ -20,19 +20,18 @@ import org.slf4j.Logger;
  *
  */
 public class FaqController {
+  
   @Inject
   private Logger logger;
+  
   /**
    * Gets answers to the question in JSON format
    * 
-   * @param searchString
-   * @param category
-   * @param baseAPIURL
-   * @return searchResults
-   * @throws IOException 
-   * @throws ParseException 
+   * @param baseAPIURL url of the faq server
+   * @param searchText search text
+   * @param filterCategoryId category id if you want answers from a specific category
+   * @return answers
    */
- 
   public String getAnswers(String baseAPIURL, String searchText,String filterCategoryId){
     try {
       URIBuilder builder = new URIBuilder(baseAPIURL);
@@ -61,8 +60,6 @@ public class FaqController {
    * 
    * @param baseAPIURL
    * @return returns categories
-   * @throws ParseException
-   * @throws IOException
    */
   public String getCategories(String baseAPIURL) {
     try {
@@ -110,8 +107,11 @@ public class FaqController {
     try {
       HttpGet httpGet = new HttpGet(uri);
       CloseableHttpClient httpclient = HttpClients.custom().build();
-      CloseableHttpResponse response = httpclient.execute(httpGet);  
-      String inline = EntityUtils.toString(response.getEntity());
+      CloseableHttpResponse response = httpclient.execute(httpGet);
+         
+      String inline = EntityUtils.toString(response.getEntity());  
+      httpclient.close();
+      response.close();
       JSONParser parser = new JSONParser();
       JSONArray jsonArray;
       try {
