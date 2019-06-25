@@ -1,19 +1,17 @@
 package fi.metatavu.metamind.images;
 
 
-import java.io.FileWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.Charset;
 import java.util.UUID;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,8 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import org.slf4j.Logger;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
 import fi.metatavu.metamind.persistence.models.Knot;
@@ -55,47 +51,49 @@ public class ImageServlet extends HttpServlet{
   
   @Override
   protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    System.out.println("Put request");
+    
     try {
       Part file = req.getPart("file");
-      if (file == null) {
+      Part idPart = req.getPart("knotId");
+      if ( file == null || idPart == null ) {
         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
       
       setCorsHeaders(resp);
       String contentType = file.getContentType();
-      UUID knotId = UUID.fromString(req.getPart("knotId").toString());     
+      
+      InputStream knotIdInputStream = idPart.getInputStream();
+      UUID knotId = UUID.fromString(convert(knotIdInputStream,Charset.defaultCharset()));
+      
       Knot knot = knotDAO.findById(knotId);
-      UUID imageFileId = UUID.randomUUID();
+      
+      if ( knot == null ) {
+        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        return;
+      }
       String extension = file.getSubmittedFileName().substring(file.getSubmittedFileName().lastIndexOf("."));
-      
-      String imageURL = "images/"+imageFileId.toString()+extension;
-      
-      knotDAO.updateImage(knot, imageURL, knot.getLastModifierId());   
-      InputStream inputStream = file.getInputStream();
-      FileWriter writer = new FileWriter(imageURL);
-      
-      while(inputStream.available()>0) {
-        writer.write(inputStream.read());
-      }
-      writer.close();
-      
-      Map<String, String> result = new HashMap<>();
-      result.put("fileName", imageFileId.toString()+extension);
-
-      resp.setContentType("application/json");
-      ServletOutputStream servletOutputStream = resp.getOutputStream();
-      try {
-        (new ObjectMapper()).writeValue(servletOutputStream, result);
-      } finally {
-        servletOutputStream.flush();
-      }
+      String fileURL = "images/"+knotId.toString()+extension;
       
     } catch (IOException | ServletException e) {
       logger.error("Upload failed on internal server error", e);
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
+  }
+
+    
+  private String convert(InputStream inputStream, Charset charset) throws IOException {
+   
+    StringBuilder stringBuilder = new StringBuilder();
+    String line = null;
+    
+    try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, charset))) { 
+      while ((line = bufferedReader.readLine()) != null) {
+        stringBuilder.append(line);
+      }
+    }
+   
+    return stringBuilder.toString();
   }
   
   
