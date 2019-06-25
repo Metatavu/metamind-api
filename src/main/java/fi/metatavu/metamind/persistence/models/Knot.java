@@ -69,9 +69,6 @@ public class Knot {
   private OffsetDateTime modifiedAt;
   
 
-  @Column(nullable = false)
-  private String image_url;
-
   public UUID getId() {
     return id;
   }
@@ -160,13 +157,6 @@ public class Knot {
     this.modifiedAt = modifiedAt;
   }
   
-  public String getImageURL() {
-    return image_url;
-  }
-  
-  public void setImageURL(String image_url) {
-    this.image_url = image_url;
-  }
 
   @PrePersist
   public void onCreate() {

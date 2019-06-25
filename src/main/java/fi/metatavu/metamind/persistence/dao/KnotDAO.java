@@ -49,7 +49,6 @@ public class KnotDAO extends AbstractDAO<Knot> {
     knot.setId(id);
     knot.setCreatorId(creatorId);
     knot.setLastModifierId(lastModifierId);
-    knot.setImageURL("");
     return persist(knot);
   }
 
@@ -152,10 +151,6 @@ public class KnotDAO extends AbstractDAO<Knot> {
     return persist(knot);
   }
   
-  public Knot updateImage(Knot knot, String URL, UUID lastModifierId) {
-    knot.setImageURL(URL);
-    return persist(knot);
-  }
   
 
 

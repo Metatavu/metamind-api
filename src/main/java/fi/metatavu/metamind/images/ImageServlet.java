@@ -10,11 +10,14 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +27,8 @@ import javax.servlet.http.Part;
 
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
 import fi.metatavu.metamind.persistence.models.Knot;
@@ -93,6 +98,17 @@ public class ImageServlet extends HttpServlet{
       Files.copy(fileInputStream, imageFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
       fileInputStream.close();
       
+      Map<String, String> result = new HashMap<>();
+      
+      result.put("fileUrl", fileURL);
+
+      resp.setContentType("application/json");
+      ServletOutputStream servletOutputStream = resp.getOutputStream();
+      try {
+        (new ObjectMapper()).writeValue(servletOutputStream, result);
+      } finally {
+        servletOutputStream.flush();
+      }
       resp.setStatus(HttpServletResponse.SC_CREATED);
     } catch (IOException | ServletException e) {
       logger.error("Upload failed on internal server error", e);

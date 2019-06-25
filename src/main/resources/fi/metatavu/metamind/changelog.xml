@@ -55,9 +55,6 @@
       <column name="content" type="longtext">
         <constraints nullable="false"/>
       </column>
-      <column name="image_url" type="varchar(191)">
-        <constraints nullable="false"/>
-      </column>
     </createTable>
     
     <createTable tableName="trainingmaterial">

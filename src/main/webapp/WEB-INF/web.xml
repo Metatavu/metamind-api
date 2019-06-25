@@ -9,4 +9,30 @@
   <module-name>metamind</module-name>
   <distributable/>
   
+   <security-constraint>
+
+    <web-resource-collection>
+
+      <web-resource-name>files</web-resource-name>
+
+      <url-pattern>/v2/images</url-pattern>
+
+    </web-resource-collection>
+
+  </security-constraint>
+
+
+
+  <security-constraint>
+
+    <web-resource-collection>
+
+      <web-resource-name>fileslist</web-resource-name>
+
+      <url-pattern>/v2/images/*</url-pattern>
+
+    </web-resource-collection>
+
+  </security-constraint>
+  
 </web-app>
