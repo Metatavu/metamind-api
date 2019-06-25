@@ -3,6 +3,7 @@ package fi.metatavu.metamind.images;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 
@@ -48,13 +50,29 @@ public class ImageServlet extends HttpServlet{
   
   private void setCorsHeaders(HttpServletResponse resp) {
     resp.setHeader("Access-Control-Allow-Origin", "*");
-    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     resp.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
   }
   @Override 
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
-    PrintWriter out = resp.getWriter();
-    out.println("Hello World");
+    setCorsHeaders(resp);
+    String fileURL = req.getPathInfo();
+    File file = new File("images/"+fileURL);
+    if(!file.exists()) {
+      resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+    resp.setStatus(HttpServletResponse.SC_FOUND);
+    try {
+      ServletOutputStream servletOutputStream = resp.getOutputStream();
+      try (InputStream data = new FileInputStream(file)) {
+        IOUtils.copy(data, servletOutputStream);
+      } finally {
+        servletOutputStream.flush();
+      }
+    } catch (IOException e) {
+      logger.warn("Failed to send response", e);
+    }
   }
   
   @Override
@@ -72,7 +90,7 @@ public class ImageServlet extends HttpServlet{
       setCorsHeaders(resp);
       
       InputStream knotIdInputStream = idPart.getInputStream();
-      UUID knotId = UUID.fromString(convert(knotIdInputStream,Charset.defaultCharset()));
+      UUID knotId = UUID.fromString(convertStreamToString(knotIdInputStream,Charset.defaultCharset()));
       
       Knot knot = knotDAO.findById(knotId);
       
@@ -117,7 +135,7 @@ public class ImageServlet extends HttpServlet{
   }
 
     
-  private String convert(InputStream inputStream, Charset charset) throws IOException {
+  private String convertStreamToString(InputStream inputStream, Charset charset) throws IOException {
    
     StringBuilder stringBuilder = new StringBuilder();
     String line = null;
