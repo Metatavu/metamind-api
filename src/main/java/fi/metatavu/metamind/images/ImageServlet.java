@@ -73,6 +73,20 @@ public class ImageServlet extends HttpServlet{
     }
   }
   
+  @Override 
+  protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+    setCorsHeaders(resp);
+    String fileURL = req.getPathInfo();
+    File file = new File("images/"+fileURL);
+    if(!file.exists()) {
+      resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+    file.delete();
+    resp.setStatus(HttpServletResponse.SC_OK);
+  }
+  
+  
   @Override
   protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     
