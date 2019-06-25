@@ -150,9 +150,4 @@ public class KnotDAO extends AbstractDAO<Knot> {
     knot.setStory(story);
     return persist(knot);
   }
-  
-  
-
-
-
 }
