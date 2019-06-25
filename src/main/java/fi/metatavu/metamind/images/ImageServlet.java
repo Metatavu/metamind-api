@@ -58,13 +58,13 @@ public class ImageServlet extends HttpServlet{
     try {
       Part file = req.getPart("file");
       Part idPart = req.getPart("knotId");
-      if ( file == null || idPart == null ) {
+      String contentType = file.getContentType();
+      if ( file == null || idPart == null || !contentType.startsWith("image") ) {
         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
       
       setCorsHeaders(resp);
-      String contentType = file.getContentType();
       
       InputStream knotIdInputStream = idPart.getInputStream();
       UUID knotId = UUID.fromString(convert(knotIdInputStream,Charset.defaultCharset()));
