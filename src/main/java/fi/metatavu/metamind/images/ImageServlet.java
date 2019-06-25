@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
@@ -34,7 +35,6 @@ import fi.metatavu.metamind.persistence.models.Knot;
 public class ImageServlet extends HttpServlet{
 
   private static final long serialVersionUID = -5737983422302604984L;
-
   @Inject
   private Logger logger;
   
@@ -92,6 +92,8 @@ public class ImageServlet extends HttpServlet{
       
       Files.copy(fileInputStream, imageFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
       fileInputStream.close();
+      
+      resp.setStatus(HttpServletResponse.SC_CREATED);
     } catch (IOException | ServletException e) {
       logger.error("Upload failed on internal server error", e);
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
