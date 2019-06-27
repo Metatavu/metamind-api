@@ -14,12 +14,24 @@ import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 
 
-
+/**
+ * Controller for the custom search functionality
+ * @author simeon
+ *
+ */
 public class CustomSearchController {
   
   @Inject
   Logger logger;
   
+  /**
+   * Gets the search results from the custom search engine based on the search query
+   * 
+   * @param APIKey
+   * @param searchEngineID id for the custom search engine
+   * @param searchQuery
+   * @return search results
+   */
   public String getSearchResults(String APIKey, String searchEngineID, String searchQuery) {
     try {
       URIBuilder uriBuilder = new URIBuilder("https://www.googleapis.com/customsearch/v1");

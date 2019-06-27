@@ -19,6 +19,9 @@ public class BotServicesScriptBinding {
   
   @Inject
   private BotWekaServiceScriptBinding weka;
+  
+  @Inject
+  private BotCustomSearchServiceScriptBinding customSearch;
 
   /**
    * Returns email service
@@ -45,6 +48,15 @@ public class BotServicesScriptBinding {
    */
   public BotWekaServiceScriptBinding weka() {
     return weka;
+  }
+  
+  /**
+   * Returns custom search services
+   * 
+   * @return custom search services
+   */
+  public BotCustomSearchServiceScriptBinding customSearch() {
+    return customSearch();
   }
 
 }
