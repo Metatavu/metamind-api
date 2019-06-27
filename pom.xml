@@ -102,6 +102,9 @@
     <!-- Weka -->
     <weka.version>3.8.3</weka.version>
     
+    <!-- Json-simple -->
+    <json-simple.version>1.1.1</json-simple.version>
+    
     <!-- Test -->
     
     <jsonassert.version>1.5.0</jsonassert.version>
@@ -489,6 +492,14 @@
       <artifactId>weka-stable</artifactId>
       <version>${weka.version}</version>
     </dependency>
+    
+    <!--  json-simple -->
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>${json-simple.version}</version>
+    </dependency>
+    
 
   </dependencies>
   
@@ -502,7 +513,7 @@
       
       <properties>
         <it.port.http>58080</it.port.http>
-        <it.host>api-itest.metamind.fi</it.host>
+        <it.host>dev.metamind.fi</it.host>
         <it.jdbc.driver>org.mariadb.jdbc.MySQLDataSource</it.jdbc.driver>
         <it.jdbc.module>com.mariadb.jdbc</it.jdbc.module>
         <it.jdbc.dbname>mmtest</it.jdbc.dbname>
@@ -603,7 +614,7 @@
                 <log>${project.basedir}/target/cargo.log</log>
                 <output>${project.basedir}/target/wildfly.log</output>
                 <zipUrlInstaller>
-                  <url>http://download.jboss.org/wildfly/${wildfly.version}/wildfly-${wildfly.version}.zip</url>
+                  <url>https://download.jboss.org/wildfly/${wildfly.version}/wildfly-${wildfly.version}.zip</url>
                   <downloadDir>${project.basedir}/.cargo/downloads</downloadDir>
                   <extractDir>${project.basedir}/.cargo/extracts</extractDir>
                 </zipUrlInstaller>
