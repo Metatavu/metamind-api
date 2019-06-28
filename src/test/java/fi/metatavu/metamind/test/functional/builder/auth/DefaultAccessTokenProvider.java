@@ -34,7 +34,7 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
   private String accessToken;
   private OffsetDateTime expires; 
   
-  public DefaultAccessTokenProvider(String realm, String clientId, String username, String password, String clientSecret) {
+  public DefaultAccessTokenProvider(String realm, String clientId, String username, String password, String clientSecret) throws IOException {
     super();
     this.realm = realm;
     this.clientId = clientId;
@@ -67,7 +67,7 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
     String response = request.post(path)
       .getBody()
       .asString(); 
-
+    
     Map<String, Object> responseMap = readJsonMap(response);
     accessToken = (String) responseMap.get("access_token");
     Integer expiresIn = (Integer) responseMap.get("expires_in");
@@ -77,7 +77,6 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
       .minus(EXPIRE_SLACK, ChronoUnit.SECONDS);
     
     assertNotNull(response, accessToken);
-    
     return accessToken;
   }
   
