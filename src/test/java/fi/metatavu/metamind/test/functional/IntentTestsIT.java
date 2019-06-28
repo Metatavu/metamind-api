@@ -25,7 +25,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
       Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
       Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
 
-      assertNotNull(builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1));
+      assertNotNull(builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, null, null, null, null));
     }
   }
   
@@ -48,7 +48,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
       Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
-      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);
+      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, null, null, null, null);
       
       builder.admin().intents().assertFindFailStatus(story.getId(), 404, UUID.randomUUID());
       builder.admin().intents().assertFindFailStatus(UUID.randomUUID(), 404, createdIntent.getId());
@@ -65,7 +65,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
 //      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
 //      Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
 //      Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
-//      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);
+//      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1,  null, null, null, null);
 //      
 //      assertNotNull(builder.admin().intents().findIntent(story, createdIntent));
 //      builder.invalid().intents().assertFindFailStatus(story.getId(), 403, createdIntent.getId());
@@ -79,7 +79,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
       Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
-      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);
+      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, null, null, null, null);
 
       Intent updateIntent = builder.admin().intents().findIntent(story, createdIntent);
       updateIntent.setName("Updated intent");
@@ -105,7 +105,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
 //      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
 //      Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
 //      Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
-//      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);
+//      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1,  null, null, null, null);
 //
 //      builder.anonymous().intents().assertUpdateFailStatus(story, 401, createdIntent);
 //      builder.invalid().intents().assertUpdateFailStatus(story, 403, createdIntent);
@@ -118,7 +118,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
       Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
-      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);
+      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, null, null, null, null);
       Intent foundIntent = builder.admin().intents().findIntent(story, createdIntent);
       assertEquals(createdIntent.getId(), foundIntent.getId());
       builder.admin().intents().delete(story, createdIntent);
@@ -134,7 +134,7 @@ public class IntentTestsIT extends AbstractFunctionalTest {
 //      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
 //      Knot sourceKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content");
 //      Knot targetKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content");
-//      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1);
+//      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, null, null, null, null);
 //
 //      builder.anonymous().intents().assertDeleteFailStatus(story, 401, createdIntent);
 //      builder.invalid().intents().assertDeleteFailStatus(story, 403, createdIntent);
