@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.test.functional.builder;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -18,11 +19,15 @@ import fi.metatavu.metamind.test.functional.builder.auth.TestBuilderAuthenticati
 public class TestBuilder implements AutoCloseable {
 
   private static final String REALM = "test";
-  private static final String CLIENT_ID = "ui";
-  private static final String ADMIN_USER = "admin@example.com";
-  private static final String ADMIN_PASSWORD = "test";
+  private static final String CLIENT_ID = "api";
+  private static final String ADMIN_USER = "admin";
+  private static final String ADMIN_PASSWORD = "admin";
+  private static final String MANAGER_USER = "manager";
+  private static final String MANAGER_PASSWORD = "manager";
+  private static final String CLIENT_SECRET = "1be749de-2023-4ebf-aba0-90679ffab56b";
 
   private TestBuilderAuthentication admin;
+  private TestBuilderAuthentication manager;
   private TestBuilderAuthentication invalid;
   private TestBuilderAuthentication anonymous;
   private List<CloseableResource<?, ?>> closables = new ArrayList<>();
@@ -31,13 +36,29 @@ public class TestBuilder implements AutoCloseable {
    * Returns admin authenticated authentication resource
    * 
    * @return admin authenticated authentication resource
+   * @throws IOException 
    */
-  public TestBuilderAuthentication admin() {
+  public TestBuilderAuthentication admin() throws IOException {
     if (admin != null) {
+//      System.out.println("ADMIN SPOTTED");
       return admin;
     }
 
-    return admin = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, null));
+    return admin = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, CLIENT_SECRET));
+  }
+  
+  /**
+   * Returns manager authenticated authentication resource
+   * 
+   * @return manager authenticated authentication resource
+   * @throws IOException 
+   */
+  public TestBuilderAuthentication manager() throws IOException {
+    if (manager != null) {
+      return manager;
+    }
+
+    return manager = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, MANAGER_USER, MANAGER_PASSWORD, CLIENT_SECRET));
   }
 
   /**
