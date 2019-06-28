@@ -205,6 +205,25 @@
   </build>
 
   <dependencies>
+  
+    <!-- Keycloak admin client -->
+  
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-admin-client</artifactId>
+      <version>${keycloak.version}</version>
+      <exclusions>      
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-core</artifactId>
+        </exclusion>      
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_4.0_spec</artifactId>
@@ -695,16 +714,16 @@
                     <command>/system-property=it-test:add(value="true")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-client-id:read-resource</command>
-                    <command>/system-property=keycloak-admin-client-id:add(value="admin-cli")</command>
+                    <command>/system-property=keycloak-admin-client-id:add(value="api")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-client-secret:read-resource</command>
-                    <command>/system-property=keycloak-admin-client-secret:add(value="041e7b11-70a1-4beb-a59a-c1de3fde1cf8")</command>
+                    <command>/system-property=keycloak-admin-client-secret:add(value="1be749de-2023-4ebf-aba0-90679ffab56b")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-password:read-resource</command>
-                    <command>/system-property=keycloak-admin-password:add(value="api-admin")</command>
+                    <command>/system-property=keycloak-admin-password:add(value="admin")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-user:read-resource</command>
-                    <command>/system-property=keycloak-admin-user:add(value="api-admin")</command>
+                    <command>/system-property=keycloak-admin-user:add(value="admin")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-realm:read-resource</command>
                     <command>/system-property=keycloak-admin-realm:add(value="test")</command>
