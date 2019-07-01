@@ -14,21 +14,17 @@ import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.keycloak.KeycloakPrincipal;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.GroupPoliciesResource;
 import org.keycloak.admin.client.resource.GroupsResource;
-import org.keycloak.admin.client.resource.PermissionsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.ResourcePermissionsResource;
 import org.keycloak.admin.client.resource.ResourcesResource;
@@ -356,7 +352,11 @@ public class AuthenticationController {
     
     
   
-  
+  /**
+   * Gets user from a current login session
+   * 
+   * @return
+   */
   public UUID getUserFromSession() {
     UUID result = new UUID(0L, 0L);
     Keycloak keycloak = getAdminClient();

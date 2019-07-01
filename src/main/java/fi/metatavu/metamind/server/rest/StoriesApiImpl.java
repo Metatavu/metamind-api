@@ -2,7 +2,6 @@ package fi.metatavu.metamind.server.rest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -12,21 +11,13 @@ import java.util.stream.Collectors;
 
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.authorization.DecisionStrategy;
-import org.keycloak.representations.idm.authorization.ResourceRepresentation;
-
-import com.google.common.collect.Sets;
-
 import fi.metatavu.metamind.bot.BotController;
 import fi.metatavu.metamind.bot.BotResponse;
 import fi.metatavu.metamind.bot.BotRuntimeContext;
@@ -41,7 +32,6 @@ import fi.metatavu.metamind.rest.api.StoriesApi;
 import fi.metatavu.metamind.rest.model.Intent;
 import fi.metatavu.metamind.rest.model.IntentTrainingMaterials;
 import fi.metatavu.metamind.rest.model.Knot;
-import fi.metatavu.metamind.rest.model.KnotType;
 import fi.metatavu.metamind.rest.model.Story;
 import fi.metatavu.metamind.rest.model.TokenizerType;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
