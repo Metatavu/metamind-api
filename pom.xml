@@ -114,6 +114,7 @@
     <rest-assured.version>3.0.3</rest-assured.version>
     <mariadb-module.version>2.3.0</mariadb-module.version>
     <metamind-api-client.version>2.0.11</metamind-api-client.version>
+    <feign-uma.version>1.0.2-SNAPSHOT</feign-uma.version>
   
     <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>
     <skipCoverage>true</skipCoverage>
@@ -211,6 +212,44 @@
   </build>
 
   <dependencies>
+  
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-core</artifactId>
+      <version>${keycloak.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-adapter-spi</artifactId>
+      <version>${keycloak.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-adapter-core</artifactId>
+      <version>${keycloak.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+	<dependency>
+	  <groupId>org.keycloak</groupId>
+	  <artifactId>keycloak-admin-client</artifactId>
+	  <version>${keycloak.version}</version>
+	  <exclusions>
+	    <exclusion>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-core</artifactId>
+		</exclusion>
+		<exclusion>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-databind</artifactId>
+		</exclusion>
+	  </exclusions>
+	</dependency>
+  
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_4.0_spec</artifactId>
@@ -294,6 +333,12 @@
       <artifactId>jboss-ejb-api_3.2_spec</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+     <groupId>org.wildfly</groupId>
+     <artifactId>wildfly-ejb3</artifactId>
+     <scope>provided</scope>
+    </dependency>	
     
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -469,6 +514,12 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>fi.metatavu.feign</groupId>
+      <artifactId>feign-uma</artifactId>
+      <version>${feign-uma.version}</version>
     </dependency>
     
     <dependency>
@@ -716,27 +767,29 @@
                     <command>/system-property=it-test:add(value="true")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-client-id:read-resource</command>
-                    <command>/system-property=keycloak-admin-client-id:add(value="admin-cli")</command>
+                    <command>/system-property=keycloak-admin-client-id:add(value="api")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-client-secret:read-resource</command>
-                    <command>/system-property=keycloak-admin-client-secret:add(value="041e7b11-70a1-4beb-a59a-c1de3fde1cf8")</command>
+                    <command>/system-property=keycloak-admin-client-secret:add(value="1be749de-2023-4ebf-aba0-90679ffab56b")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-password:read-resource</command>
-                    <command>/system-property=keycloak-admin-password:add(value="api-admin")</command>
+                    <command>/system-property=keycloak-admin-password:add(value="admin")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-user:read-resource</command>
-                    <command>/system-property=keycloak-admin-user:add(value="api-admin")</command>
+                    <command>/system-property=keycloak-admin-user:add(value="admin")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-realm:read-resource</command>
                     <command>/system-property=keycloak-admin-realm:add(value="test")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /system-property=keycloak-admin-server-url:read-resource</command>
                     <command>/system-property=keycloak-admin-server-url:add(value="http://localhost:8280/auth")</command>
-                    <command>end-if</command>                    
-                    <command>if (outcome != success) of /subsystem=keycloak/secure-deployment=metamind-api.war:read-resource</command>
-                    <command>/subsystem=keycloak/secure-deployment=metamind-api.war:add(realm="test", auth-server-url="http://localhost:8280/auth",bearer-only=true,ssl-required="EXTERNAL",resource="api")</command>
-                    <command>/subsystem=security/security-domain=keycloak/:add</command>
-                    <command>/subsystem=security/security-domain=keycloak/authentication=classic/:add(login-modules=[{ "code" => "org.keycloak.adapters.jboss.KeycloakLoginModule","flag" => "required"}])</command>
+                    <command>end-if</command> 
+					<command>if (outcome != success) of /system-property=keycloak.config-path:read-resource</command>
+					<command>/system-property=keycloak.config-path:add(value="${project.basedir}/scripts/keycloak.json")</command>
+                    <command>end-if</command> 
+					<command>if (outcome != success) of /subsystem=keycloak/secure-deployment=metamind.war:read-resource</command>
+                    <command>/subsystem=keycloak/secure-deployment=metamind.war:add(realm="test", auth-server-url="http://localhost:8280/auth",bearer-only=true,ssl-required="EXTERNAL",resource="api")</command>
+                    <command>/subsystem=keycloak/secure-deployment=metamind.war/credential=secret:add(value="1be749de-2023-4ebf-aba0-90679ffab56b")</command>
                     <command>end-if</command>
                     <command>if (outcome != success) of /subsystem=logging/logger=org.keycloak.adapters.BearerTokenRequestAuthenticator:read-resource</command>
                     <command>/subsystem=logging/logger=org.keycloak.adapters.BearerTokenRequestAuthenticator:add(level=FATAL)</command>
