@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.net.HttpRetryException;
 import java.util.UUID;
 
 import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
@@ -15,6 +16,7 @@ import com.oracle.truffle.js.nodes.cast.JSToPrimitiveNode.Hint;
 
 import feign.Body;
 import feign.FeignException;
+import feign.RetryableException;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.KnotsApi;
 import fi.metatavu.metamind.client.StoriesApi;
@@ -126,6 +128,7 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
       assertEquals(expectedStatus, e.status());
     }
   }
+  
 
   /**
    * Asserts update status fails with given status code

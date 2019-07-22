@@ -4,11 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.net.HttpRetryException;
 import java.util.UUID;
 
 import org.json.JSONException;
 
 import feign.FeignException;
+import feign.RetryableException;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.StoriesApi;
 import fi.metatavu.metamind.client.model.Story;
@@ -113,11 +115,12 @@ public class StoryTestBuilderResource extends AbstractTestBuilderResource<Story,
    * @param locale locale
    * @param name name
    */
-  public void assertCreateFailStatus(int expectedStatus, String locale, String name) {
+  public void assertCreateFailStatus(int expectedStatus, String locale, String name, String hintMessage) {
     try {
       Story story = new Story();
       story.setLocale(locale);
       story.setName(name);
+      story.setDafaultHint(hintMessage);
       getApi().createStory(story);
       fail(String.format("Expected create to fail with status %d", expectedStatus));
     } catch (FeignException e) {
@@ -183,6 +186,7 @@ public class StoryTestBuilderResource extends AbstractTestBuilderResource<Story,
 
   @Override
   public void clean(Story story) {
+    System.out.println("Deleting story..." + story.getId());
     getApi().deleteStory(story.getId());  
   }
 
