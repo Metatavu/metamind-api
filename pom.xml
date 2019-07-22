@@ -102,9 +102,6 @@
     <!-- Weka -->
     <weka.version>3.8.3</weka.version>
     
-    <!-- Json-simple -->
-    <json-simple.version>1.1.1</json-simple.version>
-    
     <!-- Test -->
     
     <jsonassert.version>1.5.0</jsonassert.version>
@@ -542,13 +539,6 @@
       <groupId>nz.ac.waikato.cms.weka</groupId>
       <artifactId>weka-stable</artifactId>
       <version>${weka.version}</version>
-    </dependency>
-    
-    <!--  json-simple -->
-    <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-	  <artifactId>json-simple</artifactId>
-	  <version>${json-simple.version}</version>
     </dependency>
 
   </dependencies>
