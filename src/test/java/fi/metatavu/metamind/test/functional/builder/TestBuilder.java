@@ -41,7 +41,6 @@ public class TestBuilder implements AutoCloseable {
    */
   public TestBuilderAuthentication admin() throws IOException {
     if (admin != null) {
-//      System.out.println("ADMIN SPOTTED");
       return admin;
     }
 
@@ -119,12 +118,9 @@ public class TestBuilder implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    System.out.println("Going to close");
     for (int i = closables.size() - 1; i >= 0; i--) {
-      System.out.println("Closing..." + i + "/" + closables.size());
       closables.get(i).close();
     }
-    System.out.println("Closed everything");
 //    admin = null;
   }
 

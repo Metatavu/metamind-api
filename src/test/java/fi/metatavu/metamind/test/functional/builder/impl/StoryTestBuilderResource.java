@@ -186,7 +186,6 @@ public class StoryTestBuilderResource extends AbstractTestBuilderResource<Story,
 
   @Override
   public void clean(Story story) {
-    System.out.println("Deleting story..." + story.getId());
     getApi().deleteStory(story.getId());  
   }
 

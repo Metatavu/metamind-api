@@ -117,7 +117,7 @@ public class AuthenticationController {
     
     ResourceRepresentation resource = new ResourceRepresentation(name, scopeRepresentations, uri, type);
     resources.create(resource);
-    System.out.println("!!!CREATED RESOURCE _----- " + resource.getName());
+//    System.out.println("!!!CREATED RESOURCE _----- " + resource.getName());
     
     List<ResourceRepresentation> foundResources = resources.findByName(name);
     if (foundResources.isEmpty()) {
@@ -146,7 +146,6 @@ public class AuthenticationController {
       return null;
     }
     UUID foundResourceId = UUID.fromString(dsdStrings.get(0));
-    System.out.println("LISTTT " + dsdStrings);
     
     return foundResourceId;
   }
@@ -154,13 +153,12 @@ public class AuthenticationController {
   /**
    * Creates new scope permission for resource
    * 
-   * @param ownerId
-   * @param realmName
-   * @param resourceId
-   * @param scopes
-   * @param name
-   * @param decisionStrategy
-   * @param policyIds
+   * @param realmName String realmName
+   * @param resourceId UUID resourceId
+   * @param scopes AuthorizationScope collection
+   * @param name String name
+   * @param decisionStrategy decisionStrategy
+   * @param policyIds UUID list
    */
   public String upsertResourcePermission(String realmName, UUID resourceId, Collection<AuthorizationScope> scopes,
       String name, DecisionStrategy decisionStrategy, List<UUID> policyIds) {
@@ -173,21 +171,12 @@ public class AuthenticationController {
     ResourcePermissionsResource resourceResource = realm.clients().get(client.getId()).authorization().permissions().resource();    
     ResourcePermissionRepresentation existingPermission = resourceResource.findByName(name);
     
-    System.out.println("POLICY ID's ARE" + policyIds);
     
     ResourcePermissionRepresentation representation = new ResourcePermissionRepresentation();
     representation.setDecisionStrategy(decisionStrategy);
     representation.setName(name);
     representation.setResources(Collections.singleton(resourceId.toString()));
     representation.setPolicies(policyIds.stream().map(UUID::toString).collect(Collectors.toSet()));
-    
-    ObjectMapper objectMapper = new ObjectMapper();
-    
-    try {
-      System.out.println("Created policies: " + objectMapper.writeValueAsString(representation));
-    } catch (JsonProcessingException e1) {
-      e1.printStackTrace();
-    }
     
     result = representation.getName();
     Response response = resourceResource.create(representation);
@@ -210,20 +199,18 @@ public class AuthenticationController {
     } finally {
       response.close();
     }
-    System.out.println("PERMISSION NAME is ..............." + result);
     return result;
   }
   
   /**
    * Creates new scope permission for resource
    * 
-   * @param ownerId
-   * @param realmName
-   * @param resourceId
-   * @param scopes
-   * @param name
-   * @param decisionStrategy
-   * @param policyIds
+   * @param realmName String realmName
+   * @param resourceId UUID resourceId
+   * @param scopes AuthorizationScope collection
+   * @param name String name
+   * @param decisionStrategy decisionStrategy
+   * @param policyIds UUID collection
    */
   public String upsertScopePermission(String realmName, UUID resourceId, Collection<AuthorizationScope> scopes, String name, DecisionStrategy decisionStrategy,
       Collection<UUID> policyIds) {
@@ -242,13 +229,6 @@ public class AuthenticationController {
     representation.setScopes(scopes.stream().map(AuthorizationScope::getName).collect(Collectors.toSet()));
     representation.setPolicies(policyIds.stream().map(UUID::toString).collect(Collectors.toSet()));
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
-    try {
-      System.out.println("Created policies: " + objectMapper.writeValueAsString(representation));
-    } catch (JsonProcessingException e1) {
-      e1.printStackTrace();
-    }
     result = representation.getName();
     Response response = scopeResource.create(representation);
     try {
@@ -337,8 +317,6 @@ public class AuthenticationController {
     UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
     
     List<UserRepresentation> existingUsers = users.list().stream().collect(Collectors.toList());
-//    List<UUID> existingUsersId = existingUsers.stream().map(user -> UUID.fromString(user.getId())).collect(Collectors.toList());
-//    System.out.println("EXISTING IDIDIDID USERS ARE " + existingUsersId);
     
     for (UserRepresentation userRep : existingUsers) {
       UUID userId = UUID.fromString(userRep.getId());
@@ -356,36 +334,12 @@ public class AuthenticationController {
         policyRepresentation.setId(userId.toString());
         userPolicies.create(policyRepresentation);
         String policyId = policyRepresentation.getId();
-//        System.out.println("POLICY ID IS " + policyId);
 
       }
     }
-//     System.out.println("Result IS > " + result);
      return result; 
     }
     
-    
-  
-//  /**
-//   * Gets user from a current login session
-//   * 
-//   * @return
-//   */
-//  public UUID getUserFromSession() {
-//    UUID result = new UUID(0L, 0L);
-//    Keycloak keycloak = getAdminClient();
-//    List<ClientRepresentation> clientRepresentation = keycloak.realm("test").clients().findByClientId("api");
-//    ClientRepresentation representation = clientRepresentation.get(0);
-//    ClientResource resource = keycloak.realm("test").clients().get(representation.getId());
-//    List<UserSessionRepresentation> counter = resource.getUserSessions(0, 1000);
-//    UserSessionRepresentation session = Iterables.getLast(counter);
-//    String sessionUname = session.getUsername();
-//    UserRepresentation accountUser = resource.getServiceAccountUser();
-//    System.out.println("Uname is " + sessionUname);
-//    UUID loggedUserId = UUID.fromString(session.getUserId());
-//    
-//    return loggedUserId;     
-//  }
 
   
   /**

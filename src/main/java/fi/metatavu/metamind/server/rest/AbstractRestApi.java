@@ -45,7 +45,6 @@ public abstract class AbstractRestApi {
     if (remoteUser == null) {
       return ANONYMOUS_USER_ID;
     }
-    System.out.println("Remote user id is: " + remoteUser);
     return UUID.fromString(remoteUser);
   }
 

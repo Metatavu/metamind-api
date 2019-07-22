@@ -43,13 +43,10 @@ public class TestBuilderAuthentication extends AbstractTestBuilderAuthentication
     ApiClient result = new ApiClient();
     String accessToken = accessTokenProvider.getAccessToken();
     String authorization = accessToken != null ? String.format("Bearer %s", accessToken) : null;
-//    System.out.println("Access token is equal to: " + accessToken);
     ApiClient apiClient = authorization != null ? new ApiClient("BearerAuth", authorization) : new ApiClient();
-//    System.out.println("Authorization is equal to: " + authorization);
     String basePath = String.format("http://%s:%d/v2", TestSettings.getHost(), TestSettings.getPort());
     if (accessToken != null) {
       Builder feignBuilder = apiClient.getFeignBuilder();
-      System.out.println("Entering umaDecoder");
       feignBuilder.errorDecoder(new UmaErrorDecoder(feignBuilder, authorization, (rpiAuthorization) -> {
         apiClient.setApiKey(rpiAuthorization);
       }));
