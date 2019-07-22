@@ -34,7 +34,7 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
   private String accessToken;
   private OffsetDateTime expires; 
   
-  public DefaultAccessTokenProvider(String realm, String clientId, String username, String password, String clientSecret) {
+  public DefaultAccessTokenProvider(String realm, String clientId, String username, String password, String clientSecret) throws IOException {
     super();
     this.realm = realm;
     this.clientId = clientId;
@@ -64,10 +64,11 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
       request.formParam("client_secret", clientSecret);
     }
 
+    System.out.println(String.format("Parametres %s:%s:%s:%s", clientId, username, password, clientSecret));
     String response = request.post(path)
       .getBody()
       .asString(); 
-
+    
     Map<String, Object> responseMap = readJsonMap(response);
     accessToken = (String) responseMap.get("access_token");
     Integer expiresIn = (Integer) responseMap.get("expires_in");

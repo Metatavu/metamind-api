@@ -1,7 +1,12 @@
 package fi.metatavu.metamind.test.functional.builder.auth;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
+import feign.Response;
+import feign.Feign.Builder;
+import feign.codec.ErrorDecoder;
+import fi.metatavu.feign.UmaErrorDecoder;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 import fi.metatavu.metamind.test.functional.settings.TestSettings;
@@ -12,6 +17,7 @@ import fi.metatavu.metamind.test.functional.settings.TestSettings;
  * @author Antti Leppä
  */
 public class TestBuilderAuthentication extends AbstractTestBuilderAuthentication {
+  
   
   private AccessTokenProvider accessTokenProvider;
 
@@ -34,10 +40,21 @@ public class TestBuilderAuthentication extends AbstractTestBuilderAuthentication
    */
   @Override
   protected ApiClient createClient() throws IOException {
+    ApiClient result = new ApiClient();
     String accessToken = accessTokenProvider.getAccessToken();
     String authorization = accessToken != null ? String.format("Bearer %s", accessToken) : null;
+//    System.out.println("Access token is equal to: " + accessToken);
     ApiClient apiClient = authorization != null ? new ApiClient("BearerAuth", authorization) : new ApiClient();
+//    System.out.println("Authorization is equal to: " + authorization);
     String basePath = String.format("http://%s:%d/v2", TestSettings.getHost(), TestSettings.getPort());
+    if (accessToken != null) {
+      Builder feignBuilder = apiClient.getFeignBuilder();
+      System.out.println("Entering umaDecoder");
+      feignBuilder.errorDecoder(new UmaErrorDecoder(feignBuilder, authorization, (rpiAuthorization) -> {
+        apiClient.setApiKey(rpiAuthorization);
+      }));
+    }
+    
     apiClient.setBasePath(basePath);
     return apiClient;
   }
