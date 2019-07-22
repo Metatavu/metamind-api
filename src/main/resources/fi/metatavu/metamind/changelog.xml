@@ -387,12 +387,29 @@
     </addColumn>
   </changeSet>
   
-  <changeSet id="default-hint-for-story" author="Daniil Smirnov">
+  <changeSet id="default-hint-for-story-fix" author="Daniil Smirnov">
     <addColumn tableName="story">
       <column name="defaulthint" type="varchar(191)">
         <constraints nullable="true"/>
       </column>
     </addColumn>
+  </changeSet>
+  
+  <changeSet id="intenttrainingmaterial-id-fix" author="Daniil Smirnov" >
+    <update tableName="intenttrainingmaterial">
+      <column name="trainingmaterial_id" type="binary(16)">
+        <constraints nullable="true"/>
+      </column>
+    </update>
+  </changeSet>
+  
+  <changeSet id="knotstorymodel-fk-remove" author="Daniil Smirnov" >
+    <dropForeignKeyConstraint baseTableName="knot" constraintName="FK_KNOT_STORY"/>
+  </changeSet>
+  
+  <changeSet id="knotstorymodel-fk-correct" author="Daniil Smirnov" >
+    <addForeignKeyConstraint baseColumnNames="story_id"
+            baseTableName="knot" constraintName="FK_KNOT_STORY" onDelete="CASCADE" onUpdate="CASCADE" referencedColumnNames="id" referencedTableName="story"/>
   </changeSet>
   
 </databaseChangeLog>
