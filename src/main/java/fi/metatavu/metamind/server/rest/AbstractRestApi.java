@@ -39,13 +39,13 @@ public abstract class AbstractRestApi {
    * 
    * @return logged user id
    */
-  protected UUID getLoggerUserId() {
+  protected UUID getLoggerUserId() { 
     HttpServletRequest httpServletRequest = getHttpServletRequest();
     String remoteUser = httpServletRequest.getRemoteUser();
     if (remoteUser == null) {
       return ANONYMOUS_USER_ID;
     }
-    
+    System.out.println("Remote user id is: " + remoteUser);
     return UUID.fromString(remoteUser);
   }
 
@@ -106,6 +106,21 @@ public abstract class AbstractRestApi {
     entity.setMessage(message);
     return Response
       .status(Response.Status.FORBIDDEN)
+      .entity(entity)
+      .build();
+  }
+  
+  /**
+   * Constructs unauthorized response
+   * 
+   * @param message message
+   * @return response
+   */
+  protected Response createUnauthorized(String message) {
+    ErrorResponse entity = new ErrorResponse();
+    entity.setMessage(message);
+    return Response
+      .status(Response.Status.UNAUTHORIZED)
       .entity(entity)
       .build();
   }
