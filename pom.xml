@@ -114,7 +114,7 @@
     <rest-assured.version>3.0.3</rest-assured.version>
     <mariadb-module.version>2.3.0</mariadb-module.version>
     <metamind-api-client.version>2.0.11</metamind-api-client.version>
-    <feign-uma.version>1.0.2-SNAPSHOT</feign-uma.version>
+    <feign-uma.version>1.0.2</feign-uma.version>
   
     <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>
     <skipCoverage>true</skipCoverage>
