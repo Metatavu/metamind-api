@@ -4,28 +4,27 @@ dist: trusty
 jdk: oraclejdk8
 cache:
   directories:
-  - $HOME/.sonar
-  - $HOME/.m2
-  
+  - "$HOME/.sonar"
+  - "$HOME/.m2"
 addons:
   hosts:
-    - api-itest.metamind.fi
+  - api-itest.metamind.fi
   apt:
     packages:
-      - oracle-java8-installer
-  mariadb: '10.3'    
+    - oracle-java8-installer
+  mariadb: '10.3'
 install: true
-
 before_script:
-  - echo -e "[mysqld]\nlower-case-table-names = 1" | sudo tee -a /etc/mysql/my.cnf
-  - sudo service mysql restart
-  - mysql -u root < scripts/setup-db.sql
-  - scripts/start-keycloak.sh
-  
+- echo -e "[mysqld]\nlower-case-table-names = 1" | sudo tee -a /etc/mysql/my.cnf
+- sudo service mysql restart
+- mysql -u root < scripts/setup-db.sql
+- scripts/start-keycloak.sh
 script:
-  - . travis.sh
-
+- ". travis.sh"
 notifications:
   email: false
   webhooks:
-    - http://travis.metatavu.io:7333/travisping
+  - http://travis.metatavu.io:7333/travisping
+env:
+  global:
+    secure: bIeE/VcAltReLdhTnyeSiCQ/4jmck9mhZkdBmqTCOVvFFVNfAoNT9T+5SyvmlyLytP7Az/vZpm7Q7tVbKg5bduecChUpe7rKRCIb1CPMueKG6vp1O2t/eRMnebUudnLfpXwBdM7pIuqp7lAZ3nURW4gokSQ4ZCMKPqOqpwe+32pjil85GLeMHhYoqryOzJot/AjDN5dsm5PbhmcU2kFcBLiC1YA2dGbWcALTEpdf3tPxnIbNC2l5NWnMWhkOBdIezx/5b01Hpkq/2h02uPqon0OuTWEvL70SnZdRu6Or9U47xffDS/hc7i48Ytx4SjtwlUN4/TjO5Jeo9FjzqtejSgBGxi3LOKnD0RiXfk9A0yTvLtj9153RK1RIlgIi/+FhUk8zZwsUWVCAO9CUPWrFQFkk1hBxQhMuzt+8Vh/CxoWE/bhtmzU7fBY4DmlDsS6gAmUfKoWd8To7lbCbgluINFoKsTX1vLSBV3wCkZJDFDp7geYgRSYrjT/IiJ8YT3CvyuhvuaqYZKO/8uEF3IwtTsz/VNcg9EYVLmVK7JJMDYr1Sbe/8Uakad2BME4Rmhv2tccGyhDICMeQt1AshFdhMrpBgQ2d+HnPkz5SFqloOdNvaDnrxeRl3Pb+PEmiCEvF1jmWHwO9HkIPceY6ldcNnJ953xHMNYwH3uwmQDMCIjw=
