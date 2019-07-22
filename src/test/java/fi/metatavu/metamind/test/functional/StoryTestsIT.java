@@ -19,14 +19,15 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       assertNotNull(builder.admin().stories().create("en", "test story", "Enter your answer"));
     }
   }
-  // TODO Uncomment test when permissions are done
-//  @Test
-//  public void testCreateStoryPermissions() throws Exception {
-//    try (TestBuilder builder = new TestBuilder()) {
-//      builder.invalid().stories().assertCreateFailStatus(403, "en", "test story");
-//      builder.anonymous().stories().assertCreateFailStatus(401, "en", "test story");
-//    }
-//  }
+  
+
+  @Test
+  public void testCreateStoryPermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      builder.invalid().stories().assertCreateFailStatus(403, "en", "test story", "Enter your answer");
+      builder.anonymous().stories().assertCreateFailStatus(401, "en", "test story", "Enter your answer");
+    }
+  }
 
   @Test
   public void testFindStory() throws Exception {
@@ -39,18 +40,18 @@ public class StoryTestsIT extends AbstractFunctionalTest {
   }
 
   // TODO Uncomment test when permissions are done
-//  @Test
-//  public void testFindStoryPermissions() throws Exception {
-//    try (TestBuilder builder = new TestBuilder()) {
-//      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
-//
-//      assertNotNull(builder.admin().stories().findStory(createdStory.getId()));
-//
-//      builder.invalid().stories().assertFindFailStatus(403, createdStory.getId());
-//      builder.anonymous().stories().assertFindFailStatus(401, createdStory.getId());
-//
-//    }
-//  }
+  @Test
+  public void testFindStoryPermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
+
+      assertNotNull(builder.admin().stories().findStory(createdStory.getId()));
+
+      builder.invalid().stories().assertFindFailStatus(403, createdStory.getId());
+      builder.anonymous().stories().assertFindFailStatus(401, createdStory.getId());
+
+    }
+  }
 
   @Test
   public void testUpdateStory() throws Exception {
@@ -73,16 +74,17 @@ public class StoryTestsIT extends AbstractFunctionalTest {
     }
   }
 
-  // TODO Uncomment test when permissions are done
-//  @Test
-//  public void testUpdateStoryPermissions() throws Exception {
-//    try (TestBuilder builder = new TestBuilder()) {
-//      Story testStory = builder.admin().stories().create("en", "test story", "Enter your answer");
-//
-//      builder.anonymous().stories().assertUpdateFailStatus(401, testStory);
-//      builder.invalid().stories().assertUpdateFailStatus(403, testStory);
-//    }
-//  }
+
+  @Test
+  public void testUpdateStoryPermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story testStory = builder.admin().stories().create("en", "test story", "Enter your answer");
+      System.out.println("testStory id id: " + testStory.getId());
+      builder.anonymous().stories().assertUpdateFailStatus(401, testStory);
+      builder.invalid().stories().assertUpdateFailStatus(403, testStory);
+      
+    }
+  }
 
   @Test
   public void testDeleteStory() throws Exception {
@@ -94,14 +96,14 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       builder.admin().stories().assertDeleteFailStatus(404, createdStory);
     }
   }
-  // TODO Uncomment test when permissions are done
-//  @Test
-//  public void testDeleteStorypermissions() throws Exception {
-//    try (TestBuilder builder = new TestBuilder()) {
-//      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
-//      builder.anonymous().stories().assertDeleteFailStatus(401, createdStory);
-//      builder.invalid().stories().assertDeleteFailStatus(403, createdStory);
-//    }
-//  }
+
+  @Test
+  public void testDeleteStorypermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
+      builder.anonymous().stories().assertDeleteFailStatus(401, createdStory);
+      builder.invalid().stories().assertDeleteFailStatus(403, createdStory);
+    }
+  }
 
 }
