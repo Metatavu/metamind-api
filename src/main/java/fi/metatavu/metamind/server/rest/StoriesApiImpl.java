@@ -343,8 +343,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createStory(Story body) {
-//    System.out.println("Requested ID is: " + getLoggerUserId());
-//    UUID requestedUserId = getLoggerUserId();
     UUID loggedUserId = getLoggerUserId();
     String realmName = "test";
     Locale locale = LocaleUtils.toLocale(body.getLocale());
@@ -352,7 +350,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     List<String> userNames = Arrays.asList("admin", "manager");
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
-//    fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(body.getId());
     System.out.println("DEBUG API IMPL: CREATED STORY's ID IS: " + story.getId());
     try {
       System.out.println("First insttance Logged user is >>> " + loggedUserId);
@@ -368,8 +365,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     } catch (Exception e) {
       System.out.println("Exception caught: " + e);
     }
-//    UUID userNameSet = authenticationController.getUserFromSession();
-//    System.out.println("ID's EXTRACTED FROM SESSION ARE ... " + userNameSet);
     System.out.println("ACCESS GRANTED, ACCOUNT WITH ID - " + loggedUserId + " IS PERMITTED");
     return createOk(storyTranslator.translateStory(story));
   }
@@ -430,9 +425,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
     }
     UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
-//    if (foundResourceId == null) {
-//      return createNotFound(String.format("Resource not found", intentId)); 
-//    }
     try {
       
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);

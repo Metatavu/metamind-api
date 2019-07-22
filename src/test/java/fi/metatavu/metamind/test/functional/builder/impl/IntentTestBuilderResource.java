@@ -43,10 +43,10 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
   /**
    * Creates a new intent
    * 
-   * @param storyId    storyId UUID
+   * @param storyId storyId UUID
    * @param sourceKnot knot
    * @param targetKnot knot
-   * @param name       intent name
+   * @param name intent name
    * @return
    */
 
@@ -73,7 +73,7 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
   /**
    * Finds an intent
    * 
-   * @param story  story
+   * @param story story
    * @param intent intent
    * @return
    */
@@ -85,7 +85,7 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
   /**
    * Updates an intent
    * 
-   * @param story  story
+   * @param story story
    * @param intent intent
    * @return
    */
@@ -97,7 +97,7 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
   /**
    * Deletes an intent
    * 
-   * @param story  story
+   * @param story story
    * @param intent intent
    */
 
@@ -116,10 +116,10 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
    * Asserts create status fails with given status code
    * 
    * @param expectedStatus status code
-   * @param name           intent name
-   * @param sourceKnot     knot
-   * @param targetKnot     knot
-   * @param story          story
+   * @param name intent name
+   * @param sourceKnot knot
+   * @param targetKnot knot
+   * @param story story
    */
 
   public void assertCreateFailStatus(int expectedStatus, String name, Knot sourceKnot, Knot targetKnot, Story story) {
@@ -140,9 +140,9 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
   /**
    * Asserts find status fails with given status code
    * 
-   * @param storyId        storyId
+   * @param storyId storyId
    * @param expectedStatus status code
-   * @param intentId       intentId
+   * @param intentId intentId
    */
 
   public void assertFindFailStatus(UUID storyId, int expectedStatus, UUID intentId) {
@@ -157,9 +157,9 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
   /**
    * Asserts update status fails with given status code
    * 
-   * @param story          story
+   * @param story story
    * @param expectedStatus status code
-   * @param intent         intent
+   * @param intent intent
    */
 
   public void assertUpdateFailStatus(Story story, int expectedStatus, Intent intent) {
@@ -174,9 +174,9 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
   /**
    * Asserts delete status fails with given status code
    * 
-   * @param story          story
+   * @param story story
    * @param expectedStatus status code
-   * @param intent         intent
+   * @param intent intent
    */
 
   public void assertDeleteFailStatus(Story story, int expectedStatus, Intent intent) {
@@ -192,7 +192,7 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
    * Asserts intents are equal
    * 
    * @param expected intent
-   * @param actual   intent
+   * @param actual intent
    * @throws IOException
    * @throws JSONException
    */
