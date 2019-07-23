@@ -39,6 +39,7 @@ import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ScopePermissionRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.keycloak.representations.idm.authorization.UserPolicyRepresentation;
+import org.keycloak.util.SystemPropertiesJsonParserFactory;
 import org.slf4j.Logger;
 
 /**
@@ -50,12 +51,12 @@ import org.slf4j.Logger;
 @ApplicationScoped
 public class AuthenticationController {
   
-  private static final String REALM = "test";
-  private static final String CLIENT_ID = "api";
-  private static final String ADMIN_USER = "admin";
-  private static final String ADMIN_PASSWORD = "admin";
-  private static final String SERVER_URL = "http://localhost:8280/auth/";
-  private static final String CLIENT_SECRET = "1be749de-2023-4ebf-aba0-90679ffab56b";
+  private static final String REALM = System.getProperty("keycloak-admin-realm");
+  private static final String CLIENT_ID = System.getProperty("keycloak-admin-client-id");
+  private static final String ADMIN_USER = System.getProperty("keycloak-admin-user");
+  private static final String ADMIN_PASSWORD = System.getProperty("keycloak-admin-password");
+  private static final String SERVER_URL = System.getProperty("keycloak-admin-server-url");
+  private static final String CLIENT_SECRET = System.getProperty("keycloak-admin-client-secret");
   
   @Inject 
   private static Logger logger;
@@ -66,6 +67,7 @@ public class AuthenticationController {
    * @return
    */
   private Keycloak getAdminClient() {
+    System.out.println("Retrieved >>>>> " + ADMIN_USER + " : " + ADMIN_PASSWORD);
     return KeycloakBuilder.builder().serverUrl(SERVER_URL).realm(REALM).clientId(CLIENT_ID).clientSecret(CLIENT_SECRET).username(ADMIN_USER).password(ADMIN_PASSWORD).build();
   }
 
@@ -108,7 +110,7 @@ public class AuthenticationController {
    * @param scopes List scopes
    * @return UUID created resource
    */
-  public UUID createProtectedResource(UUID ownerId, String name, String uri, String type, List<AuthorizationScope> scopes) {
+  public UUID createProtectedResource(UUID ownerId, String name, String uri, String type, List<AuthorizationScope> scopes) throws NullPointerException {
     Keycloak keycloak = getAdminClient();
     ResourceOwnerRepresentation owner = new ResourceOwnerRepresentation();
     owner.setId(getClientId());
@@ -143,7 +145,7 @@ public class AuthenticationController {
    * @param resource name
    * @return UUID found resource
    */
-  public UUID findProtectedResource(String name) {
+  public UUID findProtectedResource(String name) throws NullPointerException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
     ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(client.getId()).authorization().resources();
@@ -168,8 +170,7 @@ public class AuthenticationController {
    * @param policyIds UUID collection
    */
   public String upsertScopePermission(String realmName, UUID resourceId, Collection<AuthorizationScope> scopes, String name, DecisionStrategy decisionStrategy,
-      Collection<UUID> policyIds) {
-    String result = new String();
+      Collection<UUID> policyIds) throws NullPointerException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
 
@@ -184,7 +185,7 @@ public class AuthenticationController {
     representation.setScopes(scopes.stream().map(AuthorizationScope::getName).collect(Collectors.toSet()));
     representation.setPolicies(policyIds.stream().map(UUID::toString).collect(Collectors.toSet()));
 
-    result = representation.getName();
+    String result = representation.getName();
     Response response = scopeResource.create(representation);
     try {
       if (existingPermission == null) {
@@ -221,7 +222,7 @@ public class AuthenticationController {
    * @param clientId client id
    * @param userMap users names
    */
-  public List<UUID> updatePermissionUsers(String realmName, List<String> userNames) {
+  public List<UUID> updatePermissionUsers(String realmName) throws NullPointerException {
     List<UUID> result = new ArrayList();
     Keycloak keycloak = getAdminClient();
     RealmResource realm = keycloak.realm(realmName);
@@ -269,7 +270,7 @@ public class AuthenticationController {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
     RealmResource realm = keycloak.realm(realmName);
-    System.out.println("Resource permitted users: " + (getPermittedUsers(realm, client, resourceId, resourceName, scopes)));
+    logger.info("Resource permitted users: " + (getPermittedUsers(realm, client, resourceId, resourceName, scopes)));
     return getPermittedUsers(realm, client, resourceId, resourceName, scopes);      
   }
   
