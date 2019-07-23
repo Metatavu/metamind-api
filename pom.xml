@@ -774,10 +774,10 @@
                     <command>if (outcome != success) of /system-property=keycloak-admin-server-url:read-resource</command>
                     <command>/system-property=keycloak-admin-server-url:add(value="http://localhost:8280/auth")</command>
                     <command>end-if</command> 
-					<command>if (outcome != success) of /system-property=keycloak.config-path:read-resource</command>
-					<command>/system-property=keycloak.config-path:add(value="${project.basedir}/scripts/keycloak.json")</command>
+		    <command>if (outcome != success) of /system-property=keycloak.config-path:read-resource</command>
+		    <command>/system-property=keycloak.config-path:add(value="${project.basedir}/scripts/keycloak.json")</command>
                     <command>end-if</command> 
-					<command>if (outcome != success) of /subsystem=keycloak/secure-deployment=metamind.war:read-resource</command>
+		    <command>if (outcome != success) of /subsystem=keycloak/secure-deployment=metamind.war:read-resource</command>
                     <command>/subsystem=keycloak/secure-deployment=metamind.war:add(realm="test", auth-server-url="http://localhost:8280/auth",bearer-only=true,ssl-required="EXTERNAL",resource="api")</command>
                     <command>/subsystem=keycloak/secure-deployment=metamind.war/credential=secret:add(value="1be749de-2023-4ebf-aba0-90679ffab56b")</command>
                     <command>end-if</command>
