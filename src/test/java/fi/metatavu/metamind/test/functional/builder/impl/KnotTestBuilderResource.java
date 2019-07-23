@@ -4,22 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.HttpRetryException;
 import java.util.UUID;
 
-import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
-import org.jboss.wsf.stack.cxf.interceptor.HandlerAuthInterceptor;
 import org.json.JSONException;
 
-import com.fasterxml.jackson.databind.deser.impl.ExternalTypeHandler.Builder;
-import com.oracle.truffle.js.nodes.cast.JSToPrimitiveNode.Hint;
-
-import feign.Body;
 import feign.FeignException;
-import feign.RetryableException;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.KnotsApi;
-import fi.metatavu.metamind.client.StoriesApi;
 import fi.metatavu.metamind.client.model.Knot;
 import fi.metatavu.metamind.client.model.KnotType;
 import fi.metatavu.metamind.client.model.Story;

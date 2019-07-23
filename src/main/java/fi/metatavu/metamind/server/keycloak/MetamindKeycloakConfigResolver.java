@@ -10,8 +10,6 @@ import org.keycloak.adapters.spi.HttpFacade.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.optimaize.langdetect.frma.IOUtils;
-
 public class MetamindKeycloakConfigResolver implements KeycloakConfigResolver{
 
     private static Logger logger = LoggerFactory.getLogger(MetamindKeycloakConfigResolver.class.getName());

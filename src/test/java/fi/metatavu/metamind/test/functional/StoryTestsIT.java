@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import feign.FeignException;
 import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 

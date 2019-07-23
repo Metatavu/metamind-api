@@ -1,17 +1,12 @@
 package fi.metatavu.metamind.test.functional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.UUID;
 
 import org.junit.Test;
 
-import fi.metatavu.metamind.client.model.Intent;
-import fi.metatavu.metamind.client.model.IntentType;
-import fi.metatavu.metamind.client.model.Knot;
-import fi.metatavu.metamind.client.model.KnotType;
 import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.client.model.TrainingMaterial;
 import fi.metatavu.metamind.client.model.TrainingMaterialType;

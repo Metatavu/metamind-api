@@ -1,11 +1,7 @@
 package fi.metatavu.metamind.test.functional.builder.auth;
 
 import java.io.IOException;
-import java.util.function.Consumer;
-
-import feign.Response;
 import feign.Feign.Builder;
-import feign.codec.ErrorDecoder;
 import fi.metatavu.feign.UmaErrorDecoder;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;

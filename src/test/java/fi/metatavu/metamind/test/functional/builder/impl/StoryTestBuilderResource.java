@@ -4,13 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.HttpRetryException;
 import java.util.UUID;
 
 import org.json.JSONException;
 
 import feign.FeignException;
-import feign.RetryableException;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.StoriesApi;
 import fi.metatavu.metamind.client.model.Story;

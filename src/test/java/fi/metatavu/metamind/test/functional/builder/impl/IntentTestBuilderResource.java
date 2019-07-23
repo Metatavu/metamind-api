@@ -10,11 +10,7 @@ import java.util.UUID;
 
 import org.json.JSONException;
 
-import com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery.Status;
-
-import __redirected.__DatatypeFactory;
 import feign.FeignException;
-import feign.RetryableException;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.IntentsApi;
 import fi.metatavu.metamind.client.model.IntentType;
@@ -24,8 +20,6 @@ import fi.metatavu.metamind.client.model.IntentTrainingMaterials;
 import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
-import javassist.bytecode.stackmap.BasicBlock.Catch;
-import java.net.HttpRetryException;
 
 /**
  * Test builder resource for intents

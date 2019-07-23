@@ -7,8 +7,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.deser.impl.ExternalTypeHandler.Builder;
-
 import fi.metatavu.metamind.client.model.Intent;
 import fi.metatavu.metamind.client.model.Knot;
 import fi.metatavu.metamind.client.model.KnotType;
