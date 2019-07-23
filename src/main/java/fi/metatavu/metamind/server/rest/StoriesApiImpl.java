@@ -207,14 +207,10 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       List<UUID> policyIds = authenticationController.updatePermissionUsers(realmName);
       authenticationController.upsertScopePermission(realmName, createdResourceId, scopes, String.format("Permission for knot-%s", knot.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, createdResourceId, String.format("Knot-%s", knot.getId()), scopes);
-      if (!permittedUsersId.contains(loggedUserId)) {
-        if (loggedUserId != null) {
-          return createForbidden("Forbidden: 403");
-        } else {
-          return createUnauthorized("Unauthorized: 401");
-        }
-        
+      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
+        return createBadRequest("NO USER FOUND: Knots");
       }
+        
     } catch (Exception e) {
       System.out.println("Exception caught: " + e);
     }
@@ -411,9 +407,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (!isIntentFromStory(intent, story)) {
       return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
       System.out.println("test permitted users " + permittedUsersId);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
@@ -448,9 +444,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (!isKnotFromStory(knot, story)) {
       return createNotFound(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Knots");
@@ -476,9 +472,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Stories");
@@ -512,9 +508,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (!isVariableFromStory(variable, story)) {
       return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Variables");
@@ -548,9 +544,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (!isIntentFromStory(intent, story)) {
       return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Intents");
@@ -582,9 +578,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (!isKnotFromStory(knot, story)) {
       return createNotFound(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Knots");
@@ -607,9 +603,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Stories");
@@ -641,9 +637,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (!isVariableFromStory(variable, story)) {
       return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Variables");
@@ -847,9 +843,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     IntentTrainingMaterial intentRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.INTENTREGEX, intentRegexMaterial);
     IntentTrainingMaterial variableOpenNlpRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPREGEX, variableOpenNlpRegexMaterial);
     
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Intents");
@@ -886,9 +882,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (!isKnotFromStory(knot, story)) {
       return createBadRequest(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
+    
     try {
-     
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Knots");
@@ -913,10 +909,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
-    System.out.println("Found resource id is: " + foundResourceId);
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Stories");
@@ -948,9 +943,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (!isVariableFromStory(variable, story)) {
       return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
     }
-    UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
+    
     try {
-      
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Variables");

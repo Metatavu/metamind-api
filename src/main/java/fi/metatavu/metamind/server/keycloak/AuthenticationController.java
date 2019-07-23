@@ -21,6 +21,7 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.security.authorization.AuthorizationException;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -67,7 +68,6 @@ public class AuthenticationController {
    * @return
    */
   private Keycloak getAdminClient() {
-    System.out.println("Retrieved >>>>> " + ADMIN_USER + " : " + ADMIN_PASSWORD);
     return KeycloakBuilder.builder().serverUrl(SERVER_URL).realm(REALM).clientId(CLIENT_ID).clientSecret(CLIENT_SECRET).username(ADMIN_USER).password(ADMIN_PASSWORD).build();
   }
 
@@ -110,13 +110,16 @@ public class AuthenticationController {
    * @param scopes List scopes
    * @return UUID created resource
    */
-  public UUID createProtectedResource(UUID ownerId, String name, String uri, String type, List<AuthorizationScope> scopes) throws NullPointerException {
+  public UUID createProtectedResource(UUID ownerId, String name, String uri, String type, List<AuthorizationScope> scopes) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
     ResourceOwnerRepresentation owner = new ResourceOwnerRepresentation();
     owner.setId(getClientId());
     owner.setName(getClientId());
     
     ClientRepresentation client = getClient(keycloak);
+    if (client == null) {
+      throw new AuthorizationException();
+    }
     ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(client.getId()).authorization().resources();
 
     Set<ScopeRepresentation> scopeRepresentations = scopes.stream()
@@ -145,9 +148,12 @@ public class AuthenticationController {
    * @param resource name
    * @return UUID found resource
    */
-  public UUID findProtectedResource(String name) throws NullPointerException {
+  public UUID findProtectedResource(String name) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
+    if (client == null) {
+      throw new AuthorizationException();
+    }
     ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(client.getId()).authorization().resources();
     List<ResourceRepresentation> foundResources = resources.findByName(name);
     List<String> foundResourcesIds = foundResources.stream().map(ResourceRepresentation::getId).collect(Collectors.toList());
@@ -170,10 +176,12 @@ public class AuthenticationController {
    * @param policyIds UUID collection
    */
   public String upsertScopePermission(String realmName, UUID resourceId, Collection<AuthorizationScope> scopes, String name, DecisionStrategy decisionStrategy,
-      Collection<UUID> policyIds) throws NullPointerException {
+      Collection<UUID> policyIds) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
-
+    if (client == null) {
+      throw new AuthorizationException();
+    }
     RealmResource realm = keycloak.realm(realmName);
     ScopePermissionsResource scopeResource = realm.clients().get(client.getId()).authorization().permissions().scope();
     ScopePermissionRepresentation existingPermission = scopeResource.findByName(name);
@@ -222,12 +230,15 @@ public class AuthenticationController {
    * @param clientId client id
    * @param userMap users names
    */
-  public List<UUID> updatePermissionUsers(String realmName) throws NullPointerException {
+  public List<UUID> updatePermissionUsers(String realmName) throws AuthorizationException {
     List<UUID> result = new ArrayList();
     Keycloak keycloak = getAdminClient();
     RealmResource realm = keycloak.realm(realmName);
     UsersResource users = realm.users();
     ClientRepresentation client = getClient(keycloak);
+    if (client == null) {
+      throw new AuthorizationException();
+    }
     UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
     
     List<UserRepresentation> existingUsers = users.list().stream().collect(Collectors.toList());
