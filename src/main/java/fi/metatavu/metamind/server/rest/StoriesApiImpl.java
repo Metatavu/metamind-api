@@ -65,6 +65,12 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   private static final int MAX_KNOT_REDIRECTS = 50;
   
+  private UUID loggedUserId = getLoggerUserId();
+  
+  private static String realmName = "test";
+  
+  private static List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
+  
   @Inject
   private Logger logger;
   
@@ -138,14 +144,11 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     Boolean global = body.isisGlobal();
     String quickResponse = body.getQuickResponse();
     Integer quickResponseOrder = body.getQuickResponseOrder();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
     
     if (quickResponseOrder == null) {
       quickResponseOrder = 0;
     }
     
-    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Intent intent = storyController.createIntent(body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, quickResponseOrder, loggedUserId);
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
@@ -192,14 +195,10 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createKnot(Knot body, UUID storyId) {
-    UUID loggedUserId = getLoggerUserId();
+    
     TokenizerType tokenizerType = body.getTokenizer();
     String content = body.getContent();
     String hint = body.getHint();
-    
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -246,8 +245,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     BotResponse botResponse = botController.getResponse(session, content, LocaleUtils.toLocale(session.getLocale()), TimeZone.getTimeZone(session.getTimeZone()));
-    
-    UUID loggedUserId = getLoggerUserId();
     
     List<MessageResponse> messageResponses = new ArrayList<>();
     
@@ -312,12 +309,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (story == null) {
       return createBadRequest("Invalid story parameter");
     }
-    UUID loggedUserId = getLoggerUserId();
+    
     String locale = body.getLocale();
     String visitor = body.getVisitor();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    
     
     Session session = sessionController.create(story, locale, body.getTimeZone(), visitor, loggedUserId);
     
@@ -338,11 +332,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createStory(Story body) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
+
     Locale locale = LocaleUtils.toLocale(body.getLocale());
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
     try {
@@ -362,13 +353,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createVariable(Variable body, UUID storyId) {
-    UUID loggedUserId = getLoggerUserId();
+
     VariableType type = body.getType();
     String validationScript = body.getValidationScript();
-    
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -394,11 +381,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteIntent(UUID storyId, UUID intentId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -431,11 +414,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteKnot(UUID storyId, UUID knotId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -468,11 +447,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Override
   public Response deleteStory(UUID storyId) {
     
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -495,11 +469,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteVariable(UUID storyId, UUID variableId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 
@@ -531,11 +501,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findIntent(UUID storyId, UUID intentId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -565,11 +531,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findKnot(UUID storyId, UUID knotId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -599,11 +561,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findStory(UUID storyId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -624,11 +582,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findVariable(UUID storyId, UUID variableId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 
@@ -658,9 +612,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listIntents(UUID storyId) {
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -676,8 +627,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       for (fi.metatavu.metamind.persistence.models.Intent intent : intents) {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
-        UUID loggedUserId = getLoggerUserId();
-        System.out.println("RIGHT HERE");
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
           return createBadRequest("NO USER FOUND: Intents");
         }
@@ -694,9 +643,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listKnots(UUID storyId) {
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -712,7 +658,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       for (fi.metatavu.metamind.persistence.models.Knot knot : knots) {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
-        UUID loggedUserId = getLoggerUserId();
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
           return createBadRequest("NO USER FOUND: Knots");
         }
@@ -729,9 +674,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listStories() {
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
     
     List<fi.metatavu.metamind.persistence.models.Story> stories = storyController.listStories();
     if (stories == null) {
@@ -742,7 +684,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       for (fi.metatavu.metamind.persistence.models.Story story : stories) {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
-        UUID loggedUserId = getLoggerUserId();
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
           return createBadRequest("NO USER FOUND: Stories");
         }
@@ -759,9 +700,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listVariables(UUID storyId) {
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -777,7 +715,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       for (fi.metatavu.metamind.persistence.models.Variable variable : variables) {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
-        UUID loggedUserId = getLoggerUserId();
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
           return createBadRequest("NO USER FOUND: Variables");
         }
@@ -812,11 +749,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (quickResponseOrder == null) {
       quickResponseOrder = 0;
     }
-    
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
     
@@ -866,11 +798,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response updateKnot(Knot body, UUID storyId, UUID knotId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -900,11 +828,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response updateStory(Story body, UUID storyId) {
-    UUID loggedUserId = getLoggerUserId();
+    
     Locale locale = LocaleUtils.toLocale(body.getLocale());
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
 
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -926,11 +851,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response updateVariable(Variable body, UUID storyId, UUID variableId) {
-    UUID loggedUserId = getLoggerUserId();
-    String realmName = "test";
-    List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-    Arrays.asList("admin", "manager");
-    
+
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 
