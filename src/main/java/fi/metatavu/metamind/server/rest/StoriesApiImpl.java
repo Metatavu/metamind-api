@@ -67,21 +67,21 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   
   private UUID loggedUserId = getLoggerUserId();
   
-  private final static String REALM_NAME = "test";
+  private static final String REALM_NAME = "test";
   
-  private final static List<AuthorizationScope> SCOPES = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
+  private static final List<AuthorizationScope> SCOPES = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
   
-  private final static String NO_USER_FOUND_MESSAGE = "No user found %s";
+  private static final String NO_USER_FOUND_MESSAGE = String.format("No user found: user is Null");
   
-  private final static String INTENT_NAME_BEGINNING = "Intent-%s";
+  private static final String INTENT_NAME_BEGINNING = "Intent-%s";
   
-  private final static String KNOT_NAME_BEGINNING = "Knot-%s";
+  private static final String KNOT_NAME_BEGINNING = "Knot-%s";
   
-  private final static String STORY_NAME_BEGINNING = "story-%s";
+  private static final String STORY_NAME_BEGINNING = "story-%s";
   
-  private final static String VARIABLE_NAME_BEGINNING = "Variable-%s";
+  private static final String VARIABLE_NAME_BEGINNING = "Variable-%s";
   
-  private final static String EXCEPTION_CAUGHT = "Exception caught: %s";
+  private static final String EXCEPTION_CAUGHT = "Exception caught: %s";
   
   @Inject
   private Logger logger;
@@ -197,7 +197,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for intent-%s", intent.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -226,7 +226,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for knot-%s", knot.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
         
     } catch (Exception e) {
@@ -334,7 +334,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for session-%s", session.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format("Session-%s", session.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -355,7 +355,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -383,7 +383,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for variable-%s", variable.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -412,9 +412,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     try {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
-      logger.info(MessageFormat.format("Test permitted users: {0}.", permittedUsersId));
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -446,7 +445,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -469,7 +468,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -501,7 +500,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -533,7 +532,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -563,7 +562,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -584,7 +583,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -614,7 +613,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -641,7 +640,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
         }
       }
       
@@ -672,7 +671,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
         }
       }
       
@@ -698,7 +697,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
         }
       }
       
@@ -729,7 +728,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
         }
       }
       
@@ -796,7 +795,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -831,7 +830,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -854,7 +853,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -884,7 +883,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
       }
     } catch (Exception e) {
       logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
