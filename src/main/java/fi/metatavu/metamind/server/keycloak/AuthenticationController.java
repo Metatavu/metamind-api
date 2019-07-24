@@ -281,7 +281,6 @@ public class AuthenticationController {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
     RealmResource realm = keycloak.realm(realmName);
-    logger.info(String.format("Resource permitted users: %d", (getPermittedUsers(realm, client, resourceId, resourceName, scopes))));
     return getPermittedUsers(realm, client, resourceId, resourceName, scopes);      
   }
   
