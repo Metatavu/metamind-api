@@ -67,9 +67,21 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   
   private UUID loggedUserId = getLoggerUserId();
   
-  private static String realmName = "test";
+  private final static String REALM_NAME = "test";
   
-  private static List<AuthorizationScope> scopes = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
+  private final static List<AuthorizationScope> SCOPES = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
+  
+  private final static String NO_USER_FOUND_MESSAGE = "No user found %s";
+  
+  private final static String INTENT_NAME_BEGINNING = "Intent-%s";
+  
+  private final static String KNOT_NAME_BEGINNING = "Knot-%s";
+  
+  private final static String STORY_NAME_BEGINNING = "story-%s";
+  
+  private final static String VARIABLE_NAME_BEGINNING = "Variable-%s";
+  
+  private final static String EXCEPTION_CAUGHT = "Exception caught: %s";
   
   @Inject
   private Logger logger;
@@ -116,6 +128,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Inject
   private BotRuntimeContext botRuntimeContext;
   
+  @SuppressWarnings("squid:S3776")
   @Override
   public Response createIntent(Intent body, UUID storyId) {
     fi.metatavu.metamind.persistence.models.Knot sourceKnot = body.getSourceKnotId() != null ? storyController.findKnotById(body.getSourceKnotId()) : null;
@@ -179,15 +192,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     IntentTrainingMaterial variableOpenNlpRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPREGEX, variableOpenNlpRegexMaterial);
     
     try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format("Intent-%s", intent.getId()), String.format("/v2/stories/intents/%s", intent.getId()), "intent", scopes);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(realmName);
-      authenticationController.upsertScopePermission(realmName, createdResourceId, scopes, String.format("Permission for intent-%s", intent.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, createdResourceId, String.format("Intent-%s", intent.getId()), scopes);
+      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(INTENT_NAME_BEGINNING, intent.getId()), String.format("/v2/stories/intents/%s", intent.getId()), "intent", SCOPES);
+      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
+      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for intent-%s", intent.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Intents");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(intentTranslator.translateIntent(intent, intentOpenNlpDocatTrainingMaterial, variableOpenNlpNerTrainingMaterial, intentRegexTrainingMaterial, variableOpenNlpRegexTrainingMaterial));
@@ -208,16 +221,16 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     fi.metatavu.metamind.persistence.models.Knot knot = storyController.createKnot(body.getType(), tokenizerType, body.getName(), content, hint, story, loggedUserId); 
     
     try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format("Knot-%s", knot.getId()), String.format("/v2/stories/knots/%s", knot.getId()), "knot", scopes);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(realmName);
-      authenticationController.upsertScopePermission(realmName, createdResourceId, scopes, String.format("Permission for knot-%s", knot.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, createdResourceId, String.format("Knot-%s", knot.getId()), scopes);
+      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(KNOT_NAME_BEGINNING, knot.getId()), String.format("/v2/stories/knots/%s", knot.getId()), "knot", SCOPES);
+      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
+      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for knot-%s", knot.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Knots");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
         
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     logger.info("User is allowed");
     return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), story, loggedUserId)));
@@ -316,15 +329,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     Session session = sessionController.create(story, locale, body.getTimeZone(), visitor, loggedUserId);
     
     try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format("Session-%s", session.getId()), String.format("/v2/stories/sessions/%s", session.getId()), "session", scopes);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(realmName);
-      authenticationController.upsertScopePermission(realmName, createdResourceId, scopes, String.format("Permission for session-%s", session.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, createdResourceId, String.format("Session-%s", session.getId()), scopes);
+      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format("Session-%s", session.getId()), String.format("/v2/stories/sessions/%s", session.getId()), "session", SCOPES);
+      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
+      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for session-%s", session.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format("Session-%s", session.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Sessions");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(sessionTranslator.translateSession(session));
@@ -337,17 +350,17 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
     try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format("story-%s", story.getId()), String.format("/v2/stories/%s", story.getId()), "story", scopes);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(realmName);
-      authenticationController.upsertScopePermission(realmName, createdResourceId, scopes, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, createdResourceId, String.format("story-%s", story.getId()), scopes);
+      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(STORY_NAME_BEGINNING, story.getId()), String.format("/v2/stories/%s", story.getId()), "story", SCOPES);
+      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
+      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Stories");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
-    logger.info(MessageFormat.format("ACCESS GRANTED, ACCOUNT WITH ID - {0}. IS PERMITTED", loggedUserId));
+    
     return createOk(storyTranslator.translateStory(story));
   }
 
@@ -365,15 +378,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.createVariable(type, story, body.getName(), validationScript, loggedUserId);
     
     try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format("Variable-%s", variable.getId()), String.format("/v2/stories/variables/%s", variable.getId()), "variable", scopes);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(realmName);
-      authenticationController.upsertScopePermission(realmName, createdResourceId, scopes, String.format("Permission for variable-%s", variable.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, createdResourceId, String.format("Variable-%s", variable.getId()), scopes);
+      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), String.format("/v2/stories/variables/%s", variable.getId()), "variable", SCOPES);
+      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
+      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for variable-%s", variable.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Variables");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(variableTranslator.translateVariable(storyController.createVariable(body.getType(), story, body.getName(), body.getValidationScript(), loggedUserId)));
@@ -397,14 +410,14 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
       logger.info(MessageFormat.format("Test permitted users: {0}.", permittedUsersId));
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Intents");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     storyController.deleteIntent(intent);
@@ -430,13 +443,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Knots");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     storyController.deleteKnot(knot);
@@ -453,13 +466,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Stories");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     storyController.deleteStory(story);
@@ -485,13 +498,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Variables");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     storyController.deleteVariable(variable);
@@ -517,13 +530,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Intents");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(intentTranslator.translateIntent(intent, trainingMaterialController.listTrainingMaterialByIntent(intent)));
@@ -547,13 +560,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Knots");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(knotTranslator.translateKnot(knot));
@@ -568,13 +581,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Stories");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(storyTranslator.translateStory(story));
@@ -598,13 +611,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Variables");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(variableTranslator.translateVariable(variable));
@@ -625,15 +638,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     try {
       for (fi.metatavu.metamind.persistence.models.Intent intent : intents) {
-        UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
-        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
+        UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
+        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest("NO USER FOUND: Intents");
+          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
         }
       }
       
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(storyController.listIntentsByStory(story).stream()
@@ -656,15 +669,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     try {
       for (fi.metatavu.metamind.persistence.models.Knot knot : knots) {
-        UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
-        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
+        UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
+        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest("NO USER FOUND: Knots");
+          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
         }
       }
       
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(storyController.listKnotsByStory(story).stream()
@@ -682,15 +695,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     try {
       for (fi.metatavu.metamind.persistence.models.Story story : stories) {
-        UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
-        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
+        UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
+        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest("NO USER FOUND: Stories");
+          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
         }
       }
       
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(storyController.listStories().stream()
@@ -713,15 +726,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     try {
       for (fi.metatavu.metamind.persistence.models.Variable variable : variables) {
-        UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
-        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
+        UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
+        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest("NO USER FOUND: Variables");
+          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
         }
       }
       
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(storyController.listVariablesByStory(story).stream()
@@ -729,6 +742,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       .collect(Collectors.toList()));
   }
 
+  @SuppressWarnings("squid:S3776")
   @Override
   public Response updateIntent(Intent body, UUID storyId, UUID intentId) {
     fi.metatavu.metamind.persistence.models.Knot sourceKnot = body.getSourceKnotId() != null ? storyController.findKnotById(body.getSourceKnotId()) : null;
@@ -779,13 +793,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Intents");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, quickResponseOrder, loggedUserId), 
@@ -814,13 +828,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Knots");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), loggedUserId)));
@@ -837,13 +851,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Stories");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(storyTranslator.translateStory(storyController.updateStory(story, locale, body.getName(), body.getDafaultHint(), loggedUserId)));
@@ -867,13 +881,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
+      UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
+      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest("NO USER FOUND: Variables");
+        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE, "user is Null"));
       }
     } catch (Exception e) {
-      logger.warn(MessageFormat.format("Exception caught: {0}.", e));
+      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(variableTranslator.translateVariable(storyController.updateVariable(variable, body.getName(), body.getType(), body.getValidationScript(), loggedUserId)));
