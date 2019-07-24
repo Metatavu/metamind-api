@@ -1,6 +1,5 @@
 package fi.metatavu.metamind.server.rest;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -71,7 +70,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   
   private static final List<AuthorizationScope> SCOPES = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
   
-  private static final String NO_USER_FOUND_MESSAGE = String.format("No user found: user is Null");
+  private static final String NO_USER_FOUND_MESSAGE = "No user found: user is Null";
   
   private static final String INTENT_NAME_BEGINNING = "Intent-%s";
   
