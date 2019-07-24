@@ -64,7 +64,6 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
       request.formParam("client_secret", clientSecret);
     }
 
-    System.out.println(String.format("Parametres %s:%s:%s:%s", clientId, username, password, clientSecret));
     String response = request.post(path)
       .getBody()
       .asString(); 

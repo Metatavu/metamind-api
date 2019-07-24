@@ -183,7 +183,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Intents");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(intentTranslator.translateIntent(intent, intentOpenNlpDocatTrainingMaterial, variableOpenNlpNerTrainingMaterial, intentRegexTrainingMaterial, variableOpenNlpRegexTrainingMaterial));
@@ -217,7 +217,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       }
         
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     logger.info("User is allowed");
     return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), story, loggedUserId)));
@@ -329,7 +329,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Sessions");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(sessionTranslator.translateSession(session));
@@ -353,9 +353,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Stories");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
-    logger.info("ACCESS GRANTED, ACCOUNT WITH ID - " + loggedUserId + " IS PERMITTED");
+    logger.info(String.format("ACCESS GRANTED, ACCOUNT WITH ID - %s IS PERMITTED", loggedUserId));
     return createOk(storyTranslator.translateStory(story));
   }
 
@@ -385,7 +385,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Variables");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(variableTranslator.translateVariable(storyController.createVariable(body.getType(), story, body.getName(), body.getValidationScript(), loggedUserId)));
@@ -415,12 +415,12 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     try {
       UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
       Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
-      logger.info("test permitted users " + permittedUsersId);
+      logger.info(String.format("Test permitted users: %d", permittedUsersId));
       if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
         return createBadRequest("NO USER FOUND: Intents");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     storyController.deleteIntent(intent);
@@ -456,7 +456,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Knots");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     storyController.deleteKnot(knot);
@@ -484,7 +484,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Stories");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     storyController.deleteStory(story);
@@ -520,7 +520,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Variables");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     storyController.deleteVariable(variable);
@@ -556,7 +556,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Intents");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(intentTranslator.translateIntent(intent, trainingMaterialController.listTrainingMaterialByIntent(intent)));
@@ -590,7 +590,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Knots");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(knotTranslator.translateKnot(knot));
@@ -615,7 +615,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Stories");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(storyTranslator.translateStory(story));
@@ -649,7 +649,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Variables");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(variableTranslator.translateVariable(variable));
@@ -676,14 +676,14 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format("Intent-%s", intent.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Intent-%s", intent.getId()), scopes);
         UUID loggedUserId = getLoggerUserId();
-        logger.info("ID's EXTRACTED FROM SESSION ARE ... " + loggedUserId);
+        logger.info(String.format("Id's extracted from session are: %d", loggedUserId));
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
           return createBadRequest("NO USER FOUND: Intents");
         }
       }
       
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(storyController.listIntentsByStory(story).stream()
@@ -712,14 +712,14 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format("Knot-%s", knot.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Knot-%s", knot.getId()), scopes);
         UUID loggedUserId = getLoggerUserId();
-        logger.info("ID's EXTRACTED FROM SESSION ARE ... " + loggedUserId);
+        logger.info(String.format("Id's extracted from session are: %d", loggedUserId));
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
           return createBadRequest("NO USER FOUND: Knots");
         }
       }
       
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(storyController.listKnotsByStory(story).stream()
@@ -743,14 +743,14 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format("story-%s", story.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("story-%s", story.getId()), scopes);
         UUID loggedUserId = getLoggerUserId();
-        logger.info("ID's EXTRACTED FROM SESSION ARE ... " + loggedUserId);
+        logger.info(String.format("Id's extracted from session are: %d", loggedUserId));
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
           return createBadRequest("NO USER FOUND: Stories");
         }
       }
       
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(storyController.listStories().stream()
@@ -779,14 +779,14 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         UUID foundResourceId = authenticationController.findProtectedResource(String.format("Variable-%s", variable.getId()));
         Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(realmName, foundResourceId, String.format("Variable-%s", variable.getId()), scopes);
         UUID loggedUserId = getLoggerUserId();
-        logger.info("ID's EXTRACTED FROM SESSION ARE ... " + loggedUserId);
+        logger.info(String.format("Id's extracted from session are: %d", loggedUserId));
         if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
           return createBadRequest("NO USER FOUND: Variables");
         }
       }
       
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(storyController.listVariablesByStory(story).stream()
@@ -855,7 +855,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Intents");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, quickResponseOrder, loggedUserId), 
@@ -894,7 +894,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Knots");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), loggedUserId)));
@@ -921,7 +921,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Stories");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(storyTranslator.translateStory(storyController.updateStory(story, locale, body.getName(), body.getDafaultHint(), loggedUserId)));
@@ -955,7 +955,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         return createBadRequest("NO USER FOUND: Variables");
       }
     } catch (Exception e) {
-      logger.warn("Exception caught: " + e);
+      logger.warn(String.format("Exception caught: %s", e));
     }
     
     return createOk(variableTranslator.translateVariable(storyController.updateVariable(variable, body.getName(), body.getType(), body.getValidationScript(), loggedUserId)));

@@ -2,6 +2,7 @@ package fi.metatavu.metamind.server.keycloak;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,7 +41,6 @@ import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ScopePermissionRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.keycloak.representations.idm.authorization.UserPolicyRepresentation;
-import org.keycloak.util.SystemPropertiesJsonParserFactory;
 import org.slf4j.Logger;
 
 /**
@@ -201,7 +201,7 @@ public class AuthenticationController {
         if (status != 201) {
           String message = "Unknown error";
           try {
-            message = IOUtils.toString((InputStream) response.getEntity(), "UTF-8");
+            message = IOUtils.toString((InputStream) response.getEntity(), StandardCharsets.UTF_8);
           } catch (IOException e) {
             logger.warn("Failed read error message", e);
           }
@@ -281,7 +281,7 @@ public class AuthenticationController {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
     RealmResource realm = keycloak.realm(realmName);
-    logger.info("Resource permitted users: " + (getPermittedUsers(realm, client, resourceId, resourceName, scopes)));
+    logger.info(String.format("Resource permitted users: %d", (getPermittedUsers(realm, client, resourceId, resourceName, scopes))));
     return getPermittedUsers(realm, client, resourceId, resourceName, scopes);      
   }
   
@@ -295,7 +295,7 @@ public class AuthenticationController {
     if (response.getStatus() != 201) {
       try {
         if (logger.isErrorEnabled()) {
-          logger.error("Failed to execute create: {}", IOUtils.toString((InputStream) response.getEntity(), "UTF-8"));
+          logger.error("Failed to execute create: {}", IOUtils.toString((InputStream) response.getEntity(), StandardCharsets.UTF_8));
         }
       } catch (IOException e) {
         logger.error("Failed to extract error message", e);
