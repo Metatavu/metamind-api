@@ -485,9 +485,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     List<fi.metatavu.metamind.persistence.models.Knot> knots = storyController.listKnotsByStory(story);
-    if (knots.isEmpty()) {
-      logger.info(String.format("Knots: no values to list."));
-    }
 
     return createOk(storyController.listKnotsByStory(story).stream()
       .map(knotTranslator::translateKnot)
@@ -499,9 +496,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     UUID loggedUserId = getLoggerUserId();
     List<UUID> validStoryIdsForUser = authenticationController.resourceAccessEvaluate(loggedUserId);
     List<fi.metatavu.metamind.persistence.models.Story> stories = storyController.listStories().stream().filter(id -> validStoryIdsForUser.contains(id.getId())).collect(Collectors.toList());
-    if (stories == null) {
-      logger.info(String.format("Stories: no values to list."));
-    }
     
     return createOk(stories.stream()
         .map(storyTranslator::translateStory)
@@ -513,11 +507,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
-    }
-    
-    List<fi.metatavu.metamind.persistence.models.Variable> variables = storyController.listVariablesByStory(story);
-    if (variables == null) {
-      return createBadRequest(String.format("Variables %s not found", storyId)); 
     }
     
     return createOk(storyController.listVariablesByStory(story).stream()

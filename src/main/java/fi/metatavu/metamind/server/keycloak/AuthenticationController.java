@@ -310,7 +310,7 @@ public class AuthenticationController {
       
     } catch (AuthorizationException e) {
       logger.error("Failed to evaluate resource policy for {}", loggedUserId, e);
-      return null;
+      return Collections.emptyList();
     }
   }
   
