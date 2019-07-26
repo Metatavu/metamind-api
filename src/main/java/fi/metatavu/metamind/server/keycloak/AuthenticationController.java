@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +42,9 @@ import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.keycloak.representations.idm.authorization.UserPolicyRepresentation;
 import org.slf4j.Logger;
 
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.story.StoryController;
+
 /**
  * Class providing authentication keycloak system to evaluate permissions
  *  
@@ -58,48 +60,14 @@ public class AuthenticationController {
   private static final String ADMIN_PASSWORD = System.getProperty("keycloak-admin-password");
   private static final String SERVER_URL = System.getProperty("keycloak-admin-server-url");
   private static final String CLIENT_SECRET = System.getProperty("keycloak-admin-client-secret");
+  private static final String AUTHORIZATION_EXCEPTION_MESSAGE = "Client representation is NULL";
   
   @Inject 
   private static Logger logger;
   
-  /**
-   * Returns admin client builder
-   * 
-   * @return
-   */
-  private Keycloak getAdminClient() {
-    return KeycloakBuilder.builder().serverUrl(SERVER_URL).realm(REALM).clientId(CLIENT_ID).clientSecret(CLIENT_SECRET).username(ADMIN_USER).password(ADMIN_PASSWORD).build();
-  }
-
-  /**
-   * Returns String realm name
-   * 
-   * @return
-   */
-  private String getRealmName() {
-    return REALM;
-  }
-
-  /**
-   * Returns String client id
-   * 
-   * @return
-   */
-  private String getClientId() {
-    return CLIENT_ID;
-  }
-
-  /**
-   * Returns the ClientRepresentation based on client id
-   * 
-   * @param keycloak
-   * @return
-   */
-  private ClientRepresentation getClient(Keycloak keycloak) {
-    List<ClientRepresentation> clients = keycloak.realm(getRealmName()).clients().findByClientId(getClientId());
-    return clients.isEmpty() ? null : clients.get(0);
-  }
-   
+  @Inject
+  private StoryController storyController;
+  
   /**
    * Creates protected resource into Keycloak
    * 
@@ -109,6 +77,7 @@ public class AuthenticationController {
    * @param type String type
    * @param scopes List scopes
    * @return UUID created resource
+   * @throws AuthorizationException
    */
   public UUID createProtectedResource(UUID ownerId, String name, String uri, String type, List<AuthorizationScope> scopes) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
@@ -117,9 +86,11 @@ public class AuthenticationController {
     owner.setName(getClientId());
     
     ClientRepresentation client = getClient(keycloak);
+    
     if (client == null) {
-      throw new AuthorizationException();
+      throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
+    
     ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(client.getId()).authorization().resources();
 
     Set<ScopeRepresentation> scopeRepresentations = scopes.stream()
@@ -151,12 +122,15 @@ public class AuthenticationController {
   public UUID findProtectedResource(String name) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
+    
     if (client == null) {
-      throw new AuthorizationException();
+      throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
+    
     ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(client.getId()).authorization().resources();
     List<ResourceRepresentation> foundResources = resources.findByName(name);
     List<String> foundResourcesIds = foundResources.stream().map(ResourceRepresentation::getId).collect(Collectors.toList());
+    
     if (foundResourcesIds.isEmpty()) {
       return null;
     }
@@ -164,24 +138,27 @@ public class AuthenticationController {
     return UUID.fromString(foundResourcesIds.get(0));
   }
 
-  
   /**
    * Creates new scope permission for resource
    * 
-   * @param realmName String realmName
    * @param resourceId UUID resourceId
    * @param scopes AuthorizationScope collection
    * @param name String name
    * @param decisionStrategy decisionStrategy
    * @param policyIds UUID collection
+   * @throws AuthorizationException
+   * @return String permission name
    */
-  public String upsertScopePermission(String realmName, UUID resourceId, Collection<AuthorizationScope> scopes, String name, DecisionStrategy decisionStrategy,
+  public String upsertScopePermission(UUID resourceId, Collection<AuthorizationScope> scopes, String name, DecisionStrategy decisionStrategy,
       Collection<UUID> policyIds) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
+    String realmName = getRealmName();
+    
     if (client == null) {
-      throw new AuthorizationException();
+      throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
+    
     RealmResource realm = keycloak.realm(realmName);
     ScopePermissionsResource scopeResource = realm.clients().get(client.getId()).authorization().permissions().scope();
     ScopePermissionRepresentation existingPermission = scopeResource.findByName(name);
@@ -196,10 +173,13 @@ public class AuthenticationController {
     String result = representation.getName();
     Response response = scopeResource.create(representation);
     try {
+      
       if (existingPermission == null) {
         int status = response.getStatus();
+        
         if (status != 201) {
           String message = "Unknown error";
+          
           try {
             message = IOUtils.toString((InputStream) response.getEntity(), StandardCharsets.UTF_8);
           } catch (IOException e) {
@@ -219,9 +199,7 @@ public class AuthenticationController {
     
     return result;
   }
-  
 
-  
   /**
    * Updates users and user policies into Keycloak
    * 
@@ -230,67 +208,49 @@ public class AuthenticationController {
    * @param clientId client id
    * @param userMap users names
    */
-  public List<UUID> updatePermissionUsers(String realmName) throws AuthorizationException {
+  public List<UUID> updatePermissionUsers() throws AuthorizationException {
     List<UUID> result = new ArrayList();
+    String realmName = getRealmName();
     Keycloak keycloak = getAdminClient();
     RealmResource realm = keycloak.realm(realmName);
     UsersResource users = realm.users();
     ClientRepresentation client = getClient(keycloak);
-    if (client == null) {
-      throw new AuthorizationException();
-    }
-    UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
     
+    if (client == null) {
+      throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
+    }
+    
+    UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
     List<UserRepresentation> existingUsers = users.list().stream().collect(Collectors.toList());
     
-    for (UserRepresentation userRep : existingUsers) {
-      UUID userId = UUID.fromString(userRep.getId());
-      String userName = userRep.getUsername();
-      
+    for (UserRepresentation existingUser : existingUsers) {
+      UUID userId = UUID.fromString(existingUser.getId());
+      String userName = existingUser.getUsername();
+      String policyNameTemplate = String.format("user-%s", userName);
       result.add(userId);
-
-      UserPolicyRepresentation policyRepresentation = userPolicies.findByName("user-" + userName);
+      UserPolicyRepresentation policyRepresentation = userPolicies.findByName(policyNameTemplate);
+     
       if (policyRepresentation == null) {
 
         policyRepresentation = new UserPolicyRepresentation();
-        policyRepresentation.setName("user-" + userName);
+        policyRepresentation.setName(policyNameTemplate);
         policyRepresentation.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
         policyRepresentation.addUser(userName);
         policyRepresentation.setId(userId.toString());
         userPolicies.create(policyRepresentation);
-
       }
     }
-     return result; 
-    }
     
-
-  
-  /**
-   * Returns list of permitted users for a resource with given scopes 
-   * 
-   * @param keycloak keycloak client instance
-   * @param realmName realm name
-   * @param clientId client id
-   * @param resourceId resource id
-   * @param resourceName resource name
-   * @param scopes scopes
-   * @return set of user ids
-   */
-  public Set<UUID> getResourcePermittedUsers(String realmName, UUID resourceId, String resourceName, List<AuthorizationScope> scopes) {
-    Keycloak keycloak = getAdminClient();
-    ClientRepresentation client = getClient(keycloak);
-    RealmResource realm = keycloak.realm(realmName);
-    return getPermittedUsers(realm, client, resourceId, resourceName, scopes);      
+     return result; 
   }
   
   /**
    * Finds a id from Keycloak create response 
    * 
    * @param response response object
-   * @return
+   * @return UUID create response id
    */
-  public static UUID getCreateResponseId(Response response) {
+  public UUID getCreateResponseId(Response response) {
     if (response.getStatus() != 201) {
       try {
         if (logger.isErrorEnabled()) {
@@ -318,68 +278,78 @@ public class AuthenticationController {
     return null;
   }
   
-  private static Set<UUID> getPermittedUsers(RealmResource realm, ClientRepresentation client, UUID resourceId, String resourceName, List<AuthorizationScope> scopes) {
-    Map<UUID, DecisionEffect> policies = evaluatePolicies(realm, client, resourceId, resourceName, scopes);
-    
-    return policies.entrySet().stream()
-        .filter(entry -> DecisionEffect.PERMIT.equals(entry.getValue()))
-        .map(Entry::getKey)
-        .collect(Collectors.toSet());
-  }
-  
   /**
-   * Evaluates policies resource for realm users 
+   * Evaluates eligibility of a user to access resources
    * 
-   * @param realm realm name
-   * @param client client
-   * @param resourceId resource id
-   * @param resourceName resource name
-   * @param scopes scopes
-   * @return map of results where key is user id and value is decision
+   * @param loggedUserId UUID user id
+   * @param scopes Authorization scopes
+   * @return list of UUID id's that resources refer to
    */
-  private static Map<UUID, DecisionEffect> evaluatePolicies(RealmResource realm, ClientRepresentation client, UUID resourceId, String resourceName, List<AuthorizationScope> scopes) {
-    Map<UUID, DecisionEffect> result = new HashMap<>();
-    int firstResult = 0;
-    int maxResults = 10;
-    
-    while (firstResult < 1000) {
-      List<UserRepresentation> users = realm.users().list(firstResult, maxResults);
+  public List<UUID> resourceAccessEvaluate(UUID loggedUserId) {
+    try {
+      List<AuthorizationScope> scopes = Collections.singletonList(AuthorizationScope.STORY_ACCESS);
+      Keycloak keycloak = getAdminClient();
+      RealmResource realm = keycloak.realm(REALM);
+      ClientRepresentation client = getClient(keycloak);
+      List<UUID> storiesIdList = storyController.listStories().stream().map(Story::getId).collect(Collectors.toList());
+      String userId = loggedUserId.toString();
+      Map<UUID, DecisionEffect> result = new HashMap<>();
       
-      for (UserRepresentation user : users) {
-        String userId = user.getId();
-        result.put(UUID.fromString(userId), evaluatePolicy(realm, client, resourceId, resourceName, userId, scopes));
-      }
-      
-      if (users.isEmpty() || (users.size() < maxResults)) {
-        break;
+      for (UUID listedStoryid : storiesIdList) {
+        String foundResourceName = String.format("story-%s", listedStoryid.toString());
+        UUID foundResourceId = findProtectedResource(foundResourceName); 
+        PolicyEvaluationRequest evaluationRequest = createEvaluationRequest(client, foundResourceId, foundResourceName, userId, scopes);
+        PolicyEvaluationResponse response = realm.clients().get(client.getId()).authorization().policies().evaluate(evaluationRequest);
+        result.put(listedStoryid, response.getStatus());
       }
 
-      firstResult += maxResults;
+      return result.entrySet().stream()
+          .filter(entry -> DecisionEffect.PERMIT.equals(entry.getValue()))
+          .map(Entry::getKey)
+          .collect(Collectors.toList());
+      
+    } catch (AuthorizationException e) {
+      logger.error("Failed to evaluate resource policy for {}", loggedUserId, e);
+      return null;
     }
-    
-    return result;
   }
   
   /**
-   * Evaluates policy for a resource
+   * Returns admin client 
    * 
-   * @param realm realm name
-   * @param client client
-   * @param resourceId resource id
-   * @param resourceName resource name
-   * @param userId user's id
-   * @param scopes scopes
-   * @return decision
+   * @return admin
    */
-  private static DecisionEffect evaluatePolicy(RealmResource realm, ClientRepresentation client, UUID resourceId, String resourceName, String userId, List<AuthorizationScope> scopes) {
-    try {
-      PolicyEvaluationRequest evaluationRequest = createEvaluationRequest(client, resourceId, resourceName, userId, scopes);
-      PolicyEvaluationResponse response = realm.clients().get(client.getId()).authorization().policies().evaluate(evaluationRequest);
-      return response.getStatus();
-    } catch (InternalServerErrorException e) {
-      logger.error("Failed to evaluate resource {} policy for {}", resourceName, userId, e);
-      return DecisionEffect.DENY;
-    }
+  private Keycloak getAdminClient() {
+    return KeycloakBuilder.builder().serverUrl(SERVER_URL).realm(REALM).clientId(CLIENT_ID).clientSecret(CLIENT_SECRET).username(ADMIN_USER).password(ADMIN_PASSWORD).build();
+  }
+
+  /**
+   * Returns String realm name
+   * 
+   * @return String realm name
+   */
+  private String getRealmName() {
+    return REALM;
+  }
+
+  /**
+   * Returns String client id
+   * 
+   * @return String CLIENT_ID
+   */
+  private String getClientId() {
+    return CLIENT_ID;
+  }
+
+  /**
+   * Returns the ClientRepresentation based on client id
+   * 
+   * @param keycloak
+   * @return ClientRepresentation
+   */
+  private ClientRepresentation getClient(Keycloak keycloak) {
+    List<ClientRepresentation> clients = keycloak.realm(getRealmName()).clients().findByClientId(getClientId());
+    return clients.isEmpty() ? null : clients.get(0);
   }
   
   /**
@@ -392,7 +362,7 @@ public class AuthenticationController {
    * @param scopes scopes
    * @return created request
    */
-  private static PolicyEvaluationRequest createEvaluationRequest(ClientRepresentation client, UUID resourceId, String resourceName, String userId, Collection<AuthorizationScope> scopes) {
+  private PolicyEvaluationRequest createEvaluationRequest(ClientRepresentation client, UUID resourceId, String resourceName, String userId, Collection<AuthorizationScope> scopes) {
     Set<ScopeRepresentation> resourceScopes = scopes.stream().map(AuthorizationScope::getName).map(ScopeRepresentation::new).collect(Collectors.toSet());
     ResourceRepresentation resource = new ResourceRepresentation(resourceName, resourceScopes);
     resource.setId(resourceId.toString());
