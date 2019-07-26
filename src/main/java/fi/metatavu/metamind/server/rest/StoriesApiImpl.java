@@ -483,8 +483,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
-    
-    List<fi.metatavu.metamind.persistence.models.Knot> knots = storyController.listKnotsByStory(story);
 
     return createOk(storyController.listKnotsByStory(story).stream()
       .map(knotTranslator::translateKnot)
