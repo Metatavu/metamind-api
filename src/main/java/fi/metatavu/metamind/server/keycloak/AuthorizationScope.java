@@ -1,5 +1,11 @@
 package fi.metatavu.metamind.server.keycloak;
 
+/**
+ * Scopes for Keycloak authorization checks
+ * 
+ * @author DaniilSmirnov1
+ *
+ */
 public enum AuthorizationScope {
   /**
    * Authorization scope for editing the data
