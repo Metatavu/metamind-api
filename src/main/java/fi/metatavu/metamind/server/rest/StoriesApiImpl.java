@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.security.authorization.AuthorizationException;
 import org.keycloak.representations.idm.authorization.DecisionStrategy;
 import org.slf4j.Logger;
 
@@ -35,10 +35,8 @@ import fi.metatavu.metamind.rest.model.Intent;
 import fi.metatavu.metamind.rest.model.IntentTrainingMaterials;
 import fi.metatavu.metamind.rest.model.Knot;
 import fi.metatavu.metamind.rest.model.Story;
-import fi.metatavu.metamind.rest.model.TokenizerType;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.rest.model.Variable;
-import fi.metatavu.metamind.rest.model.VariableType;
 import fi.metatavu.metamind.server.keycloak.AuthenticationController;
 import fi.metatavu.metamind.server.keycloak.AuthorizationScope;
 import fi.metatavu.metamind.server.rest.translation.IntentTranslator;
@@ -64,21 +62,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   private static final int MAX_KNOT_REDIRECTS = 50;
   
-  private UUID loggedUserId = getLoggerUserId();
-  
-  private static final String REALM_NAME = "test";
-  
-  private static final List<AuthorizationScope> SCOPES = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
-  
-  private static final String NO_USER_FOUND_MESSAGE = "No user found: user is Null";
-  
-  private static final String INTENT_NAME_BEGINNING = "Intent-%s";
-  
-  private static final String KNOT_NAME_BEGINNING = "Knot-%s";
-  
-  private static final String STORY_NAME_BEGINNING = "story-%s";
-  
-  private static final String VARIABLE_NAME_BEGINNING = "Variable-%s";
+  private static final String STORY_NAME_TEMPLATE = "story-%s";
   
   private static final String EXCEPTION_CAUGHT = "Exception caught: %s";
   
@@ -130,6 +114,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @SuppressWarnings("squid:S3776")
   @Override
   public Response createIntent(Intent body, UUID storyId) {
+    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Knot sourceKnot = body.getSourceKnotId() != null ? storyController.findKnotById(body.getSourceKnotId()) : null;
     if (body.getSourceKnotId() != null && sourceKnot == null) {
       return createBadRequest(String.format("Invalid source knot id %s", body.getSourceKnotId()));
@@ -190,53 +175,25 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     IntentTrainingMaterial intentRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.INTENTREGEX, intentRegexMaterial);
     IntentTrainingMaterial variableOpenNlpRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPREGEX, variableOpenNlpRegexMaterial);
     
-    try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(INTENT_NAME_BEGINNING, intent.getId()), String.format("/v2/stories/intents/%s", intent.getId()), "intent", SCOPES);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
-      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for intent-%s", intent.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(intentTranslator.translateIntent(intent, intentOpenNlpDocatTrainingMaterial, variableOpenNlpNerTrainingMaterial, intentRegexTrainingMaterial, variableOpenNlpRegexTrainingMaterial));
   }
 
   @Override
   public Response createKnot(Knot body, UUID storyId) {
-    
-    TokenizerType tokenizerType = body.getTokenizer();
-    String content = body.getContent();
-    String hint = body.getHint();
+    UUID loggedUserId = getLoggerUserId();
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    fi.metatavu.metamind.persistence.models.Knot knot = storyController.createKnot(body.getType(), tokenizerType, body.getName(), content, hint, story, loggedUserId); 
-    
-    try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(KNOT_NAME_BEGINNING, knot.getId()), String.format("/v2/stories/knots/%s", knot.getId()), "knot", SCOPES);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
-      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for knot-%s", knot.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-        
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
     logger.info("User is allowed");
     return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), story, loggedUserId)));
   }
 
   @Override
   public Response createMessage(fi.metatavu.metamind.rest.model.Message body, UUID storyId) {
+    UUID loggedUserId = getLoggerUserId();
     Session session = sessionController.findSessionById(body.getSessionId());
     if (session == null) {
       return createBadRequest("Invalid session id");
@@ -317,6 +274,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createSession(fi.metatavu.metamind.rest.model.Session body, UUID storyId) {
+    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest("Invalid story parameter");
@@ -327,37 +285,22 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     Session session = sessionController.create(story, locale, body.getTimeZone(), visitor, loggedUserId);
     
-    try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format("Session-%s", session.getId()), String.format("/v2/stories/sessions/%s", session.getId()), "session", SCOPES);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
-      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for session-%s", session.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format("Session-%s", session.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(sessionTranslator.translateSession(session));
   }
 
   @Override
   public Response createStory(Story body) {
-
+    UUID loggedUserId = getLoggerUserId();
     Locale locale = LocaleUtils.toLocale(body.getLocale());
-    
+    List<AuthorizationScope> authorisationScopesList = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
     fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
     try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(STORY_NAME_BEGINNING, story.getId()), String.format("/v2/stories/%s", story.getId()), "story", SCOPES);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
-      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
+      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(STORY_NAME_TEMPLATE, story.getId()), String.format("/v2/stories/%s", story.getId()), "story", authorisationScopesList);
+      List<UUID> policyIds = authenticationController.updatePermissionUsers();
+      authenticationController.upsertScopePermission(createdResourceId, authorisationScopesList, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
+    } catch (AuthorizationException e) {
+      
+      return createInternalServerError(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(storyTranslator.translateStory(story));
@@ -365,27 +308,11 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createVariable(Variable body, UUID storyId) {
-
-    VariableType type = body.getType();
-    String validationScript = body.getValidationScript();
+    UUID loggedUserId = getLoggerUserId();
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
-    }
-    
-    fi.metatavu.metamind.persistence.models.Variable variable = storyController.createVariable(type, story, body.getName(), validationScript, loggedUserId);
-    
-    try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), String.format("/v2/stories/variables/%s", variable.getId()), "variable", SCOPES);
-      List<UUID> policyIds = authenticationController.updatePermissionUsers(REALM_NAME);
-      authenticationController.upsertScopePermission(REALM_NAME, createdResourceId, SCOPES, String.format("Permission for variable-%s", variable.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, createdResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(variableTranslator.translateVariable(storyController.createVariable(body.getType(), story, body.getName(), body.getValidationScript(), loggedUserId)));
@@ -393,7 +320,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteIntent(UUID storyId, UUID intentId) {
-
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -406,16 +332,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     if (!isIntentFromStory(intent, story)) {
       return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
-    }
-    
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     storyController.deleteIntent(intent);
@@ -425,7 +341,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteKnot(UUID storyId, UUID knotId) {
-
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -440,16 +355,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createNotFound(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
     
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     storyController.deleteKnot(knot);
 
     return createNoContent();
@@ -457,20 +362,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteStory(UUID storyId) {
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
-    }
-    
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     storyController.deleteStory(story);
@@ -480,7 +374,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteVariable(UUID storyId, UUID variableId) {
-
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 
@@ -495,16 +388,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
     }
     
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     storyController.deleteVariable(variable);
     
     return createNoContent();
@@ -512,7 +395,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findIntent(UUID storyId, UUID intentId) {
-
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -527,22 +409,11 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
     }
     
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(intentTranslator.translateIntent(intent, trainingMaterialController.listTrainingMaterialByIntent(intent)));
   }
 
   @Override
   public Response findKnot(UUID storyId, UUID knotId) {
-
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -557,35 +428,14 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createNotFound(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
     
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(knotTranslator.translateKnot(knot));
   }
 
   @Override
   public Response findStory(UUID storyId) {
-
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
-    }
-    
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(storyTranslator.translateStory(story));
@@ -593,7 +443,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findVariable(UUID storyId, UUID variableId) {
-
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 
@@ -608,22 +457,11 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
     }
     
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(variableTranslator.translateVariable(variable));
   }
 
   @Override
   public Response listIntents(UUID storyId) {
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -634,19 +472,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createNotFound(String.format("Intents %s not found", storyId)); 
     }
     
-    try {
-      for (fi.metatavu.metamind.persistence.models.Intent intent : intents) {
-        UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
-        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
-        if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-        }
-      }
-      
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(storyController.listIntentsByStory(story).stream()
       .map(intent -> intentTranslator.translateIntent(intent, trainingMaterialController.listTrainingMaterialByIntent(intent)))
       .collect(Collectors.toList()));
@@ -654,7 +479,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listKnots(UUID storyId) {
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -662,22 +486,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     List<fi.metatavu.metamind.persistence.models.Knot> knots = storyController.listKnotsByStory(story);
     if (knots.isEmpty()) {
-      return createNotFound(String.format("Knots %s not found", storyId)); 
+      logger.info(String.format("Knots: no values to list."));
     }
-    
-    try {
-      for (fi.metatavu.metamind.persistence.models.Knot knot : knots) {
-        UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
-        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
-        if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-        }
-      }
-      
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
+
     return createOk(storyController.listKnotsByStory(story).stream()
       .map(knotTranslator::translateKnot)
       .collect(Collectors.toList()));
@@ -685,33 +496,20 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listStories() {
-    
-    List<fi.metatavu.metamind.persistence.models.Story> stories = storyController.listStories();
+    UUID loggedUserId = getLoggerUserId();
+    List<UUID> validStoryIdsForUser = authenticationController.resourceAccessEvaluate(loggedUserId);
+    List<fi.metatavu.metamind.persistence.models.Story> stories = storyController.listStories().stream().filter(id -> validStoryIdsForUser.contains(id.getId())).collect(Collectors.toList());
     if (stories == null) {
-      return createBadRequest("Stories %s not found"); 
+      logger.info(String.format("Stories: no values to list."));
     }
     
-    try {
-      for (fi.metatavu.metamind.persistence.models.Story story : stories) {
-        UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
-        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
-        if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-        }
-      }
-      
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
-    return createOk(storyController.listStories().stream()
-      .map(storyTranslator::translateStory)
-      .collect(Collectors.toList()));
+    return createOk(stories.stream()
+        .map(storyTranslator::translateStory)
+        .collect(Collectors.toList()));
   }
 
   @Override
   public Response listVariables(UUID storyId) {
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -722,19 +520,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Variables %s not found", storyId)); 
     }
     
-    try {
-      for (fi.metatavu.metamind.persistence.models.Variable variable : variables) {
-        UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
-        Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
-        if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-          return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-        }
-      }
-      
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(storyController.listVariablesByStory(story).stream()
       .map(variableTranslator::translateVariable)
       .collect(Collectors.toList()));
@@ -743,6 +528,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @SuppressWarnings("squid:S3776")
   @Override
   public Response updateIntent(Intent body, UUID storyId, UUID intentId) {
+    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Knot sourceKnot = body.getSourceKnotId() != null ? storyController.findKnotById(body.getSourceKnotId()) : null;
     if (body.getSourceKnotId() != null && sourceKnot == null) {
       return createBadRequest(String.format("Invalid source knot id %s", body.getSourceKnotId()));
@@ -789,17 +575,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     IntentTrainingMaterial intentRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.INTENTREGEX, intentRegexMaterial);
     IntentTrainingMaterial variableOpenNlpRegexTrainingMaterial = trainingMaterialController.setIntentTrainingMaterial(intent, TrainingMaterialType.VARIABLEOPENNLPREGEX, variableOpenNlpRegexMaterial);
     
-    
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(INTENT_NAME_BEGINNING, intent.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(INTENT_NAME_BEGINNING, intent.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(intentTranslator.translateIntent(storyController.updateIntent(intent, body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, quickResponseOrder, loggedUserId), 
       intentOpenNlpDocatTrainingMaterial, 
       variableOpenNlpNerTrainingMaterial, 
@@ -810,7 +585,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response updateKnot(Knot body, UUID storyId, UUID knotId) {
-
+    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -825,45 +600,25 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
     
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(KNOT_NAME_BEGINNING, knot.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(KNOT_NAME_BEGINNING, knot.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
     return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), loggedUserId)));
   }
 
   @Override
   public Response updateStory(Story body, UUID storyId) {
-    
+    UUID loggedUserId = getLoggerUserId();
     Locale locale = LocaleUtils.toLocale(body.getLocale());
 
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
-    
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(STORY_NAME_BEGINNING, story.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(STORY_NAME_BEGINNING, story.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
-    }
-    
+
     return createOk(storyTranslator.translateStory(storyController.updateStory(story, locale, body.getName(), body.getDafaultHint(), loggedUserId)));
   }
 
   @Override
   public Response updateVariable(Variable body, UUID storyId, UUID variableId) {
-
+    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 
@@ -876,16 +631,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     if (!isVariableFromStory(variable, story)) {
       return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
-    }
-    
-    try {
-      UUID foundResourceId = authenticationController.findProtectedResource(String.format(VARIABLE_NAME_BEGINNING, variable.getId()));
-      Set<UUID> permittedUsersId = authenticationController.getResourcePermittedUsers(REALM_NAME, foundResourceId, String.format(VARIABLE_NAME_BEGINNING, variable.getId()), SCOPES);
-      if (!permittedUsersId.contains(loggedUserId) || loggedUserId == null) {
-        return createBadRequest(String.format(NO_USER_FOUND_MESSAGE));
-      }
-    } catch (Exception e) {
-      logger.warn(String.format(EXCEPTION_CAUGHT, e.getMessage()));
     }
     
     return createOk(variableTranslator.translateVariable(storyController.updateVariable(variable, body.getName(), body.getType(), body.getValidationScript(), loggedUserId)));
