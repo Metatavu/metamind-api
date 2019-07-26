@@ -10,6 +10,12 @@ import org.keycloak.adapters.spi.HttpFacade.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Resolves Keycloak config from a file
+ * 
+ * @author DaniilSmirnov1
+ *
+ */
 public class MetamindKeycloakConfigResolver implements KeycloakConfigResolver{
 
     private static Logger logger = LoggerFactory.getLogger(MetamindKeycloakConfigResolver.class.getName());
