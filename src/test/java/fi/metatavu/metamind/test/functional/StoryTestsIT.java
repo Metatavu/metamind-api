@@ -38,7 +38,6 @@ public class StoryTestsIT extends AbstractFunctionalTest {
     }
   }
 
-  // TODO Uncomment test when permissions are done
   @Test
   public void testFindStoryPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
