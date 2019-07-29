@@ -35,11 +35,11 @@
         "methods" : [
           {
             "method": "POST",
-            "scopes" : []
+            "scopes" : ["story:manage"]
           },
           {
             "method": "GET",
-            "scopes" : []
+            "scopes" : ["story:access"]
           }
         ]
       },
@@ -49,19 +49,19 @@
         "methods" : [
           {
             "method": "POST",
-            "scopes" : []
+            "scopes" : ["story:manage"]
           },
           {
             "method": "GET",
-            "scopes" : []
+            "scopes" : ["story:access"]
           },
           {
             "method": "DELETE",
-            "scopes" : []
+            "scopes" : ["story:manage"]
           },
           {
             "method": "PUT",
-            "scopes" : []
+            "scopes" : ["story:manage"]
           }
         ]
       }
