@@ -125,8 +125,7 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
       intent.setType(IntentType.NORMAL);
       getApi().createIntent(intent, story.getId());
       fail(String.format("Expected create to fail with status %d", expectedStatus));
-      } 
-    catch (FeignException e) {
+    } catch (FeignException e) {
       assertEquals(expectedStatus, e.status());
     }
   }

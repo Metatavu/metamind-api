@@ -24,7 +24,6 @@ public class TestBuilder implements AutoCloseable {
   private static final String ADMIN_PASSWORD = "admin";
   private static final String MANAGER_USER = "manager";
   private static final String MANAGER_PASSWORD = "manager";
-//  private static final String CLIENT_SECRET = "1be749de-2023-4ebf-aba0-90679ffab56b";
   private static final String CLIENT_SECRET = null;
 
   private TestBuilderAuthentication admin;
@@ -121,7 +120,7 @@ public class TestBuilder implements AutoCloseable {
     for (int i = closables.size() - 1; i >= 0; i--) {
       closables.get(i).close();
     }
-//    admin = null;
+    admin = null;
   }
 
 }

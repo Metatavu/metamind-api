@@ -28,9 +28,9 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.ResourcesResource;
 import org.keycloak.admin.client.resource.ScopePermissionsResource;
 import org.keycloak.admin.client.resource.UserPoliciesResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.idm.authorization.DecisionEffect;
 import org.keycloak.representations.idm.authorization.DecisionStrategy;
 import org.keycloak.representations.idm.authorization.PolicyEvaluationRequest;
@@ -43,7 +43,6 @@ import org.keycloak.representations.idm.authorization.UserPolicyRepresentation;
 import org.slf4j.Logger;
 
 import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.story.StoryController;
 
 /**
  * Class providing authentication keycloak system to evaluate permissions
@@ -64,9 +63,6 @@ public class AuthenticationController {
   
   @Inject 
   private static Logger logger;
-  
-  @Inject
-  private StoryController storyController;
   
   /**
    * Creates protected resource into Keycloak
@@ -208,26 +204,25 @@ public class AuthenticationController {
    * @param clientId client id
    * @param userMap users names
    */
-  public List<UUID> updatePermissionUsers() throws AuthorizationException {
-    List<UUID> result = new ArrayList();
+  public List<UUID> checkUserPolicy(UUID loggedUserId) throws AuthorizationException {
+    List<UUID> result = new ArrayList<>();
     String realmName = getRealmName();
     Keycloak keycloak = getAdminClient();
     RealmResource realm = keycloak.realm(realmName);
     UsersResource users = realm.users();
     ClientRepresentation client = getClient(keycloak);
+    String loggedUserIdString = loggedUserId.toString();
     
     if (client == null) {
       throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
     
     UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
-    List<UserRepresentation> existingUsers = users.list().stream().collect(Collectors.toList());
+    UserResource loggedUserResource = users.get(loggedUserIdString);
     
-    for (UserRepresentation existingUser : existingUsers) {
-      UUID userId = UUID.fromString(existingUser.getId());
-      String userName = existingUser.getUsername();
+      String userName = loggedUserResource.toRepresentation().getUsername();
       String policyNameTemplate = String.format("user-%s", userName);
-      result.add(userId);
+      result.add(loggedUserId);
       UserPolicyRepresentation policyRepresentation = userPolicies.findByName(policyNameTemplate);
      
       if (policyRepresentation == null) {
@@ -236,10 +231,10 @@ public class AuthenticationController {
         policyRepresentation.setName(policyNameTemplate);
         policyRepresentation.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
         policyRepresentation.addUser(userName);
-        policyRepresentation.setId(userId.toString());
+        policyRepresentation.setId(loggedUserIdString);
         userPolicies.create(policyRepresentation);
       }
-    }
+    
     
      return result; 
   }
@@ -285,22 +280,22 @@ public class AuthenticationController {
    * @param scopes Authorization scopes
    * @return list of UUID id's that resources refer to
    */
-  public List<UUID> resourceAccessEvaluate(UUID loggedUserId) {
+  public List<UUID> getPermittedStories(UUID loggedUserId, List<Story> storiesList) {
     try {
       List<AuthorizationScope> scopes = Collections.singletonList(AuthorizationScope.STORY_ACCESS);
       Keycloak keycloak = getAdminClient();
       RealmResource realm = keycloak.realm(REALM);
       ClientRepresentation client = getClient(keycloak);
-      List<UUID> storiesIdList = storyController.listStories().stream().map(Story::getId).collect(Collectors.toList());
       String userId = loggedUserId.toString();
       Map<UUID, DecisionEffect> result = new HashMap<>();
       
-      for (UUID listedStoryid : storiesIdList) {
-        String foundResourceName = String.format("story-%s", listedStoryid.toString());
+      for (Story listedStory : storiesList) {
+        UUID listedStoryId = listedStory.getId();
+        String foundResourceName = String.format("story-%s", listedStoryId.toString());
         UUID foundResourceId = findProtectedResource(foundResourceName); 
         PolicyEvaluationRequest evaluationRequest = createEvaluationRequest(client, foundResourceId, foundResourceName, userId, scopes);
         PolicyEvaluationResponse response = realm.clients().get(client.getId()).authorization().policies().evaluate(evaluationRequest);
-        result.put(listedStoryid, response.getStatus());
+        result.put(listedStoryId, response.getStatus());
       }
 
       return result.entrySet().stream()
