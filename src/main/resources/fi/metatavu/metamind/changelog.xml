@@ -387,7 +387,7 @@
     </addColumn>
   </changeSet>
   
-  <changeSet id="default-hint-for-story-fix" author="Daniil Smirnov">
+  <changeSet id="default-hint-for-story" author="Daniil Smirnov">
     <addColumn tableName="story">
       <column name="defaulthint" type="varchar(191)">
         <constraints nullable="true"/>
