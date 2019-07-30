@@ -209,18 +209,17 @@ public class AuthenticationController {
     UsersResource users = realm.users();
     ClientRepresentation client = getClient(keycloak);
     String userIdString = userId.toString();
-    UUID policyId = userId;
     
     if (client == null) {
       throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
     
     UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
+    
     UserResource loggedUserResource = users.get(userIdString);
 
     String userName = loggedUserResource.toRepresentation().getUsername();
     String policyNameTemplate = String.format("user-%s", userName);
-    UUID result = policyId;
     UserPolicyRepresentation policyRepresentation = userPolicies.findByName(policyNameTemplate);
 
     if (policyRepresentation == null) {
@@ -231,9 +230,12 @@ public class AuthenticationController {
       policyRepresentation.addUser(userName);
       policyRepresentation.setId(userIdString);
       userPolicies.create(policyRepresentation);
-    }
 
-    return result;
+      return UUID.fromString(policyRepresentation.getId());
+    } else {
+
+      return UUID.fromString(policyRepresentation.getId());
+    }
   }
   
   /**
