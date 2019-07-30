@@ -228,8 +228,8 @@ public class AuthenticationController {
       createdPolicyRepresentation.setName(policyNameTemplate);
       createdPolicyRepresentation.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
       createdPolicyRepresentation.addUser(userName);
-      createdPolicyRepresentation.setId(userIdString);
       userPolicies.create(createdPolicyRepresentation);
+      createdPolicyRepresentation = userPolicies.findByName(policyNameTemplate);
 
       return UUID.fromString(createdPolicyRepresentation.getId());
     } else {
