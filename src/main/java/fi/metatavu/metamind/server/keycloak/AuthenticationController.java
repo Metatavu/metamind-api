@@ -224,14 +224,14 @@ public class AuthenticationController {
 
     if (policyRepresentation == null) {
 
-      policyRepresentation = new UserPolicyRepresentation();
-      policyRepresentation.setName(policyNameTemplate);
-      policyRepresentation.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
-      policyRepresentation.addUser(userName);
-      policyRepresentation.setId(userIdString);
-      userPolicies.create(policyRepresentation);
+      UserPolicyRepresentation createdPolicyRepresentation = new UserPolicyRepresentation();
+      createdPolicyRepresentation.setName(policyNameTemplate);
+      createdPolicyRepresentation.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
+      createdPolicyRepresentation.addUser(userName);
+      createdPolicyRepresentation.setId(userIdString);
+      userPolicies.create(createdPolicyRepresentation);
 
-      return UUID.fromString(policyRepresentation.getId());
+      return UUID.fromString(createdPolicyRepresentation.getId());
     } else {
 
       return UUID.fromString(policyRepresentation.getId());
