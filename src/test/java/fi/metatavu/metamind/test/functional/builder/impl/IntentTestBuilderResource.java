@@ -44,6 +44,23 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
    * @return
    */
 
+  /**
+   * Creates a new intent
+   * 
+   * @param storyId storyId UUID
+   * @param sourceKnot knot
+   * @param targetKnot knot
+   * @param name String intent name
+   * @param type intent type
+   * @param global boolean global
+   * @param quickResponse String quick response
+   * @param quickResponseOrder int response order
+   * @param intentOpenNlpDoccatId UUID 
+   * @param intentRegexId UUID
+   * @param variableOpenNlpNerId UUID
+   * @param variableOpenNlpRegexId UUID
+   * @return
+   */
   public Intent create(UUID storyId, Knot sourceKnot, Knot targetKnot, String name, IntentType type, boolean global, String quickResponse,
       int quickResponseOrder, UUID intentOpenNlpDoccatId, UUID intentRegexId, UUID variableOpenNlpNerId, UUID variableOpenNlpRegexId) {
 

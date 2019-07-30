@@ -3,7 +3,6 @@ package fi.metatavu.metamind.server.keycloak;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -145,8 +144,7 @@ public class AuthenticationController {
    * @throws AuthorizationException
    * @return String permission name
    */
-  public String upsertScopePermission(UUID resourceId, Collection<AuthorizationScope> scopes, String name, DecisionStrategy decisionStrategy,
-      Collection<UUID> policyIds) throws AuthorizationException {
+  public String upsertScopePermission(UUID resourceId, Collection<AuthorizationScope> scopes, String name, DecisionStrategy decisionStrategy, UUID policyId) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
     String realmName = getRealmName();
@@ -164,7 +162,7 @@ public class AuthenticationController {
     representation.setDecisionStrategy(decisionStrategy);
     representation.setName(name);
     representation.setScopes(scopes.stream().map(AuthorizationScope::getName).collect(Collectors.toSet()));
-    representation.setPolicies(policyIds.stream().map(UUID::toString).collect(Collectors.toSet()));
+    representation.setPolicies(Collections.singleton(policyId.toString()));
 
     String result = representation.getName();
     Response response = scopeResource.create(representation);
@@ -197,32 +195,32 @@ public class AuthenticationController {
   }
 
   /**
-   * Updates users and user policies into Keycloak
+   * Assures that logged user has an existing policy
    * 
    * @param keycloak admin client
    * @param realmName realm name
    * @param clientId client id
-   * @param userMap users names
+   * @return UUID user policy id
    */
-  public List<UUID> checkUserPolicy(UUID loggedUserId) throws AuthorizationException {
-    List<UUID> result = new ArrayList<>();
+  public UUID ensureUserPolicyExists(UUID userId) throws AuthorizationException {
+    UUID result = new UUID(0L, 0L);
     String realmName = getRealmName();
     Keycloak keycloak = getAdminClient();
     RealmResource realm = keycloak.realm(realmName);
     UsersResource users = realm.users();
     ClientRepresentation client = getClient(keycloak);
-    String loggedUserIdString = loggedUserId.toString();
+    String userIdString = userId.toString();
     
     if (client == null) {
       throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
     
     UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
-    UserResource loggedUserResource = users.get(loggedUserIdString);
+    UserResource loggedUserResource = users.get(userIdString);
     
       String userName = loggedUserResource.toRepresentation().getUsername();
       String policyNameTemplate = String.format("user-%s", userName);
-      result.add(loggedUserId);
+      result = userId;
       UserPolicyRepresentation policyRepresentation = userPolicies.findByName(policyNameTemplate);
      
       if (policyRepresentation == null) {
@@ -231,12 +229,11 @@ public class AuthenticationController {
         policyRepresentation.setName(policyNameTemplate);
         policyRepresentation.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
         policyRepresentation.addUser(userName);
-        policyRepresentation.setId(loggedUserIdString);
+        policyRepresentation.setId(userIdString);
         userPolicies.create(policyRepresentation);
       }
     
-    
-     return result; 
+    return result; 
   }
   
   /**
@@ -274,20 +271,20 @@ public class AuthenticationController {
   }
   
   /**
-   * Evaluates eligibility of a user to access resources
+   * Evaluates eligibility of a user to list stories
    * 
    * @param loggedUserId UUID user id
-   * @param scopes Authorization scopes
-   * @return list of UUID id's that resources refer to
+   * @param storiesList List<Story> of all stories
+   * @return List<story> stories that resources refer to
    */
-  public List<UUID> getPermittedStories(UUID loggedUserId, List<Story> storiesList) {
+  public List<Story> getPermittedStories(UUID loggedUserId, List<Story> storiesList) {
     try {
       List<AuthorizationScope> scopes = Collections.singletonList(AuthorizationScope.STORY_ACCESS);
       Keycloak keycloak = getAdminClient();
       RealmResource realm = keycloak.realm(REALM);
       ClientRepresentation client = getClient(keycloak);
       String userId = loggedUserId.toString();
-      Map<UUID, DecisionEffect> result = new HashMap<>();
+      Map<Story, DecisionEffect> result = new HashMap<>();
       
       for (Story listedStory : storiesList) {
         UUID listedStoryId = listedStory.getId();
@@ -295,7 +292,7 @@ public class AuthenticationController {
         UUID foundResourceId = findProtectedResource(foundResourceName); 
         PolicyEvaluationRequest evaluationRequest = createEvaluationRequest(client, foundResourceId, foundResourceName, userId, scopes);
         PolicyEvaluationResponse response = realm.clients().get(client.getId()).authorization().policies().evaluate(evaluationRequest);
-        result.put(listedStoryId, response.getStatus());
+        result.put(listedStory, response.getStatus());
       }
 
       return result.entrySet().stream()

@@ -62,7 +62,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   
   private static final String STORY_NAME_TEMPLATE = "story-%s";
   
-  private static final String EXCEPTION_CAUGHT = "Exception caught: %s";
+  private static final String EXCEPTION_CAUGHT = "Failed to apply authorization rules for story: %s";
   
   @Inject
   private AuthenticationController authenticationController;
@@ -290,8 +290,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
     try {
       UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(STORY_NAME_TEMPLATE, story.getId()), String.format("/v2/stories/%s", story.getId()), "story", authorisationScopesList);
-      List<UUID> policyIds = authenticationController.checkUserPolicy(loggedUserId);
-      authenticationController.upsertScopePermission(createdResourceId, authorisationScopesList, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyIds);
+      UUID policyId = authenticationController.ensureUserPolicyExists(loggedUserId);
+      authenticationController.upsertScopePermission(createdResourceId, authorisationScopesList, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyId);
     } catch (AuthorizationException e) {
       
       return createInternalServerError(String.format(EXCEPTION_CAUGHT, e.getMessage()));
@@ -461,11 +461,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    List<fi.metatavu.metamind.persistence.models.Intent> intents = storyController.listIntentsByStory(story);
-    if (intents.isEmpty()) {
-      return createOk(new ArrayList<fi.metatavu.metamind.persistence.models.Intent>());
-    }
-    
     return createOk(storyController.listIntentsByStory(story).stream()
       .map(intent -> intentTranslator.translateIntent(intent, trainingMaterialController.listTrainingMaterialByIntent(intent)))
       .collect(Collectors.toList()));
@@ -478,11 +473,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    List<fi.metatavu.metamind.persistence.models.Knot> knots = storyController.listKnotsByStory(story);
-    if (knots.isEmpty()) {
-      return createOk(new ArrayList<fi.metatavu.metamind.persistence.models.Knot>());
-    }
-
     return createOk(storyController.listKnotsByStory(story).stream()
       .map(knotTranslator::translateKnot)
       .collect(Collectors.toList()));
@@ -491,13 +481,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Override
   public Response listStories() {
     UUID loggedUserId = getLoggerUserId();
-    List<fi.metatavu.metamind.persistence.models.Story> storiesList = storyController.listStories();
-    List<UUID> validStoryIdsForUser = authenticationController.getPermittedStories(loggedUserId, storiesList);
-    List<fi.metatavu.metamind.persistence.models.Story> stories = storiesList.stream().filter(id -> validStoryIdsForUser.contains(id.getId())).collect(Collectors.toList());
     
-    return createOk(stories.stream()
-        .map(storyTranslator::translateStory)
-        .collect(Collectors.toList()));
+    return createOk(authenticationController.getPermittedStories(loggedUserId, storyController.listStories()).stream().map(storyTranslator::translateStory).collect(Collectors.toList()));
   }
 
   @Override
@@ -505,11 +490,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
-    }
-    
-    List<fi.metatavu.metamind.persistence.models.Variable> variables = storyController.listVariablesByStory(story);
-    if (variables.isEmpty()) {
-      return createOk(new ArrayList<fi.metatavu.metamind.persistence.models.Variable>());
     }
     
     return createOk(storyController.listVariablesByStory(story).stream()

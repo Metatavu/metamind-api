@@ -517,6 +517,7 @@
       <groupId>fi.metatavu.feign</groupId>
       <artifactId>feign-uma</artifactId>
       <version>${feign-uma.version}</version>
+      <scope>test</scope>
     </dependency>
     
     <dependency>
