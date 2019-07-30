@@ -1,0 +1,70 @@
+{
+  "realm": "test",
+  "auth-server-url": "http://localhost:8280/auth",
+  "ssl-required": "external",
+  "resource": "api",
+  "bearer-only": true,
+  "credentials": {
+    "secret": "1be749de-2023-4ebf-aba0-90679ffab56b"
+  },
+  "confidential-port": 0,
+  "policy-enforcer": {"enforcement-mode": "ENFORCING",
+    "user-managed-access": {},
+    "paths": [
+      {
+        "name" : "Story",
+        "path" : "/v2/stories/{storyId}/*",
+        "methods" : [
+          {
+            "method": "DELETE",
+            "scopes" : ["story:manage"]
+          },
+          {
+            "method": "PUT",
+            "scopes" : ["story:manage"]
+          },
+          {
+            "method": "GET",
+            "scopes" : ["story:access"]
+          }
+        ]
+      },
+      {
+        "name" : "Stories",
+        "path" : "/v2/stories",
+        "methods" : [
+          {
+            "method": "POST",
+            "scopes" : ["story:manage"]
+          },
+          {
+            "method": "GET",
+            "scopes" : ["story:access"]
+          }
+        ]
+      },
+      {
+        "name" : "Trainingmaterial",
+        "path" : "/v2/trainingMaterials/*",
+        "methods" : [
+          {
+            "method": "POST",
+            "scopes" : ["story:manage"]
+          },
+          {
+            "method": "GET",
+            "scopes" : ["story:access"]
+          },
+          {
+            "method": "DELETE",
+            "scopes" : ["story:manage"]
+          },
+          {
+            "method": "PUT",
+            "scopes" : ["story:manage"]
+          }
+        ]
+      }
+    ]
+  }
+}

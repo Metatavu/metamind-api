@@ -1,6 +1,7 @@
 package fi.metatavu.metamind.server.rest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -13,10 +14,10 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-
+import org.jboss.security.authorization.AuthorizationException;
+import org.keycloak.representations.idm.authorization.DecisionStrategy;
 import fi.metatavu.metamind.bot.BotController;
 import fi.metatavu.metamind.bot.BotResponse;
 import fi.metatavu.metamind.bot.BotRuntimeContext;
@@ -34,6 +35,8 @@ import fi.metatavu.metamind.rest.model.Knot;
 import fi.metatavu.metamind.rest.model.Story;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.rest.model.Variable;
+import fi.metatavu.metamind.server.keycloak.AuthenticationController;
+import fi.metatavu.metamind.server.keycloak.AuthorizationScope;
 import fi.metatavu.metamind.server.rest.translation.IntentTranslator;
 import fi.metatavu.metamind.server.rest.translation.KnotTranslator;
 import fi.metatavu.metamind.server.rest.translation.MessageTranslator;
@@ -56,7 +59,12 @@ import fi.metatavu.metamind.story.StoryController;
 public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   private static final int MAX_KNOT_REDIRECTS = 50;
-
+  
+  private static final String STORY_NAME_TEMPLATE = "story-%s";
+  
+  @Inject
+  private AuthenticationController authenticationController;
+  
   @Inject
   private SessionController sessionController;
 
@@ -96,8 +104,10 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Inject
   private BotRuntimeContext botRuntimeContext;
   
+  @SuppressWarnings("squid:S3776")
   @Override
   public Response createIntent(Intent body, UUID storyId) {
+    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Knot sourceKnot = body.getSourceKnotId() != null ? storyController.findKnotById(body.getSourceKnotId()) : null;
     if (body.getSourceKnotId() != null && sourceKnot == null) {
       return createBadRequest(String.format("Invalid source knot id %s", body.getSourceKnotId()));
@@ -121,16 +131,14 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Source knot %s is not from the story %s", sourceKnot.getId(), story.getId()));
     }
     
-    // TODO: Permission check
-    
     Boolean global = body.isisGlobal();
     String quickResponse = body.getQuickResponse();
     Integer quickResponseOrder = body.getQuickResponseOrder();
+    
     if (quickResponseOrder == null) {
       quickResponseOrder = 0;
     }
     
-    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Intent intent = storyController.createIntent(body.getType(), body.getName(), sourceKnot, targetKnot, global, quickResponse, quickResponseOrder, loggedUserId);
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
@@ -167,8 +175,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   public Response createKnot(Knot body, UUID storyId) {
     UUID loggedUserId = getLoggerUserId();
     
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -179,6 +185,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createMessage(fi.metatavu.metamind.rest.model.Message body, UUID storyId) {
+    UUID loggedUserId = getLoggerUserId();
     Session session = sessionController.findSessionById(body.getSessionId());
     if (session == null) {
       return createBadRequest("Invalid session id");
@@ -199,8 +206,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     }
     
     BotResponse botResponse = botController.getResponse(session, content, LocaleUtils.toLocale(session.getLocale()), TimeZone.getTimeZone(session.getTimeZone()));
-    
-    UUID loggedUserId = getLoggerUserId();
     
     List<MessageResponse> messageResponses = new ArrayList<>();
     
@@ -261,16 +266,14 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createSession(fi.metatavu.metamind.rest.model.Session body, UUID storyId) {
+    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest("Invalid story parameter");
     }
     
-    UUID loggedUserId = getLoggerUserId();
     String locale = body.getLocale();
     String visitor = body.getVisitor();
-    
-    // TODO: Permission check
     
     Session session = sessionController.create(story, locale, body.getTimeZone(), visitor, loggedUserId);
     
@@ -281,17 +284,23 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   public Response createStory(Story body) {
     UUID loggedUserId = getLoggerUserId();
     Locale locale = LocaleUtils.toLocale(body.getLocale());
+    List<AuthorizationScope> authorisationScopesList = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
+    fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
+    try {
+      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(STORY_NAME_TEMPLATE, story.getId()), String.format("/v2/stories/%s", story.getId()), "story", authorisationScopesList);
+      UUID policyId = authenticationController.ensureUserPolicyExists(loggedUserId);
+      authenticationController.upsertScopePermission(createdResourceId, authorisationScopesList, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyId);
+    } catch (AuthorizationException e) {
+      
+      return createInternalServerError(String.format("Failed to apply authorization rules for story: %s", e.getMessage()));
+    }
     
-    // TODO: Permission check
-
-    return createOk(storyTranslator.translateStory(storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId)));
+    return createOk(storyTranslator.translateStory(story));
   }
 
   @Override
   public Response createVariable(Variable body, UUID storyId) {
     UUID loggedUserId = getLoggerUserId();
-    
-    // TODO: Permission check
     
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
@@ -303,8 +312,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteIntent(UUID storyId, UUID intentId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -326,8 +333,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteKnot(UUID storyId, UUID knotId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -349,8 +354,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteStory(UUID storyId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -363,8 +366,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response deleteVariable(UUID storyId, UUID variableId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 
@@ -386,8 +387,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findIntent(UUID storyId, UUID intentId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -407,8 +406,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findKnot(UUID storyId, UUID knotId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -428,8 +425,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findStory(UUID storyId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createNotFound(String.format("Story %s not found", storyId)); 
@@ -440,8 +435,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response findVariable(UUID storyId, UUID variableId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 
@@ -461,8 +454,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listIntents(UUID storyId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -475,8 +466,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listKnots(UUID storyId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -489,17 +478,13 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listStories() {
-    // TODO: Permission check
+    UUID loggedUserId = getLoggerUserId();
     
-    return createOk(storyController.listStories().stream()
-      .map(storyTranslator::translateStory)
-      .collect(Collectors.toList()));
+    return createOk(authenticationController.getPermittedStories(loggedUserId, storyController.listStories()).stream().map(storyTranslator::translateStory).collect(Collectors.toList()));
   }
 
   @Override
   public Response listVariables(UUID storyId) {
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -510,8 +495,10 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       .collect(Collectors.toList()));
   }
 
+  @SuppressWarnings("squid:S3776")
   @Override
   public Response updateIntent(Intent body, UUID storyId, UUID intentId) {
+    UUID loggedUserId = getLoggerUserId();
     fi.metatavu.metamind.persistence.models.Knot sourceKnot = body.getSourceKnotId() != null ? storyController.findKnotById(body.getSourceKnotId()) : null;
     if (body.getSourceKnotId() != null && sourceKnot == null) {
       return createBadRequest(String.format("Invalid source knot id %s", body.getSourceKnotId()));
@@ -524,17 +511,12 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     
     fi.metatavu.metamind.persistence.models.Intent intent = storyController.findIntentById(intentId);
     
-    // TODO: Permission check
-    // TODO: Story check
-    
     Boolean global = body.isisGlobal();
     String quickResponse = body.getQuickResponse();
     Integer quickResponseOrder = body.getQuickResponseOrder();
     if (quickResponseOrder == null) {
       quickResponseOrder = 0;
     }
-    
-    UUID loggedUserId = getLoggerUserId();
     
     IntentTrainingMaterials intentTrainingMaterials = body.getTrainingMaterials();
     
@@ -574,9 +556,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Override
   public Response updateKnot(Knot body, UUID storyId, UUID knotId) {
     UUID loggedUserId = getLoggerUserId();
-    
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -598,22 +577,18 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   public Response updateStory(Story body, UUID storyId) {
     UUID loggedUserId = getLoggerUserId();
     Locale locale = LocaleUtils.toLocale(body.getLocale());
-    
-    // TODO: Permission check
 
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
-    
+
     return createOk(storyTranslator.translateStory(storyController.updateStory(story, locale, body.getName(), body.getDafaultHint(), loggedUserId)));
   }
 
   @Override
   public Response updateVariable(Variable body, UUID storyId, UUID variableId) {
     UUID loggedUserId = getLoggerUserId();
-    // TODO: Permission check
-    
     fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
     if (variable == null) {
       return createBadRequest(String.format("Variable %s not found", variableId)); 

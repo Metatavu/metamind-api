@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.test.functional.builder;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -19,10 +20,14 @@ public class TestBuilder implements AutoCloseable {
 
   private static final String REALM = "test";
   private static final String CLIENT_ID = "ui";
-  private static final String ADMIN_USER = "admin@example.com";
-  private static final String ADMIN_PASSWORD = "test";
+  private static final String ADMIN_USER = "admin";
+  private static final String ADMIN_PASSWORD = "admin";
+  private static final String MANAGER_USER = "manager";
+  private static final String MANAGER_PASSWORD = "manager";
+  private static final String CLIENT_SECRET = null;
 
   private TestBuilderAuthentication admin;
+  private TestBuilderAuthentication manager;
   private TestBuilderAuthentication invalid;
   private TestBuilderAuthentication anonymous;
   private List<CloseableResource<?, ?>> closables = new ArrayList<>();
@@ -31,13 +36,28 @@ public class TestBuilder implements AutoCloseable {
    * Returns admin authenticated authentication resource
    * 
    * @return admin authenticated authentication resource
+   * @throws IOException 
    */
-  public TestBuilderAuthentication admin() {
+  public TestBuilderAuthentication admin() throws IOException {
     if (admin != null) {
       return admin;
     }
 
-    return admin = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, null));
+    return admin = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, CLIENT_SECRET));
+  }
+  
+  /**
+   * Returns manager authenticated authentication resource
+   * 
+   * @return manager authenticated authentication resource
+   * @throws IOException 
+   */
+  public TestBuilderAuthentication manager() throws IOException {
+    if (manager != null) {
+      return manager;
+    }
+
+    return manager = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, MANAGER_USER, MANAGER_PASSWORD, CLIENT_SECRET));
   }
 
   /**
@@ -100,7 +120,6 @@ public class TestBuilder implements AutoCloseable {
     for (int i = closables.size() - 1; i >= 0; i--) {
       closables.get(i).close();
     }
-
     admin = null;
   }
 

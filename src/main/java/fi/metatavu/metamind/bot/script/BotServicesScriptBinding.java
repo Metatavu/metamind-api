@@ -46,5 +46,5 @@ public class BotServicesScriptBinding {
   public BotWekaServiceScriptBinding weka() {
     return weka;
   }
-
+  
 }

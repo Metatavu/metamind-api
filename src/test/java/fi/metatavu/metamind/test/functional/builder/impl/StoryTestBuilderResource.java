@@ -113,11 +113,12 @@ public class StoryTestBuilderResource extends AbstractTestBuilderResource<Story,
    * @param locale locale
    * @param name name
    */
-  public void assertCreateFailStatus(int expectedStatus, String locale, String name) {
+  public void assertCreateFailStatus(int expectedStatus, String locale, String name, String hintMessage) {
     try {
       Story story = new Story();
       story.setLocale(locale);
       story.setName(name);
+      story.setDafaultHint(hintMessage);
       getApi().createStory(story);
       fail(String.format("Expected create to fail with status %d", expectedStatus));
     } catch (FeignException e) {

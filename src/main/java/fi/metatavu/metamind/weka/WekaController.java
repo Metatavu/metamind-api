@@ -6,8 +6,7 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
-import org.apache.logging.log4j.Logger;
-
+import org.slf4j.Logger;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 

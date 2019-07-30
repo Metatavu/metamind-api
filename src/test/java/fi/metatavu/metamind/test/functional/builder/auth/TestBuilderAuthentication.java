@@ -1,7 +1,8 @@
 package fi.metatavu.metamind.test.functional.builder.auth;
 
 import java.io.IOException;
-
+import feign.Feign.Builder;
+import fi.metatavu.feign.UmaErrorDecoder;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 import fi.metatavu.metamind.test.functional.settings.TestSettings;
@@ -12,6 +13,7 @@ import fi.metatavu.metamind.test.functional.settings.TestSettings;
  * @author Antti Leppä
  */
 public class TestBuilderAuthentication extends AbstractTestBuilderAuthentication {
+  
   
   private AccessTokenProvider accessTokenProvider;
 
@@ -34,10 +36,18 @@ public class TestBuilderAuthentication extends AbstractTestBuilderAuthentication
    */
   @Override
   protected ApiClient createClient() throws IOException {
+    ApiClient result = new ApiClient();
     String accessToken = accessTokenProvider.getAccessToken();
     String authorization = accessToken != null ? String.format("Bearer %s", accessToken) : null;
     ApiClient apiClient = authorization != null ? new ApiClient("BearerAuth", authorization) : new ApiClient();
     String basePath = String.format("http://%s:%d/v2", TestSettings.getHost(), TestSettings.getPort());
+    if (accessToken != null) {
+      Builder feignBuilder = apiClient.getFeignBuilder();
+      feignBuilder.errorDecoder(new UmaErrorDecoder(feignBuilder, authorization, (rpiAuthorization) -> {
+        apiClient.setApiKey(rpiAuthorization);
+      }));
+    }
+    
     apiClient.setBasePath(basePath);
     return apiClient;
   }
