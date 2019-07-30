@@ -209,6 +209,7 @@ public class AuthenticationController {
     UsersResource users = realm.users();
     ClientRepresentation client = getClient(keycloak);
     String userIdString = userId.toString();
+    UUID policyId = userId;
     
     if (client == null) {
       throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
@@ -216,23 +217,23 @@ public class AuthenticationController {
     
     UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
     UserResource loggedUserResource = users.get(userIdString);
-    
-      String userName = loggedUserResource.toRepresentation().getUsername();
-      String policyNameTemplate = String.format("user-%s", userName);
-      UUID result = userId;
-      UserPolicyRepresentation policyRepresentation = userPolicies.findByName(policyNameTemplate);
-     
-      if (policyRepresentation == null) {
 
-        policyRepresentation = new UserPolicyRepresentation();
-        policyRepresentation.setName(policyNameTemplate);
-        policyRepresentation.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
-        policyRepresentation.addUser(userName);
-        policyRepresentation.setId(userIdString);
-        userPolicies.create(policyRepresentation);
-      }
-    
-    return result; 
+    String userName = loggedUserResource.toRepresentation().getUsername();
+    String policyNameTemplate = String.format("user-%s", userName);
+    UUID result = policyId;
+    UserPolicyRepresentation policyRepresentation = userPolicies.findByName(policyNameTemplate);
+
+    if (policyRepresentation == null) {
+
+      policyRepresentation = new UserPolicyRepresentation();
+      policyRepresentation.setName(policyNameTemplate);
+      policyRepresentation.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
+      policyRepresentation.addUser(userName);
+      policyRepresentation.setId(userIdString);
+      userPolicies.create(policyRepresentation);
+    }
+
+    return result;
   }
   
   /**

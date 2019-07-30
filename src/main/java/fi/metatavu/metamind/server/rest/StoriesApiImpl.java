@@ -62,8 +62,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   
   private static final String STORY_NAME_TEMPLATE = "story-%s";
   
-  private static final String EXCEPTION_CAUGHT = "Failed to apply authorization rules for story: %s";
-  
   @Inject
   private AuthenticationController authenticationController;
   
@@ -294,7 +292,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       authenticationController.upsertScopePermission(createdResourceId, authorisationScopesList, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyId);
     } catch (AuthorizationException e) {
       
-      return createInternalServerError(String.format(EXCEPTION_CAUGHT, e.getMessage()));
+      return createInternalServerError(String.format("Failed to apply authorization rules for story: %s", e.getMessage()));
     }
     
     return createOk(storyTranslator.translateStory(story));
