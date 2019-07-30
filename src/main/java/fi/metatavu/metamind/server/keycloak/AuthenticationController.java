@@ -203,7 +203,6 @@ public class AuthenticationController {
    * @return UUID user policy id
    */
   public UUID ensureUserPolicyExists(UUID userId) throws AuthorizationException {
-    UUID result = new UUID(0L, 0L);
     String realmName = getRealmName();
     Keycloak keycloak = getAdminClient();
     RealmResource realm = keycloak.realm(realmName);
@@ -220,7 +219,7 @@ public class AuthenticationController {
     
       String userName = loggedUserResource.toRepresentation().getUsername();
       String policyNameTemplate = String.format("user-%s", userName);
-      result = userId;
+      UUID result = userId;
       UserPolicyRepresentation policyRepresentation = userPolicies.findByName(policyNameTemplate);
      
       if (policyRepresentation == null) {
