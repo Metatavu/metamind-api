@@ -412,4 +412,12 @@
             baseTableName="knot" constraintName="FK_KNOT_STORY" onDelete="CASCADE" onUpdate="CASCADE" referencedColumnNames="id" referencedTableName="story"/>
   </changeSet>
   
+  <changeSet id="training-material-visibility" author="Daniil Smirnov">
+    <addColumn tableName="trainingmaterial">
+      <column name="visibility" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  
 </databaseChangeLog>
