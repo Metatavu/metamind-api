@@ -44,6 +44,7 @@ import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.utils.RegexUtils;
 import one.util.streamex.StreamEx;
 import opennlp.tools.doccat.BagOfWordsFeatureGenerator;
@@ -117,8 +118,8 @@ public class TrainingMaterialController {
    * @param creatorId creator's id
    * @return created trainingMaterial
    */
-  public TrainingMaterial createTrainingMaterial(TrainingMaterialType type, String name, String text, Story story, UUID creatorId) {
-    return trainingMaterialDAO.create(UUID.randomUUID(), type, name, text, story, creatorId, creatorId);
+  public TrainingMaterial createTrainingMaterial(TrainingMaterialType type, String name, String text, Story story, UUID creatorId, TrainingMaterialVisibility visibility) {
+    return trainingMaterialDAO.create(UUID.randomUUID(), type, name, text, story, creatorId, creatorId, visibility);
   }
   
   /**
@@ -242,8 +243,8 @@ public class TrainingMaterialController {
    * @param type type
    * @return training materials
    */
-  public List<TrainingMaterial> listTrainingMaterials(Story story, TrainingMaterialType type) {
-    return trainingMaterialDAO.list(true, story, type);
+  public List<TrainingMaterial> listTrainingMaterials(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
+    return trainingMaterialDAO.list(true, story, type, visibility);
   }
 
   /**
