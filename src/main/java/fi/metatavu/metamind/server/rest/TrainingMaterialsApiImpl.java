@@ -14,6 +14,7 @@ import fi.metatavu.metamind.nlp.TrainingMaterialController;
 import fi.metatavu.metamind.rest.api.TrainingMaterialsApi;
 import fi.metatavu.metamind.rest.model.TrainingMaterial;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.server.rest.translation.TrainingMaterialTranslator;
 import fi.metatavu.metamind.story.StoryController;
 
@@ -44,13 +45,14 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
     UUID loggedUserId = getLoggerUserId();
     UUID storyId = body.getStoryId();
     TrainingMaterialType type = body.getType();
+    TrainingMaterialVisibility visibility = body.getVisibility();
     
     fi.metatavu.metamind.persistence.models.Story story = storyId != null ? storyController.findStoryById(storyId) : null;
     if (storyId != null && story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.createTrainingMaterial(type, body.getName(), body.getText(), story, loggedUserId)));
+    return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.createTrainingMaterial(type, body.getName(), body.getText(), story, loggedUserId, visibility)));
   }
 
   @Override
@@ -80,7 +82,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
   }
   
   @Override
-  public Response listTrainingMaterials(UUID storyId, TrainingMaterialType type) {
+  public Response listTrainingMaterials(UUID storyId, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
     // TODO: Check permissions
     
     fi.metatavu.metamind.persistence.models.Story story = storyId != null ? storyController.findStoryById(storyId) : null;
@@ -88,7 +90,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    return createOk(trainingMaterialController.listTrainingMaterials(story, type).stream()
+    return createOk(trainingMaterialController.listTrainingMaterials(story, type, visibility).stream()
       .map(trainingMaterialTranslator::translateTrainingMaterial)
       .collect(Collectors.toList()));
   }
