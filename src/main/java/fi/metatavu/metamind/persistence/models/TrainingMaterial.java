@@ -33,6 +33,10 @@ public class TrainingMaterial {
   @Enumerated (EnumType.STRING)
   @Column(nullable = false)
   private TrainingMaterialType type;
+  
+  @Enumerated (EnumType.STRING)
+  @Column(nullable = false)
+  private TrainingMaterialVisibility visibility;
 
   @NotNull
   @NotEmpty
@@ -61,10 +65,6 @@ public class TrainingMaterial {
 
   @Column(nullable = false)
   private OffsetDateTime modifiedAt;
-  
-  @Enumerated (EnumType.STRING)
-  @Column(nullable = false)
-  private TrainingMaterialVisibility visibility;
 
   public UUID getId() {
     return id;

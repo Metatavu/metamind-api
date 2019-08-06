@@ -116,6 +116,7 @@ public class TrainingMaterialController {
    * @param text text
    * @param story story
    * @param creatorId creator's id
+   * @param visibility visibility
    * @return created trainingMaterial
    */
   public TrainingMaterial createTrainingMaterial(TrainingMaterialType type, String name, String text, Story story, UUID creatorId, TrainingMaterialVisibility visibility) {
@@ -241,6 +242,7 @@ public class TrainingMaterialController {
    * 
    * @param story filter materials by story
    * @param type type
+   * @param visibility visibility
    * @return training materials
    */
   public List<TrainingMaterial> listTrainingMaterials(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {

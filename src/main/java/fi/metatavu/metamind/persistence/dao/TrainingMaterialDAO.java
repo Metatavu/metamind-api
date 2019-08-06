@@ -32,18 +32,20 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
    * @param story story
    * @param creatorId creator's id
    * @param lastModifierId last modifier's id
+   * @param visibility visibility
    * @return created trainingMaterial
    */
+  @SuppressWarnings("squid:S00107")
   public TrainingMaterial create(UUID id, TrainingMaterialType type, String name, String text, Story story, UUID creatorId, UUID lastModifierId, TrainingMaterialVisibility visibility) {
     TrainingMaterial trainingMaterial = new TrainingMaterial();
     trainingMaterial.setType(type);
+    trainingMaterial.setVisibility(visibility);
     trainingMaterial.setName(name);
     trainingMaterial.setText(text);
     trainingMaterial.setStory(story);
     trainingMaterial.setId(id);
     trainingMaterial.setCreatorId(creatorId);
     trainingMaterial.setLastModifierId(lastModifierId);
-    trainingMaterial.setVisibility(visibility);
     return persist(trainingMaterial);
   }
 
