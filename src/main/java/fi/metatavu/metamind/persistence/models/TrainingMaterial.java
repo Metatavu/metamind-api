@@ -20,6 +20,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 
 @Entity
 @Cacheable
@@ -32,6 +33,10 @@ public class TrainingMaterial {
   @Enumerated (EnumType.STRING)
   @Column(nullable = false)
   private TrainingMaterialType type;
+  
+  @Enumerated (EnumType.STRING)
+  @Column(nullable = false)
+  private TrainingMaterialVisibility visibility;
 
   @NotNull
   @NotEmpty
@@ -75,6 +80,14 @@ public class TrainingMaterial {
   
   public void setType(TrainingMaterialType type) {
     this.type = type;
+  }
+  
+  public TrainingMaterialVisibility getVisibility() {
+    return visibility;
+  }
+  
+  public void setVisibility(TrainingMaterialVisibility visibility) {
+    this.visibility = visibility;
   }
 
   public String getName() {

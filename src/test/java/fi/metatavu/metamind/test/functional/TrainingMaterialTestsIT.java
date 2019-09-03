@@ -10,6 +10,7 @@ import org.junit.Test;
 import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.client.model.TrainingMaterial;
 import fi.metatavu.metamind.client.model.TrainingMaterialType;
+import fi.metatavu.metamind.client.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
 public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
@@ -19,7 +20,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       
-      assertNotNull(builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test"));
+      assertNotNull(builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY));
     }
   }
   
@@ -38,7 +39,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
   public void testFindTrainingMaterial() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
       
       builder.admin().trainingMaterial().assertFindFailStatus(404, UUID.randomUUID());
       TrainingMaterial foundTrainingMaterial = builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial);
@@ -52,7 +53,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
   public void testFindTrainingMaterialPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
       
       assertNotNull(builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial));
       builder.invalid().trainingMaterial().assertFindFailStatus(403, createdTrainingMaterial.getId());
@@ -64,7 +65,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
   public void testUpdateTrainingMaterial() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
 
       TrainingMaterial updateTrainingMaterial = builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial);
       updateTrainingMaterial.setName("Updated training material");
@@ -89,7 +90,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
   public void testUpdateIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
 
       builder.anonymous().trainingMaterial().assertUpdateFailStatus(401, createdTrainingMaterial);
       builder.invalid().trainingMaterial().assertUpdateFailStatus(403, createdTrainingMaterial);
@@ -101,7 +102,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
  
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
       TrainingMaterial foundTrainingMaterial = builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial);
       assertEquals(createdTrainingMaterial.getId(), foundTrainingMaterial.getId());
       builder.admin().trainingMaterial().delete(createdTrainingMaterial);
@@ -115,7 +116,7 @@ public class TrainingMaterialTestsIT extends AbstractFunctionalTest {
   public void testDeleteIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
       
       builder.anonymous().trainingMaterial().assertDeleteFailStatus(401, createdTrainingMaterial);
       builder.invalid().trainingMaterial().assertDeleteFailStatus(403, createdTrainingMaterial);

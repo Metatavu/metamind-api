@@ -12,6 +12,7 @@ import feign.FeignException;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.model.TrainingMaterial;
 import fi.metatavu.metamind.client.model.TrainingMaterialType;
+import fi.metatavu.metamind.client.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.client.TrainingMaterialsApi;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
@@ -35,12 +36,13 @@ public class IntentTrainingMaterialTestBuilderResource extends AbstractTestBuild
    * @param text text
    * @return
    */
-  public TrainingMaterial create(UUID storyId, TrainingMaterialType type, String name, String text) {
+  public TrainingMaterial create(UUID storyId, TrainingMaterialType type, String name, String text, TrainingMaterialVisibility visibility) {
     TrainingMaterial trainingMaterial = new TrainingMaterial();
     trainingMaterial.setName(name);
     trainingMaterial.setStoryId(storyId);
     trainingMaterial.setText(text);
     trainingMaterial.setType(type);
+    trainingMaterial.setVisibility(visibility);
     TrainingMaterial createdTrainingMaterial = getApi().createTrainingMaterial(trainingMaterial);
     return addClosable(createdTrainingMaterial);
   }

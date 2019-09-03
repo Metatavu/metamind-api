@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import fi.metatavu.metamind.persistence.models.*;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 
 /**
  * DAO class for TrainingMaterial
@@ -31,11 +32,14 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
    * @param story story
    * @param creatorId creator's id
    * @param lastModifierId last modifier's id
+   * @param visibility visibility
    * @return created trainingMaterial
    */
-  public TrainingMaterial create(UUID id, TrainingMaterialType type, String name, String text, Story story, UUID creatorId, UUID lastModifierId) {
+  @SuppressWarnings("squid:S00107")
+  public TrainingMaterial create(UUID id, TrainingMaterialType type, String name, String text, Story story, UUID creatorId, UUID lastModifierId, TrainingMaterialVisibility visibility) {
     TrainingMaterial trainingMaterial = new TrainingMaterial();
     trainingMaterial.setType(type);
+    trainingMaterial.setVisibility(visibility);
     trainingMaterial.setName(name);
     trainingMaterial.setText(text);
     trainingMaterial.setStory(story);
@@ -54,7 +58,7 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
    * 
    * @return found training materials
    */
-  public List<TrainingMaterial> list(boolean includeNullStories, Story story, TrainingMaterialType type) {
+  public List<TrainingMaterial> list(boolean includeNullStories, Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
     EntityManager entityManager = getEntityManager();
 
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -76,6 +80,10 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
     
     if (type != null) {
       restrictions.add(criteriaBuilder.equal(root.get(TrainingMaterial_.type), type));
+    }
+    
+    if (visibility != null) {
+      restrictions.add(criteriaBuilder.equal(root.get(TrainingMaterial_.visibility), visibility));
     }
 
     criteria.where(restrictions.toArray(new Predicate[0]));
@@ -132,6 +140,20 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
   public TrainingMaterial updateStory(TrainingMaterial trainingMaterial, Story story, UUID lastModifierId) {
     trainingMaterial.setLastModifierId(lastModifierId);
     trainingMaterial.setStory(story);
+    return persist(trainingMaterial);
+  }
+  
+  /**
+   * Updates visibility
+   * 
+   * @param trainingMaterial trainingMaterial
+   * @param visibility TrainingMaterilaVisibility
+   * @param lastModifiedId trainingMaterial
+   * @return updated trainingMaterial
+   */
+  public TrainingMaterial updateVisibility(TrainingMaterial trainingMaterial, TrainingMaterialVisibility visibility, UUID lastModifiedId) {
+    trainingMaterial.setLastModifierId(lastModifiedId);
+    trainingMaterial.setVisibility(visibility);
     return persist(trainingMaterial);
   }
 

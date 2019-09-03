@@ -30,6 +30,7 @@ public class TrainingMaterialTranslator {
     result.setId(jpaTrainingMaterial.getId());
     result.setModifiedAt(jpaTrainingMaterial.getModifiedAt());
     result.setText(jpaTrainingMaterial.getText());
+    result.setVisibility(jpaTrainingMaterial.getVisibility());
     result.setName(jpaTrainingMaterial.getName());
     result.setStoryId(jpaTrainingMaterial.getStory() != null ? jpaTrainingMaterial.getId() : null);
     result.setType(jpaTrainingMaterial.getType());

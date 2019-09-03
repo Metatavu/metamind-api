@@ -44,6 +44,7 @@ import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.utils.RegexUtils;
 import one.util.streamex.StreamEx;
 import opennlp.tools.doccat.BagOfWordsFeatureGenerator;
@@ -115,10 +116,11 @@ public class TrainingMaterialController {
    * @param text text
    * @param story story
    * @param creatorId creator's id
+   * @param visibility TrainingMaterialVisibility
    * @return created trainingMaterial
    */
-  public TrainingMaterial createTrainingMaterial(TrainingMaterialType type, String name, String text, Story story, UUID creatorId) {
-    return trainingMaterialDAO.create(UUID.randomUUID(), type, name, text, story, creatorId, creatorId);
+  public TrainingMaterial createTrainingMaterial(TrainingMaterialType type, String name, String text, Story story, UUID creatorId, TrainingMaterialVisibility visibility) {
+    return trainingMaterialDAO.create(UUID.randomUUID(), type, name, text, story, creatorId, creatorId, visibility);
   }
   
   /**
@@ -130,11 +132,13 @@ public class TrainingMaterialController {
    * @param name name
    * @param text text
    * @param lastModifierId last modifier id
+   * @param visibility TrainingMaterialVisibility
    * @return updated training material
    */
-  public TrainingMaterial updateTrainingMaterial(TrainingMaterial trainingMaterial, String name, String text, UUID lastModifierId) {
+  public TrainingMaterial updateTrainingMaterial(TrainingMaterial trainingMaterial, String name, String text, UUID lastModifierId, TrainingMaterialVisibility visibility) {
     trainingMaterial = trainingMaterialDAO.updateText(trainingMaterial, text, lastModifierId);
     trainingMaterial = trainingMaterialDAO.updateName(trainingMaterial, name, lastModifierId);
+    trainingMaterial = trainingMaterialDAO.updateVisibility(trainingMaterial, visibility, trainingMaterial.getId());
     requestTrainingMaterialUpdates(trainingMaterial);
 
     return trainingMaterial;
@@ -240,10 +244,11 @@ public class TrainingMaterialController {
    * 
    * @param story filter materials by story
    * @param type type
+   * @param visibility TrainingMaterialVisibility
    * @return training materials
    */
-  public List<TrainingMaterial> listTrainingMaterials(Story story, TrainingMaterialType type) {
-    return trainingMaterialDAO.list(true, story, type);
+  public List<TrainingMaterial> listTrainingMaterials(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
+    return trainingMaterialDAO.list(true, story, type, visibility);
   }
 
   /**
@@ -562,7 +567,7 @@ public class TrainingMaterialController {
     List<Intent> localIntents = new ArrayList<>();
     
     for (Intent intent : intents) {
-      if (intent.getGlobal()) {
+      if (Boolean.TRUE.equals(intent.getGlobal())) {
         globalIntents.add(intent);
       } else {
         localIntents.add(intent);
