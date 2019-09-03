@@ -567,7 +567,7 @@ public class TrainingMaterialController {
     List<Intent> localIntents = new ArrayList<>();
     
     for (Intent intent : intents) {
-      if (intent.getGlobal()) {
+      if (Boolean.TRUE.equals(intent.getGlobal())) {
         globalIntents.add(intent);
       } else {
         localIntents.add(intent);
