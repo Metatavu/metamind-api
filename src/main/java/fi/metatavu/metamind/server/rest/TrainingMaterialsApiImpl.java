@@ -106,7 +106,7 @@ public class TrainingMaterialsApiImpl extends AbstractRestApi implements Trainin
     
     UUID loggedUserId = getLoggerUserId();
     
-    return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.updateTrainingMaterial(trainingMaterial, body.getName(), body.getText(), loggedUserId)));
+    return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.updateTrainingMaterial(trainingMaterial, body.getName(), body.getText(), loggedUserId, body.getVisibility())));
   }
 
 }

@@ -116,7 +116,7 @@ public class TrainingMaterialController {
    * @param text text
    * @param story story
    * @param creatorId creator's id
-   * @param visibility visibility
+   * @param visibility TrainingMaterialVisibility
    * @return created trainingMaterial
    */
   public TrainingMaterial createTrainingMaterial(TrainingMaterialType type, String name, String text, Story story, UUID creatorId, TrainingMaterialVisibility visibility) {
@@ -132,11 +132,13 @@ public class TrainingMaterialController {
    * @param name name
    * @param text text
    * @param lastModifierId last modifier id
+   * @param visibility TrainingMaterialVisibility
    * @return updated training material
    */
-  public TrainingMaterial updateTrainingMaterial(TrainingMaterial trainingMaterial, String name, String text, UUID lastModifierId) {
+  public TrainingMaterial updateTrainingMaterial(TrainingMaterial trainingMaterial, String name, String text, UUID lastModifierId, TrainingMaterialVisibility visibility) {
     trainingMaterial = trainingMaterialDAO.updateText(trainingMaterial, text, lastModifierId);
     trainingMaterial = trainingMaterialDAO.updateName(trainingMaterial, name, lastModifierId);
+    trainingMaterial = trainingMaterialDAO.updateVisibility(trainingMaterial, visibility, trainingMaterial.getId());
     requestTrainingMaterialUpdates(trainingMaterial);
 
     return trainingMaterial;
@@ -242,7 +244,7 @@ public class TrainingMaterialController {
    * 
    * @param story filter materials by story
    * @param type type
-   * @param visibility visibility
+   * @param visibility TrainingMaterialVisibility
    * @return training materials
    */
   public List<TrainingMaterial> listTrainingMaterials(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {

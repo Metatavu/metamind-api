@@ -143,6 +143,14 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
     return persist(trainingMaterial);
   }
   
+  /**
+   * Updates visibility
+   * 
+   * @param trainingMaterial trainingMaterial
+   * @param visibility TrainingMaterilaVisibility
+   * @param lastModifiedId trainingMaterial
+   * @return updated trainingMaterial
+   */
   public TrainingMaterial updateVisibility(TrainingMaterial trainingMaterial, TrainingMaterialVisibility visibility, UUID lastModifiedId) {
     trainingMaterial.setLastModifierId(lastModifiedId);
     trainingMaterial.setVisibility(visibility);
