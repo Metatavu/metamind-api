@@ -18,7 +18,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   public void testCreateKnot() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      assertNotNull(builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content"));
+      assertNotNull(builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0));
     }
   }
   
@@ -38,7 +38,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       assertNotNull(story);
       
-      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0);
       builder.admin().knots().assertFindFailStatus(story.getId(), 404, UUID.randomUUID());
       builder.admin().knots().assertFindFailStatus(UUID.randomUUID(), 404, createdKnot.getId());
       Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
@@ -52,7 +52,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   public void testFindKnotPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0);
       assertNotNull(builder.admin().knots().findKnot(story, createdKnot));
       builder.invalid().knots().assertFindFailStatus(story.getId(), 403, createdKnot.getId());
       builder.anonymous().knots().assertFindFailStatus(story.getId(), 401, createdKnot.getId());
@@ -63,7 +63,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   public void testUpdateKnot() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0);
       builder.admin().knots().assertKnotsEqual(createdKnot, builder.admin().knots().findKnot(story, createdKnot));
 
       Knot updateKnot = builder.admin().knots().findKnot(story, createdKnot);
@@ -82,7 +82,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   public void testUpdateKnotPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0);
 
       builder.anonymous().knots().assertUpdateFailStatus(story, 401, createdKnot);
       builder.invalid().knots().assertUpdateFailStatus(story, 403, createdKnot);
@@ -94,7 +94,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       assertNotNull(story);
-      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0);
       Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
       assertEquals(createdKnot.getId(), foundKnot.getId());
       builder.admin().knots().delete(story, createdKnot);
@@ -107,7 +107,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
   public void testDeleteKnotPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content");
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0);
       builder.anonymous().knots().assertDeleteFailStatus(story, 401, createdKnot);
       builder.invalid().knots().assertDeleteFailStatus(story, 403, createdKnot);
     }
