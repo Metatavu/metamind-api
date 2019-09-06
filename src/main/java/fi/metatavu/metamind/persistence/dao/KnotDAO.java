@@ -38,7 +38,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
    * @param lastModifierId last modifier's id
    * @return created knot
    */
-  public Knot create(UUID id, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, UUID lastModifierId) {
+  public Knot create(UUID id, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, UUID lastModifierId, Double coordinateX, Double coordinateY) {
     Knot knot = new Knot();
     knot.setType(type);
     knot.setTokenizerType(tokenizerType);
@@ -47,6 +47,8 @@ public class KnotDAO extends AbstractDAO<Knot> {
     knot.setContent(content);
     knot.setStory(story);
     knot.setId(id);
+    knot.setCoordinateX(coordinateX);
+    knot.setCoordinateY(coordinateY);
     knot.setCreatorId(creatorId);
     knot.setLastModifierId(lastModifierId);
     return persist(knot);
@@ -148,6 +150,20 @@ public class KnotDAO extends AbstractDAO<Knot> {
   public Knot updateStory(Knot knot, Story story, UUID lastModifierId) {
     knot.setLastModifierId(lastModifierId);
     knot.setStory(story);
+    return persist(knot);
+  }
+  
+  /**
+   * Updates knot coordinates
+   * 
+   * @param knot
+   * @param coordinateX Integer coordinateX
+   * @param coordinateY Integer coordinateY
+   * @return updated knot
+   */
+  public Knot updateCoordinates(Knot knot, Double coordinateX, Double coordinateY) {
+    knot.setCoordinateX(coordinateX);
+    knot.setCoordinateY(coordinateY);
     return persist(knot);
   }
 

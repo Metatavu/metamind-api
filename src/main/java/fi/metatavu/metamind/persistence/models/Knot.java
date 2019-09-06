@@ -61,6 +61,12 @@ public class Knot {
   @Column(nullable = false)
   @NotNull
   private UUID lastModifierId;
+  
+  @Column(nullable = true)
+  private Double coordinateX;
+  
+  @Column(nullable = true)
+  private Double coordinateY;
 
   @Column(nullable = false)
   private OffsetDateTime createdAt;
@@ -138,6 +144,22 @@ public class Knot {
 
   public void setLastModifierId(UUID lastModifierId) {
     this.lastModifierId = lastModifierId;
+  }
+  
+  public Double getCoordinateX() {
+    return coordinateX;
+  }
+  
+  public void setCoordinateX(Double coordinateX) {
+    this.coordinateX = coordinateX;
+  }
+  
+  public Double getCoordinateY() {
+    return coordinateY;
+  }
+  
+  public void setCoordinateY(Double coordinateY) {
+    this.coordinateY = coordinateY;
   }
 
   public OffsetDateTime getCreatedAt() {
