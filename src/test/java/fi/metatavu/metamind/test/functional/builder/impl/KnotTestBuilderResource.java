@@ -32,6 +32,8 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
    * @param type knot type
    * @param name knot name 
    * @param content knot content
+   * @param coordinateX Double coordinate
+   * @param coordinateY Double coordinate
    * @return
    */
   public Knot create(Story story, KnotType type, String name, String content, Double coordinateX, Double coordinateY) {
