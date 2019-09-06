@@ -420,4 +420,26 @@
     </addColumn>
   </changeSet>
   
+  <changeSet id="intent-coordinates" author="Daniil Smirnov">
+    <addColumn tableName="intent">
+      <column name="coordinatex" type="double">
+        <constraints nullable="true"/>
+      </column>
+      <column name="coordinatey" type="double">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  
+  <changeSet id="knot-coordinates" author="Daniil Smirnov">
+    <addColumn tableName="knot">
+      <column name="coordinatex" type="double">
+        <constraints nullable="true"/>
+      </column>
+      <column name="coordinatey" type="double">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  
 </databaseChangeLog>
