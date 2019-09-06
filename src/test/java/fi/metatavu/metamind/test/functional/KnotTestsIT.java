@@ -79,7 +79,6 @@ public class KnotTestsIT extends AbstractFunctionalTest {
       Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
       assertEquals(createdKnot.getId(), foundKnot.getId());
       assertEquals(updateKnot.getName(), foundKnot.getName());
-      System.out.println("Update knot coordinates: " + updateKnot.getCoordinates());
       assertEquals(updateKnot.getCoordinates(), foundKnot.getCoordinates());
     }
   }
