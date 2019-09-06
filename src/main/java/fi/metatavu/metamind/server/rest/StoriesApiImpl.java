@@ -516,7 +516,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
     Boolean global = body.isisGlobal();
     String quickResponse = body.getQuickResponse();
     Integer quickResponseOrder = body.getQuickResponseOrder();
-    
     if (quickResponseOrder == null) {
       quickResponseOrder = 0;
     }
