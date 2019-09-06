@@ -2,6 +2,7 @@ package fi.metatavu.metamind.server.rest.translation;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import fi.metatavu.metamind.rest.model.Coordinates;
 import fi.metatavu.metamind.rest.model.Knot;
 
 /**
@@ -24,6 +25,7 @@ public class KnotTranslator {
     if (jpaKnot == null) {
       return null;
     }
+    Coordinates coordinates = new Coordinates();
 
     Knot result = new Knot();
     result.setCreatedAt(jpaKnot.getCreatedAt());
@@ -33,6 +35,8 @@ public class KnotTranslator {
     result.setName(jpaKnot.getName());
     result.setStoryId(jpaKnot.getStory() != null ? jpaKnot.getStory().getId() : null);
     result.setType(jpaKnot.getType());
+    result.setCoordinates(coordinates.x(jpaKnot.getCoordinateX()));
+    result.setCoordinates(coordinates.y(jpaKnot.getCoordinateY()));
     result.setHint(jpaKnot.getHint());
     result.setTokenizer(jpaKnot.getTokenizerType());
       
