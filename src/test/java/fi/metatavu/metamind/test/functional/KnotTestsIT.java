@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.junit.Test;
 
+import fi.metatavu.metamind.client.model.Coordinates;
 import fi.metatavu.metamind.client.model.Knot;
 import fi.metatavu.metamind.client.model.KnotType;
 import fi.metatavu.metamind.client.model.Story;
@@ -64,15 +65,20 @@ public class KnotTestsIT extends AbstractFunctionalTest {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       Knot createdKnot = builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0);
+      Coordinates coordinates = new Coordinates();
       builder.admin().knots().assertKnotsEqual(createdKnot, builder.admin().knots().findKnot(story, createdKnot));
 
       Knot updateKnot = builder.admin().knots().findKnot(story, createdKnot);
       updateKnot.setName("updated knot");
+      updateKnot.setCoordinates(coordinates.x(20.0));
+      updateKnot.setCoordinates(coordinates.y(40.0));
       Knot updatedKnot = builder.admin().knots().updateKnot(story, updateKnot);
       assertEquals(createdKnot.getId(), updatedKnot.getId());
       assertEquals(updateKnot.getName(), updatedKnot.getName());
+      assertEquals(updateKnot.getCoordinates(), updatedKnot.getCoordinates());
       Knot foundKnot = builder.admin().knots().findKnot(story, createdKnot);
       assertEquals(createdKnot.getId(), foundKnot.getId());
+      assertEquals(createdKnot.getCoordinates(), foundKnot.getCoordinates());
       assertEquals(updateKnot.getName(), foundKnot.getName());
     }
   }

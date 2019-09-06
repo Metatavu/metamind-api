@@ -36,6 +36,8 @@ public class KnotDAO extends AbstractDAO<Knot> {
    * @param story story
    * @param creatorId creator's id
    * @param lastModifierId last modifier's id
+   * @param coordinateX Double coordinate
+   * @param coordinateY Double coordinate
    * @return created knot
    */
   public Knot create(UUID id, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, UUID lastModifierId, Double coordinateX, Double coordinateY) {
