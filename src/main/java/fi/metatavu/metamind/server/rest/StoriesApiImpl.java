@@ -174,6 +174,10 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Override
   public Response createKnot(Knot body, UUID storyId) {
     UUID loggedUserId = getLoggerUserId();
+    if (body.getCoordinates() == null) {
+      return createBadRequest(String.format("Knot coordinates %s not found", body.getId())); 
+    }
+    
     Double coordinateX = body.getCoordinates().getX();
     Double coordinateY = body.getCoordinates().getY();
     
@@ -558,6 +562,10 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Override
   public Response updateKnot(Knot body, UUID storyId, UUID knotId) {
     UUID loggedUserId = getLoggerUserId();
+    if (body.getCoordinates() == null) {
+      return createBadRequest(String.format("Knot coordinates %s not found", body.getId())); 
+    }
+    
     Double coordinateX = body.getCoordinates().getX();
     Double coordinateY = body.getCoordinates().getY();
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
