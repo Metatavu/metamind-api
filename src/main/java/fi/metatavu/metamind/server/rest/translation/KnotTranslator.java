@@ -26,6 +26,8 @@ public class KnotTranslator {
       return null;
     }
     Coordinates coordinates = new Coordinates();
+    coordinates.setX(jpaKnot.getCoordinateX());
+    coordinates.setY(jpaKnot.getCoordinateY());
 
     Knot result = new Knot();
     result.setCreatedAt(jpaKnot.getCreatedAt());
@@ -35,8 +37,7 @@ public class KnotTranslator {
     result.setName(jpaKnot.getName());
     result.setStoryId(jpaKnot.getStory() != null ? jpaKnot.getStory().getId() : null);
     result.setType(jpaKnot.getType());
-    result.setCoordinates(coordinates.x(jpaKnot.getCoordinateX()));
-    result.setCoordinates(coordinates.y(jpaKnot.getCoordinateY()));
+    result.setCoordinates(coordinates);
     result.setHint(jpaKnot.getHint());
     result.setTokenizer(jpaKnot.getTokenizerType());
       
