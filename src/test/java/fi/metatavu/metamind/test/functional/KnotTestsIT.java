@@ -20,6 +20,7 @@ public class KnotTestsIT extends AbstractFunctionalTest {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       assertNotNull(builder.admin().knots().create(story, KnotType.TEXT, "Test", "Content", 10.0, 20.0));
+      assertNotNull(builder.admin().knots().create(story, KnotType.TEXT, "Test Null", "Content", null, null));
     }
   }
   
@@ -80,6 +81,13 @@ public class KnotTestsIT extends AbstractFunctionalTest {
       assertEquals(createdKnot.getId(), foundKnot.getId());
       assertEquals(updateKnot.getName(), foundKnot.getName());
       assertEquals(updateKnot.getCoordinates(), foundKnot.getCoordinates());
+      
+      updateKnot.setCoordinates(coordinates.x(null));
+      updateKnot.setCoordinates(coordinates.y(null));
+      Knot newUpdatedKnot = builder.admin().knots().updateKnot(story, updateKnot);
+      assertEquals(updateKnot.getCoordinates(), newUpdatedKnot.getCoordinates());
+      Knot newFoundKnot = builder.admin().knots().findKnot(story, createdKnot);
+      assertEquals(updateKnot.getCoordinates(), newFoundKnot.getCoordinates());
     }
   }
   
