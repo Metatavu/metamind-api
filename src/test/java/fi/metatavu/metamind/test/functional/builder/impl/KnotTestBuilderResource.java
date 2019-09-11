@@ -39,13 +39,14 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
   public Knot create(Story story, KnotType type, String name, String content, Double coordinateX, Double coordinateY) {
     Knot knot = new Knot();
     Coordinates coordinates = new Coordinates();
+    coordinates.setX(coordinateX);
+    coordinates.setY(coordinateY);
     knot.setType(type);
     knot.setName(name);
     knot.setContent(content);
     knot.setTokenizer(TokenizerType.WHITESPACE);
     knot.setHint("hint");
-    knot.setCoordinates(coordinates.x(coordinateX));
-    knot.setCoordinates(coordinates.y(coordinateY));
+    knot.setCoordinates(coordinates);
     return addClosable(getApi().createKnot(knot, story.getId()));
   }
 
