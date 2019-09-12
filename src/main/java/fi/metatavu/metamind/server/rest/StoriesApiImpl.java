@@ -175,12 +175,15 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   public Response createKnot(Knot body, UUID storyId) {
     UUID loggedUserId = getLoggerUserId();
     
+    Double coordinateX = body.getCoordinates() != null ? body.getCoordinates().getX() : null;
+    Double coordinateY = body.getCoordinates() != null ? body.getCoordinates().getY() : null;
+    
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
     }
     
-    return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), story, loggedUserId)));
+    return createOk(knotTranslator.translateKnot(storyController.createKnot(body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), story, loggedUserId, coordinateX, coordinateY)));
   }
 
   @Override
@@ -556,6 +559,9 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   @Override
   public Response updateKnot(Knot body, UUID storyId, UUID knotId) {
     UUID loggedUserId = getLoggerUserId();
+    
+    Double coordinateX = body.getCoordinates() != null ? body.getCoordinates().getX() : null;
+    Double coordinateY = body.getCoordinates() != null ? body.getCoordinates().getY() : null;
     fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
     if (story == null) {
       return createBadRequest(String.format("Story %s not found", storyId)); 
@@ -570,7 +576,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       return createBadRequest(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
     }
     
-    return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), loggedUserId)));
+    return createOk(knotTranslator.translateKnot(storyController.updateKnot(knot, body.getType(), body.getTokenizer(), body.getName(), body.getContent(), body.getHint(), loggedUserId, coordinateX, coordinateY)));
   }
 
   @Override

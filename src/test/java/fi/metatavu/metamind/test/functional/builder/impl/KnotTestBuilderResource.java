@@ -11,6 +11,7 @@ import org.json.JSONException;
 import feign.FeignException;
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.KnotsApi;
+import fi.metatavu.metamind.client.model.Coordinates;
 import fi.metatavu.metamind.client.model.Knot;
 import fi.metatavu.metamind.client.model.KnotType;
 import fi.metatavu.metamind.client.model.Story;
@@ -31,15 +32,21 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
    * @param type knot type
    * @param name knot name 
    * @param content knot content
+   * @param coordinateX Double coordinate
+   * @param coordinateY Double coordinate
    * @return
    */
-  public Knot create(Story story, KnotType type, String name, String content) {
+  public Knot create(Story story, KnotType type, String name, String content, Double coordinateX, Double coordinateY) {
     Knot knot = new Knot();
+    Coordinates coordinates = new Coordinates();
+    coordinates.setX(coordinateX);
+    coordinates.setY(coordinateY);
     knot.setType(type);
     knot.setName(name);
     knot.setContent(content);
     knot.setTokenizer(TokenizerType.WHITESPACE);
     knot.setHint("hint");
+    knot.setCoordinates(coordinates);
     return addClosable(getApi().createKnot(knot, story.getId()));
   }
 

@@ -105,10 +105,12 @@ public class StoryController {
    * @param hint hint
    * @param story story
    * @param creatorId creator's id
+   * @param coordinateX Double coordinate
+   * @param coordinateY Double coordinate
    * @return created knot
    */
-  public Knot createKnot(KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId) {
-    return knotDAO.create(UUID.randomUUID(), type, tokenizerType, name, content, hint, story, creatorId, creatorId);
+  public Knot createKnot(KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, Double coordinateX, Double coordinateY) {
+    return knotDAO.create(UUID.randomUUID(), type, tokenizerType, name, content, hint, story, creatorId, creatorId, coordinateX, coordinateY);
   }
   
   /**
@@ -276,14 +278,17 @@ public class StoryController {
    * @param content content
    * @param hint hint
    * @param lastModifierId last modifier's id
+   * @param coordinateX Double coordinate
+   * @param coordinateY Double coordinate
    * @return updated knot
    */
-  public Knot updateKnot(Knot knot, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, UUID lastModifierId) {
+  public Knot updateKnot(Knot knot, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, UUID lastModifierId, Double coordinateX, Double coordinateY) {
     knot = knotDAO.updateContent(knot, content, lastModifierId);
     knot = knotDAO.updateName(knot, name, lastModifierId);
     knot = knotDAO.updateType(knot, type, lastModifierId);
     knot = knotDAO.updateTokenizerType(knot, tokenizerType, lastModifierId);
     knot = knotDAO.updateHint(knot, hint, lastModifierId);
+    knot = knotDAO.updateCoordinates(knot, coordinateX, coordinateY);
     return knot;
   }
 
