@@ -26,13 +26,13 @@ public class QuickResponseDAO extends AbstractDAO<QuickResponse> {
    * Creates new quick response
    * 
    * @param message Message that quick response is related to
-   * @param quickResponseText quick response as a string
+   * @param text quick response as a string
    * @return created quick response
    */
-  public QuickResponse create(Message message, String quickResponseText) {
+  public QuickResponse create(Message message, String text) {
     QuickResponse quickResponseEntity = new QuickResponse();
     quickResponseEntity.setMessage(message);
-    quickResponseEntity.setQuickResponseText(quickResponseText);
+    quickResponseEntity.setText(text);
     return persist(quickResponseEntity);
   }
   

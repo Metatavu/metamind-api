@@ -3,6 +3,7 @@ package fi.metatavu.metamind.persistence.dao;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -10,7 +11,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.hibernate.jpa.criteria.compile.CriteriaQueryTypeQueryAdapter;
 import org.slf4j.Logger;
 
 /**
@@ -37,7 +37,7 @@ public abstract class AbstractDAO<T> {
    * @return entity or null if non found
    */
   @SuppressWarnings("unchecked")
-  public T findById(String id) {
+  public T findById(UUID id) {
     return (T) getEntityManager().find(getGenericTypeClass(), id);
   }
   
@@ -137,20 +137,10 @@ public abstract class AbstractDAO<T> {
       return null;
     
     if (list.size() > 1) {
-      logger.error("SingleResult query returned %d elements from %s", list.size(), getGenericTypeClass().getName());
+      logger.error("SingleResult query returned {} elements from {}", list.size(), getGenericTypeClass().getName());
     }
 
     return list.get(list.size() - 1);
-  }
-  
-  /**
-   * Prints query as HQL. Used for debugging purposes only
-   * 
-   * @param query query
-   * @return query as HQL
-   */
-  protected String getQueryHQL(Query query) {
-    return ((CriteriaQueryTypeQueryAdapter<?>) query).getHibernateQuery().getQueryString();
   }
 
   private Class<?> getFirstTypeArgument(ParameterizedType parameterizedType) {

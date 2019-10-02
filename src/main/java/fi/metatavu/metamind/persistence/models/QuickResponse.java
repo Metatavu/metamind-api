@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 public class QuickResponse {
@@ -23,7 +23,7 @@ public class QuickResponse {
   @NotNull
   @NotEmpty
   @Column(nullable = false)
-  private String quickResponseText;
+  private String text;
 
   public Long getId() {
     return id;
@@ -40,13 +40,13 @@ public class QuickResponse {
   public void setMessage(Message message) {
     this.message = message;
   }
-
-  public String getQuickResponseText() {
-    return quickResponseText;
+  
+  public String getText() {
+    return text;
   }
-
-  public void setQuickResponseText(String quickResponseText) {
-    this.quickResponseText = quickResponseText;
+  
+  public void setText(String text) {
+    this.text = text;
   }
   
 }

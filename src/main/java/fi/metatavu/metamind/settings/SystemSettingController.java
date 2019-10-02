@@ -177,16 +177,6 @@ public class SystemSettingController {
     
     return systemSettingDAO.updateValue(systemSetting, value);
   }
-  
-  /**
-   * Finds system setting by id
-   * 
-   * @param id system setting id
-   * @return system setting or null if not found
-   */
-  public SystemSetting findSystemSetting(String id) {
-    return systemSettingDAO.findById(id);
-  }
 
   /**
    * Finds system setting by key

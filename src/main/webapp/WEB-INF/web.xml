@@ -7,5 +7,6 @@
   <display-name>Metamind API</display-name>
   <description>Metamind API</description>
   <module-name>metamind</module-name>
+  <distributable/>
 
 </web-app>
