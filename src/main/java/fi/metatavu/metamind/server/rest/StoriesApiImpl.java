@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import fi.metatavu.metamind.bot.BotController;
 import fi.metatavu.metamind.bot.BotResponse;
@@ -57,6 +58,9 @@ import fi.metatavu.metamind.story.StoryController;
 public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   private static final int MAX_KNOT_REDIRECTS = 50;
+
+  @Inject
+  private Logger logger;
 
   @Inject
   private SessionController sessionController;
@@ -224,7 +228,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       if (message == null) {
         return createInternalServerError("Could not create new message");
       }
-      
+
       for (String response : botRuntimeContext.getResponses()) {
         messageResponses.add(messageController.createMessageResponse(message, response));
       }
@@ -248,6 +252,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(entry.getKey());
         if (variable != null) {
           sessionController.setSessionVariableValue(session, variable, entry.getValue());
+        } else {
+          logger.warn("Failed to store variable {} because it does not exist", entry.getKey());
         }
       });
       

@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
 
 import fi.metatavu.metamind.bot.BotRuntimeContext;
 import fi.metatavu.metamind.persistence.models.Knot;
@@ -24,6 +25,9 @@ import fi.metatavu.metamind.story.StoryController;
  */
 @ApplicationScoped
 public class BotSessionScriptBinding {
+
+  @Inject
+  private Logger logger;
 
   @Inject
   private SessionController sessionController; 
@@ -95,6 +99,7 @@ public class BotSessionScriptBinding {
     Variable variable = storyController.findVariableByStoryAndName(story, variableName);
     
     if (variable == null) {
+      logger.warn("Failed to load variable {} because it does not exist", variableName);
       return null;
     }
     
