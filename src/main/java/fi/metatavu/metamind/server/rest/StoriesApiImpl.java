@@ -1,6 +1,7 @@
 package fi.metatavu.metamind.server.rest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -212,7 +213,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
       botRuntimeContext.setLoggedUserId(loggedUserId);
       botRuntimeContext.setCurrentKnot(knot);
       botRuntimeContext.setMatchedIntent(matchedIntent);
-      botRuntimeContext.setVariableValues(botResponse.getVariableValues());
+      botRuntimeContext.setVariableValues(new HashMap<>(botResponse.getVariableValues()));
       botRuntimeContext.setCurrentMessageContent(content);  
       
       scriptProcessor.processScripts();
