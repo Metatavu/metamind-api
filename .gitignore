@@ -5,3 +5,6 @@
 /bin/
 /.vscode
 .factorypath
+/.cargo
+/keycloak*
+/.DS_Store
