@@ -129,20 +129,14 @@ public class BotSessionScriptBinding {
    * @param value value
    */
   public void setVariableValue(String variableName, Object value) {
-    System.out.println("setVariableValue 1");
-    
     Session session = runtimeContext.getSession();
     Story story = session.getStory();
     Variable variable = storyController.findVariableByStoryAndName(story, variableName);
-
-    System.out.println("setVariableValue 2");
 
     if (variable == null) {
       logger.warn("Could not store session variable value because variable {} does not exist", variableName);
       return;
     }
-
-    System.out.println(String.format("setVariableValue 3 %s: %s", variableName, value));
     
     runtimeContext.setVariableValue(variable.getId(), value);
   }

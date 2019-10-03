@@ -184,6 +184,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response createMessage(fi.metatavu.metamind.rest.model.Message body, UUID storyId) {
+    System.out.println("Incoming message");
+    
     Session session = sessionController.findSessionById(body.getSessionId());
     if (session == null) {
       return createBadRequest("Invalid session id");
@@ -247,6 +249,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
  
       messageController.updateMessageTargetKnot(message, currentKnot, loggedUserId);
       sessionController.updateSessionCurrentKnot(session, currentKnot, loggedUserId);
+      
+      System.out.println("Processing variables...");
       
       botRuntimeContext.getVariableValues().entrySet().stream().forEach(entry -> {
         System.out.println(String.format("Setting %s to %s", entry.getKey(), entry.getValue()));
