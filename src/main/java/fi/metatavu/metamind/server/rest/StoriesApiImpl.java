@@ -253,7 +253,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
         if (variable != null) {
           sessionController.setSessionVariableValue(session, variable, entry.getValue());
         } else {
-          logger.warn("Failed to store variable {} because it does not exist", entry.getKey());
+          logger.warn("Failed to save session variable {} because it does not exist", entry.getKey());
         }
       });
       
