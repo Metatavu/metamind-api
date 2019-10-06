@@ -190,6 +190,17 @@ public class StoryController {
   public List<Knot> listKnotsByStory(Story story) {
     return knotDAO.listByStory(story);
   }
+
+  /**
+   * Lists knots by given parameters
+   * 
+   * @param story story
+   * @param nameLike filter by knots which's name matches like query. Ignored if null given
+   * @return matching knots
+   */
+  public List<Knot> listKnots(Story story, String nameLike) {
+    return knotDAO.list(story, nameLike);
+  }
   
   /**
    * List variables by story
