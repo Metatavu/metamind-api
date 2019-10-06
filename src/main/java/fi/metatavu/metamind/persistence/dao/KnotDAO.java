@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,7 +9,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+import org.apache.commons.lang3.StringUtils;
 
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Knot_;
@@ -53,10 +57,10 @@ public class KnotDAO extends AbstractDAO<Knot> {
   }
 
   /**
-   * Lists intents by story
+   * Lists knots by story
    * 
-   * @param sourceKnot story
-   * @return List of intents
+   * @param story story
+   * @return List of knots
    */
   public List<Knot> listByStory(Story story) {
     EntityManager entityManager = getEntityManager();
@@ -67,6 +71,36 @@ public class KnotDAO extends AbstractDAO<Knot> {
    
     criteria.select(root);
     criteria.where(criteriaBuilder.equal(root.get(Knot_.story), story));
+    
+    TypedQuery<Knot> query = entityManager.createQuery(criteria);
+    
+    return query.getResultList();
+  }
+
+  /**
+   * Lists knots
+   * 
+   * @param story story
+   * @param nameLike filter by knots which's name matches like query
+   * @return List of knots
+   */
+  public List<Knot> list(Story story, String nameLike) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Knot> criteria = criteriaBuilder.createQuery(Knot.class);
+    Root<Knot> root = criteria.from(Knot.class);
+    
+    List<Predicate> restrictions = new ArrayList<>();
+
+    restrictions.add(criteriaBuilder.equal(root.get(Knot_.story), story));
+    
+    if (StringUtils.isNotBlank(nameLike)) {
+      restrictions.add(criteriaBuilder.like(root.get(Knot_.name), nameLike));
+    }
+    
+    criteria.select(root);
+    criteria.where(criteriaBuilder.and(restrictions.toArray(new Predicate[0])));
     
     TypedQuery<Knot> query = entityManager.createQuery(criteria);
     
