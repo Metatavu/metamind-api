@@ -18,7 +18,8 @@ import fi.metatavu.metamind.test.functional.builder.auth.TestBuilderAuthenticati
  */
 public class TestBuilder implements AutoCloseable {
 
-  private static final String REALM = "test";
+  private static final String REALM = "metamind";
+  private static final String SERVER_URL = "http://localhost:1234";
   private static final String CLIENT_ID = "ui";
   private static final String ADMIN_USER = "admin";
   private static final String ADMIN_PASSWORD = "admin";
@@ -43,7 +44,7 @@ public class TestBuilder implements AutoCloseable {
       return admin;
     }
 
-    return admin = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, CLIENT_SECRET));
+    return admin = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, CLIENT_SECRET, SERVER_URL));
   }
   
   /**
@@ -57,7 +58,7 @@ public class TestBuilder implements AutoCloseable {
       return manager;
     }
 
-    return manager = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, MANAGER_USER, MANAGER_PASSWORD, CLIENT_SECRET));
+    return manager = new TestBuilderAuthentication(this, new DefaultAccessTokenProvider(REALM, CLIENT_ID, MANAGER_USER, MANAGER_PASSWORD, CLIENT_SECRET, SERVER_URL));
   }
 
   /**

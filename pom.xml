@@ -645,14 +645,14 @@
                       <KEYCLOAK_ADMIN_USER>master</KEYCLOAK_ADMIN_USER>
                       <KEYCLOAK_ADMIN_PASS>pass</KEYCLOAK_ADMIN_PASS>
                       <KEYCLOAK_ADMIN_CLIENT_ID>admin-cli</KEYCLOAK_ADMIN_CLIENT_ID>
-                      <KEYCLOAK_CONFIG_PATH>/opt/docker/keycloak.json</KEYCLOAK_CONFIG_PATH>
+                      <KEYCLOAK_CONFIG_PATH>/opt/docker/scripts/keycloak.json</KEYCLOAK_CONFIG_PATH>
                       <KUBERNETES_NAMESPACE>test</KUBERNETES_NAMESPACE>
                       <KUBERNETES_LABELS>test</KUBERNETES_LABELS>
                       <runmode>TEST</runmode>
                     </env>
                     <volumes>
                       <bind>
-                        <volume>${project.basedir}/scripts:/opt/docker</volume>
+                        <volume>${project.basedir}/scripts:/opt/docker/scripts</volume>
                       </bind>
                     </volumes>
                   </run>

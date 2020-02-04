@@ -22,7 +22,7 @@ import io.restassured.specification.RequestSpecification;
  */
 public class DefaultAccessTokenProvider implements AccessTokenProvider {
   
-  private static final String AUTH_SERVER_URL = "http://localhost:8280";
+  private static final String AUTH_SERVER_URL = "http://test-keycloak:8080";
   private static final int EXPIRE_SLACK = 30;
 
   private String realm;
@@ -30,11 +30,12 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
   private String username;
   private String password;
   private String clientSecret;
+  private String serverUrl;
   
   private String accessToken;
   private OffsetDateTime expires; 
   
-  public DefaultAccessTokenProvider(String realm, String clientId, String username, String password, String clientSecret) throws IOException {
+  public DefaultAccessTokenProvider(String realm, String clientId, String username, String password, String clientSecret, String serverUrl) throws IOException {
     super();
     this.realm = realm;
     this.clientId = clientId;
@@ -43,27 +44,30 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
     this.clientSecret = clientSecret;
     this.accessToken = null;
     this.expires = null;
+    this.serverUrl = serverUrl;
   }
 
   @Override
   public String getAccessToken() throws IOException {
+    
     if (accessToken != null && expires != null && expires.isAfter(OffsetDateTime.now())) {
       return accessToken;
     }
-    
-    String path = String.format("/auth/realms/%s/protocol/openid-connect/token", realm);
 
+    String path = String.format("/auth/realms/%s/protocol/openid-connect/token", realm);
+      
     RequestSpecification request = given()
       .baseUri(AUTH_SERVER_URL)
       .formParam("client_id", clientId)
       .formParam("grant_type", "password")
       .formParam("username", username)
-      .formParam("password", password);
-
+      .formParam("password", password)
+      .formParam("serverUrl", serverUrl);
+    
     if (clientSecret != null) {
       request.formParam("client_secret", clientSecret);
     }
-
+    
     String response = request.post(path)
       .getBody()
       .asString(); 
