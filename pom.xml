@@ -112,6 +112,7 @@
     <mariadb-module.version>2.3.0</mariadb-module.version>
     <metamind-api-client.version>2.0.13</metamind-api-client.version>
     <feign-uma.version>1.0.2</feign-uma.version>
+
   
     <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>
     <skipCoverage>true</skipCoverage>
@@ -553,8 +554,8 @@
       </activation>
       
       <properties>
-        <it.port.http>58080</it.port.http>
-        <it.host>api-itest.metamind.fi</it.host>
+        <it.port.http>1234</it.port.http>
+        <it.host>localhost</it.host>
         <it.jdbc.driver>org.mariadb.jdbc.MySQLDataSource</it.jdbc.driver>
         <it.jdbc.module>com.mariadb.jdbc</it.jdbc.module>
         <it.jdbc.dbname>mmtest</it.jdbc.dbname>
@@ -568,6 +569,122 @@
       
       <build>
         <plugins>
+          <plugin>
+          	<groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <configuration>
+              <images>
+            	   <image>
+                  <name>mysql:5.6</name>
+                  <alias>test-mysql</alias>
+                  <run>
+                    <ports>
+                      <port>3306:3306 </port>
+                    </ports>
+                    <env>
+                      <MYSQL_ROOT_PASSWORD>rootpass</MYSQL_ROOT_PASSWORD>
+                      <MYSQL_DATABASE>db</MYSQL_DATABASE>
+                      <MYSQL_USER>user</MYSQL_USER>
+                      <MYSQL_PASSWORD>pass</MYSQL_PASSWORD>
+                    </env>
+                    <wait>
+                      <log>ready for connections.</log>
+                    </wait>
+                    <cmd>--lower_case_table_names=1</cmd>
+                  </run>
+                </image>
+                <image>
+                  <name>jboss/keycloak:${keycloak.version}</name>
+                  <alias>test-keycloak</alias>
+                  <run>
+                    <env>
+                      <KEYCLOAK_USER>admin</KEYCLOAK_USER>
+                      <KEYCLOAK_PASSWORD>admin</KEYCLOAK_PASSWORD>
+                      <KEYCLOAK_IMPORT>/opt/docker/kc.json</KEYCLOAK_IMPORT>
+                    </env>
+                    <volumes>
+                      <bind>
+                        <volume>${project.basedir}/test-volumes/keycloak:/opt/docker</volume>
+                      </bind>
+                    </volumes>
+                    <ports>
+                      <port>8080:8080</port>
+                    </ports>
+                    <wait>
+                      <log>Resuming server</log>
+                      <time>120000</time>
+                    </wait>
+                  </run>
+                </image>
+                <image>
+                  <name>test-api</name>
+                  <build>
+                    <dockerFileDir>${project.basedir}</dockerFileDir>
+                    <filter>@</filter>
+                  </build>
+                  <run>
+                    <ports>
+                      <port>1234:8080</port>
+                    </ports>
+                    <links>
+                      <link>test-mysql:test-mysql</link>
+                      <link>test-keycloak:test-keycloak</link>
+                    </links>
+                    <env>
+                      <METAMIND_API_HOST>localhost</METAMIND_API_HOST>
+                      <METAMIND_API_DB_HOST>test-mysql</METAMIND_API_DB_HOST>
+                      <METAMIND_API_DB_PORT>3306</METAMIND_API_DB_PORT>
+                      <METAMIND_API_DB_NAME>db</METAMIND_API_DB_NAME>
+                      <METAMIND_API_DB_OPTS></METAMIND_API_DB_OPTS>
+                      <METAMIND_API_DB_USERNAME>root</METAMIND_API_DB_USERNAME>
+                      <METAMIND_API_DB_PASSWORD>rootpass</METAMIND_API_DB_PASSWORD>
+                      <KEYCLOAK_REALM>metamind</KEYCLOAK_REALM>
+                      <KEYCLOAK_RESOURCE>api</KEYCLOAK_RESOURCE>
+                      <KEYCLOAK_URL>http://test-keycloak:8080/auth</KEYCLOAK_URL>
+                      <KEYCLOAK_SECRET>b6ced3b3-d560-43c9-b31b-d2a79958b794</KEYCLOAK_SECRET>
+                      <KEYCLOAK_ADMIN_USER>master</KEYCLOAK_ADMIN_USER>
+                      <KEYCLOAK_ADMIN_PASS>pass</KEYCLOAK_ADMIN_PASS>
+                      <KEYCLOAK_ADMIN_CLIENT_ID>admin-cli</KEYCLOAK_ADMIN_CLIENT_ID>
+                      <KEYCLOAK_CONFIG_PATH>/opt/docker/keycloak.json</KEYCLOAK_CONFIG_PATH>
+                      <KUBERNETES_NAMESPACE>test</KUBERNETES_NAMESPACE>
+                      <KUBERNETES_LABELS>test</KUBERNETES_LABELS>
+                      <runmode>TEST</runmode>
+
+                    </env>
+                    <volumes>
+                      <bind>
+                        <volume>${project.basedir}/scripts:/opt/docker</volume>
+                      </bind>
+                    </volumes>
+                  </run>
+                </image>
+            	</images>
+            	<showLogs>true</showLogs>
+            </configuration>
+            <executions>
+              <execution>
+                <id>docker-test-api-build</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>docker-test-api-start</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>docker-test-api-stop</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -607,222 +724,8 @@
               </execution>
             </executions>
           </plugin>
-         
-          <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.3</version>
-            <configuration>
-              <destFile>${jacoco.reportPath}</destFile>
-              <dataFile>${jacoco.reportPath}</dataFile>
-              <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-              <classDumpDir>${project.reporting.outputDirectory}/jacoco-it/classes</classDumpDir>
-              <excludes>
-                <exclude>**/*_.class</exclude>
-              </excludes>
-            </configuration>
-                
-            <executions>
-              <execution>
-                <id>jacoco-agent</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>prepare-agent</goal>
-                </goals>
-                <configuration>
-                  <destFile>${jacoco.reportPath}</destFile>
-                  <propertyName>jacoco.agent.itArgLine</propertyName>
-                </configuration>
-              </execution>
-              <execution>
-                <id>jacoco-report</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>dump</goal>
-                  <goal>report</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
           
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.7.3</version>
-            <configuration>
-              <container>
-                <containerId>wildfly16x</containerId>
-                <log>${project.basedir}/target/cargo.log</log>
-                <output>${project.basedir}/target/wildfly.log</output>
-                <zipUrlInstaller>
-                  <url>https://download.jboss.org/wildfly/${wildfly.version}/wildfly-${wildfly.version}.zip</url>
-                  <downloadDir>${project.basedir}/.cargo/downloads</downloadDir>
-                  <extractDir>${project.basedir}/.cargo/extracts</extractDir>
-                </zipUrlInstaller>
-              </container>
-              <configuration>
-                <properties>
-                  <cargo.servlet.port>${it.port.http}</cargo.servlet.port>
-                  <cargo.jboss.configuration>standalone</cargo.jboss.configuration>
-                  <cargo.jvmargs>${jacoco.agent.itArgLine},output=tcpserver,port=6300 -Xmx2G -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -Drunmode=TEST</cargo.jvmargs>
-                </properties>    
-              </configuration>
-              <deployer/>
-            </configuration>
-            <executions>
-              <execution>
-                <id>install-wildfly</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>install</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>3.1.1</version>
-            <executions>
-              <execution>
-                <id>unpack-keycloak-wildfly-adapter</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>unpack-dependencies</goal>
-                </goals>
-                <configuration>
-                  <includeGroupIds>org.keycloak</includeGroupIds>
-                  <includeArtifactIds>keycloak-wildfly-adapter-dist</includeArtifactIds>
-                  <outputDirectory>${project.build.directory}/../.cargo/extracts/wildfly-${wildfly.version}/wildfly-${wildfly.version}</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-		    <groupId>org.apache.maven.plugins</groupId>
-		    <artifactId>maven-antrun-plugin</artifactId>
-		    <version>1.8</version>
-		    <executions>
-              <execution>
-                <id>unpack-mariadb-module</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <get src="https://static.metatavu.io/wildfly/wildfly-${wildfly.version}-mariadb-module-${mariadb-module.version}.zip" dest="${project.build.directory}/mariadb-module.zip" verbose="true" usetimestamp="true"/>
-                    <unzip src="${project.build.directory}/mariadb-module.zip" dest="${project.build.directory}/../.cargo/extracts/wildfly-${wildfly.version}/wildfly-${wildfly.version}"/>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.wildfly.plugins</groupId>
-            <artifactId>wildfly-maven-plugin</artifactId>
-            <version>2.0.1.Final</version>
-            <executions>
-              <execution>
-                <id>wildfly-configure</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>execute-commands</goal>
-                </goals>
-                <configuration>
-                  <batch>false</batch>
-                  <offline>true</offline>
-                  <jbossHome>${project.build.directory}/../.cargo/extracts/wildfly-${wildfly.version}/wildfly-${wildfly.version}</jbossHome>
-                  <commands>
-                    <command>embed-server --server-config=standalone.xml</command>
-                    <command>if (outcome != success) of /extension=org.keycloak.keycloak-adapter-subsystem:read-resource</command>
-                    <command>/extension=org.keycloak.keycloak-adapter-subsystem/:add(module=org.keycloak.keycloak-adapter-subsystem)</command>
-                    <command>/subsystem=keycloak:add</command>
-                    <command>/subsystem=elytron/custom-realm=KeycloakOIDCRealm:add(class-name=org.keycloak.adapters.elytron.KeycloakSecurityRealm, module=org.keycloak.keycloak-wildfly-elytron-oidc-adapter)</command>
-                    <command>/subsystem=elytron/security-domain=KeycloakDomain:add(default-realm=KeycloakOIDCRealm,permission-mapper=default-permission-mapper,security-event-listener=local-audit,realms=[{realm=KeycloakOIDCRealm}])</command>
-                    <command>/subsystem=elytron/constant-realm-mapper=keycloak-oidc-realm-mapper:add(realm-name=KeycloakOIDCRealm)</command>
-                    <command>/subsystem=elytron/service-loader-http-server-mechanism-factory=keycloak-oidc-http-server-mechanism-factory:add(module=org.keycloak.keycloak-wildfly-elytron-oidc-adapter)</command>
-                    <command>/subsystem=elytron/aggregate-http-server-mechanism-factory=keycloak-http-server-mechanism-factory:add(http-server-mechanism-factories=[keycloak-oidc-http-server-mechanism-factory, global])</command>
-                    <command>/subsystem=elytron/http-authentication-factory=keycloak-http-authentication:add(security-domain=KeycloakDomain,http-server-mechanism-factory=keycloak-http-server-mechanism-factory,mechanism-configurations=[{mechanism-name=KEYCLOAK,mechanism-realm-configurations=[{realm-name=KeycloakOIDCRealm,realm-mapper=keycloak-oidc-realm-mapper}]}])</command>
-                    <command>/subsystem=undertow/application-security-domain=other:add(http-authentication-factory=keycloak-http-authentication)</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /subsystem=datasources/data-source=metamind:read-resource</command>
-                    <command>/subsystem=datasources/jdbc-driver=it:add(driver-name="it", driver-module-name=${it.jdbc.module},driver-xa-datasource-class-name=${it.jdbc.driver})</command>
-                    <command>data-source add --name=metamind --use-ccm=true --jta=true --enabled=true --driver-name=it --jndi-name=${it.jdbc.jndi} --user-name=${it.jdbc.username} --password=${it.jdbc.password} --connection-url=${it.jdbc.url}</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /subsystem=undertow/server=default-server/host=metamind-api:read-resource</command>
-                    <command>/subsystem=undertow/server=default-server/host=metamind-api:add(alias=["${it.host}"],default-web-module="metamind.war")</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /system-property=it-test:read-resource</command>
-                    <command>/system-property=it-test:add(value="true")</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /system-property=keycloak-admin-client-id:read-resource</command>
-                    <command>/system-property=keycloak-admin-client-id:add(value="api")</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /system-property=keycloak-admin-client-secret:read-resource</command>
-                    <command>/system-property=keycloak-admin-client-secret:add(value="1be749de-2023-4ebf-aba0-90679ffab56b")</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /system-property=keycloak-admin-password:read-resource</command>
-                    <command>/system-property=keycloak-admin-password:add(value="admin")</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /system-property=keycloak-admin-user:read-resource</command>
-                    <command>/system-property=keycloak-admin-user:add(value="admin")</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /system-property=keycloak-admin-realm:read-resource</command>
-                    <command>/system-property=keycloak-admin-realm:add(value="test")</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /system-property=keycloak-admin-server-url:read-resource</command>
-                    <command>/system-property=keycloak-admin-server-url:add(value="http://localhost:8280/auth")</command>
-                    <command>end-if</command> 
-		    <command>if (outcome != success) of /system-property=keycloak.config-path:read-resource</command>
-		    <command>/system-property=keycloak.config-path:add(value="${project.basedir}/scripts/keycloak.json")</command>
-                    <command>end-if</command> 
-		    <command>if (outcome != success) of /subsystem=keycloak/secure-deployment=metamind.war:read-resource</command>
-                    <command>/subsystem=keycloak/secure-deployment=metamind.war:add(realm="test", auth-server-url="http://localhost:8280/auth",bearer-only=true,ssl-required="EXTERNAL",resource="api")</command>
-                    <command>/subsystem=keycloak/secure-deployment=metamind.war/credential=secret:add(value="1be749de-2023-4ebf-aba0-90679ffab56b")</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /subsystem=logging/logger=org.keycloak.adapters.BearerTokenRequestAuthenticator:read-resource</command>
-                    <command>/subsystem=logging/logger=org.keycloak.adapters.BearerTokenRequestAuthenticator:add(level=FATAL)</command>
-                    <command>end-if</command>
-                    <command>if (outcome != success) of /subsystem=logging/logger=org.jboss.as.ejb3.invocation:read-resource</command>
-                    <command>/subsystem=logging/logger=org.jboss.as.ejb3.invocation:add(level=FATAL)</command>
-                    <command>end-if</command>
-                  </commands>
-                </configuration>
-              </execution>
-              <execution>
-                <id>wildfly-start</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>start</goal>
-                </goals>
-                <configuration>
-                  <javaOpts>-Djboss.http.port=${it.port.http} ${jacoco.agent.itArgLine},output=tcpserver,port=6300 -Xmx2G -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -Drunmode=TEST</javaOpts>
-                  <jbossHome>${project.build.directory}/../.cargo/extracts/wildfly-${wildfly.version}/wildfly-${wildfly.version}</jbossHome>
-                </configuration>
-              </execution>   
-              
-              <execution>
-                <id>wildfly-deploy</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>deploy</goal>
-                </goals>
-                <configuration>
-                  <filename>${project.build.finalName}.${project.packaging}</filename>
-                </configuration>
-              </execution>
-              <execution>
-                <id>wildfly-shutdown</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>shutdown</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          
+            
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>wait-maven-plugin</artifactId>
@@ -836,8 +739,8 @@
                 </goals>      
                 <configuration>
                   <protocol>http</protocol>
-                  <host>${it.host}</host>
-                  <port>${it.port.http}</port>
+                  <host>localhost</host>
+                  <port>1234</port>
                   <file>/v2/system/ping</file>
                   <maxcount>20</maxcount>
                   <timeout>10000</timeout>

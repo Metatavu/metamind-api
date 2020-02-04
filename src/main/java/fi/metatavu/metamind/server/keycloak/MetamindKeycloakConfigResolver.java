@@ -22,7 +22,7 @@ public class MetamindKeycloakConfigResolver implements KeycloakConfigResolver{
 
     @Override
     public KeycloakDeployment resolve(Request request) {
-      String configFilePath = System.getProperty("keycloak.config-path");
+      String configFilePath = System.getenv("KEYCLOAK_CONFIG_PATH") != null ? System.getenv("KEYCLOAK_CONFIG_PATH"): System.getProperty("keycloak.config-path");
       FileInputStream configStream;
       try {
         configStream = new FileInputStream(configFilePath);
