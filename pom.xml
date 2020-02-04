@@ -649,7 +649,6 @@
                       <KUBERNETES_NAMESPACE>test</KUBERNETES_NAMESPACE>
                       <KUBERNETES_LABELS>test</KUBERNETES_LABELS>
                       <runmode>TEST</runmode>
-
                     </env>
                     <volumes>
                       <bind>
