@@ -648,6 +648,8 @@
                       <KEYCLOAK_CONFIG_PATH>/opt/docker/scripts/keycloak.json</KEYCLOAK_CONFIG_PATH>
                       <KUBERNETES_NAMESPACE>test</KUBERNETES_NAMESPACE>
                       <KUBERNETES_LABELS>test</KUBERNETES_LABELS>
+                      <IT_HOST>localhost</IT_HOST>
+                      <IT_PORT_HTTP>1234</IT_PORT_HTTP>
                       <runmode>TEST</runmode>
                     </env>
                     <volumes>

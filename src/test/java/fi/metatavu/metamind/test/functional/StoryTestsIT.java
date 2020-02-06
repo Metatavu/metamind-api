@@ -77,7 +77,6 @@ public class StoryTestsIT extends AbstractFunctionalTest {
   public void testUpdateStoryPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story testStory = builder.admin().stories().create("en", "test story", "Enter your answer");
-      System.out.println("testStory id id: " + testStory.getId());
       builder.anonymous().stories().assertUpdateFailStatus(401, testStory);
       builder.invalid().stories().assertUpdateFailStatus(403, testStory);
       

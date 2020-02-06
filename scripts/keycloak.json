@@ -12,60 +12,7 @@
   "policy-enforcer": {"enforcement-mode": "ENFORCING",
     "user-managed-access": {},
     "paths": [
-      {
-        "name" : "Story",
-        "path" : "/v2/stories/{storyId}/*",
-        "methods" : [
-          {
-            "method": "DELETE",
-            "scopes" : ["story:manage"]
-          },
-          {
-            "method": "PUT",
-            "scopes" : ["story:manage"]
-          },
-          {
-            "method": "GET",
-            "scopes" : ["story:access"]
-          }
-        ]
-      },
-      {
-        "name" : "Stories",
-        "path" : "/v2/stories",
-        "methods" : [
-          {
-            "method": "POST",
-            "scopes" : ["story:manage"]
-          },
-          {
-            "method": "GET",
-            "scopes" : ["story:access"]
-          }
-        ]
-      },
-      {
-        "name" : "Trainingmaterial",
-        "path" : "/v2/trainingMaterials/*",
-        "methods" : [
-          {
-            "method": "POST",
-            "scopes" : ["story:manage"]
-          },
-          {
-            "method": "GET",
-            "scopes" : ["story:access"]
-          },
-          {
-            "method": "DELETE",
-            "scopes" : ["story:manage"]
-          },
-          {
-            "method": "PUT",
-            "scopes" : ["story:manage"]
-          }
-        ]
-      }
+      
     ]
   }
 }
