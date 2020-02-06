@@ -740,8 +740,8 @@
                 </goals>      
                 <configuration>
                   <protocol>http</protocol>
-                  <host>localhost</host>
-                  <port>1234</port>
+                  <host>${it.host}</host>
+                  <port>${it.port.http}</port>
                   <file>/v2/system/ping</file>
                   <maxcount>20</maxcount>
                   <timeout>10000</timeout>
