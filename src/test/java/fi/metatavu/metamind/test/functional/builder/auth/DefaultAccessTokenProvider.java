@@ -30,12 +30,11 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
   private String username;
   private String password;
   private String clientSecret;
-  private String serverUrl;
   
   private String accessToken;
   private OffsetDateTime expires; 
   
-  public DefaultAccessTokenProvider(String realm, String clientId, String username, String password, String clientSecret, String serverUrl) throws IOException {
+  public DefaultAccessTokenProvider(String realm, String clientId, String username, String password, String clientSecret) throws IOException {
     super();
     this.realm = realm;
     this.clientId = clientId;
@@ -44,7 +43,6 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
     this.clientSecret = clientSecret;
     this.accessToken = null;
     this.expires = null;
-    this.serverUrl = serverUrl;
   }
 
   @Override
@@ -61,8 +59,7 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
       .formParam("client_id", clientId)
       .formParam("grant_type", "password")
       .formParam("username", username)
-      .formParam("password", password)
-      .formParam("serverUrl", serverUrl);
+      .formParam("password", password);
     
     if (clientSecret != null) {
       request.formParam("client_secret", clientSecret);

@@ -112,7 +112,6 @@
     <mariadb-module.version>2.3.0</mariadb-module.version>
     <metamind-api-client.version>2.0.13</metamind-api-client.version>
     <feign-uma.version>1.0.2</feign-uma.version>
-
   
     <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>
     <skipCoverage>true</skipCoverage>
@@ -641,10 +640,11 @@
                       <KEYCLOAK_REALM>metamind</KEYCLOAK_REALM>
                       <KEYCLOAK_RESOURCE>api</KEYCLOAK_RESOURCE>
                       <KEYCLOAK_URL>http://test-keycloak:8080/auth</KEYCLOAK_URL>
-                      <KEYCLOAK_SECRET>b6ced3b3-d560-43c9-b31b-d2a79958b794</KEYCLOAK_SECRET>
-                      <KEYCLOAK_ADMIN_USER>master</KEYCLOAK_ADMIN_USER>
-                      <KEYCLOAK_ADMIN_PASS>pass</KEYCLOAK_ADMIN_PASS>
+                      <KEYCLOAK_SECRET>1be749de-2023-4ebf-aba0-90679ffab56b</KEYCLOAK_SECRET>
+                      <KEYCLOAK_ADMIN_USER>admin</KEYCLOAK_ADMIN_USER>
+                      <KEYCLOAK_ADMIN_PASS>admin</KEYCLOAK_ADMIN_PASS>
                       <KEYCLOAK_ADMIN_CLIENT_ID>admin-cli</KEYCLOAK_ADMIN_CLIENT_ID>
+                      <KEYCLOAK_ADMIN_CLIENT_SECRET></KEYCLOAK_ADMIN_CLIENT_SECRET>
                       <KEYCLOAK_CONFIG_PATH>/opt/docker/scripts/keycloak.json</KEYCLOAK_CONFIG_PATH>
                       <KUBERNETES_NAMESPACE>test</KUBERNETES_NAMESPACE>
                       <KUBERNETES_LABELS>test</KUBERNETES_LABELS>

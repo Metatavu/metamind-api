@@ -6,7 +6,7 @@
   "resource": "api",
   "bearer-only": true,
   "credentials": {
-    "secret": "b6ced3b3-d560-43c9-b31b-d2a79958b794"
+    "secret": "1be749de-2023-4ebf-aba0-90679ffab56b"
   },
   "confidential-port": 0,
   "policy-enforcer": {"enforcement-mode": "ENFORCING",

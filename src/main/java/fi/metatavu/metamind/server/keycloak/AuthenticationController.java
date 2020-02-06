@@ -3,6 +3,7 @@ package fi.metatavu.metamind.server.keycloak;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,7 +21,15 @@ import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.jboss.security.authorization.AuthorizationException;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -41,6 +50,9 @@ import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.keycloak.representations.idm.authorization.UserPolicyRepresentation;
 import org.slf4j.Logger;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fi.metatavu.metamind.persistence.models.Story;
 
 /**
@@ -51,17 +63,40 @@ import fi.metatavu.metamind.persistence.models.Story;
  */
 @ApplicationScoped
 public class AuthenticationController {
-  
-  private static final String REALM = System.getProperty("keycloak-admin-realm");
-  private static final String CLIENT_ID = System.getProperty("keycloak-admin-client-id");
-  private static final String ADMIN_USER = System.getProperty("keycloak-admin-user");
-  private static final String ADMIN_PASSWORD = System.getProperty("keycloak-admin-password");
-  private static final String SERVER_URL = System.getProperty("keycloak-admin-server-url");
-  private static final String CLIENT_SECRET = System.getProperty("keycloak-admin-client-secret");
+  private static final String REALM = getRealm();
+  private static final String CLIENT_ID = getClientId();
+  private static final String ADMIN_USER = getAdminUser();
+  private static final String ADMIN_PASSWORD = getAdminPassword();
+  private static final String SERVER_URL = getServerUrl();
+  private static final String CLIENT_SECRET = getClientSecret();
   private static final String AUTHORIZATION_EXCEPTION_MESSAGE = "Client representation is NULL";
   
   @Inject 
   private static Logger logger;
+  
+  private static final String getRealm() {
+    return System.getenv("KEYCLOAK_REALM") != null ? System.getenv("KEYCLOAK_REALM") : System.getProperty("keycloak-admin-realm");
+  }
+  
+  private static final String getClientId() {
+    return System.getenv("KEYCLOAK_ADMIN_CLIENT_ID") != null ? System.getenv("KEYCLOAK_ADMIN_CLIENT_ID") : System.getProperty("keycloak-admin-client-id");
+  }
+  
+  private static final String getAdminUser() {
+    return System.getenv("KEYCLOAK_ADMIN_USER") != null ? System.getenv("KEYCLOAK_ADMIN_USER") : System.getProperty("keycloak-admin-user");
+  }
+  
+  private static final String getAdminPassword() {
+    return System.getenv("KEYCLOAK_ADMIN_PASS") != null ? System.getenv("KEYCLOAK_ADMIN_PASS") : System.getProperty("keycloak-admin-password");
+  }
+  
+  private static final String getServerUrl() {
+    return System.getenv("KEYCLOAK_URL") != null ? System.getenv("KEYCLOAK_URL") : System.getProperty("keycloak-admin-server-url");
+  }
+  
+  private static final String getClientSecret() {
+    return System.getenv("KEYCLOAK_ADMIN_CLIENT_SECRET") != null ? System.getenv("KEYCLOAK_ADMIN_CLIENT_SECRET") : System.getProperty("keycloak-admin-client-secret");
+  }
   
   /**
    * Creates protected resource into Keycloak
@@ -93,14 +128,24 @@ public class AuthenticationController {
       .map(ScopeRepresentation::new)
       .collect(Collectors.toSet());
     
+    System.out.println("--------------------------------");
+    System.out.println("1");
+    
     ResourceRepresentation resource = new ResourceRepresentation(name, scopeRepresentations, uri, type);
-    resources.create(resource);
+    System.out.println("2");
+    
+    Response createResponse = resources.create(resource);
+    System.out.println("3");
+    System.out.println(createResponse.getStatus());
+    System.out.println("4");
+    
+    System.out.println("--------------------------------");
     
     List<ResourceRepresentation> foundResources = resources.findByName(name);
     if (foundResources.isEmpty()) {
       return null;
     }
-    
+    System.out.println("we are getting resources");
     if (foundResources.size() > 1) {
       logger.warn("Found more than one resource with name {}", name);
     }
@@ -307,14 +352,75 @@ public class AuthenticationController {
       return Collections.emptyList();
     }
   }
-  
+    
   /**
-   * Returns admin client 
+   * Creates admin client for config
    * 
-   * @return admin
+   * @param configuration configuration
+   * @return admin client
    */
   private Keycloak getAdminClient() {
-    return KeycloakBuilder.builder().serverUrl(SERVER_URL).realm(REALM).clientId(CLIENT_ID).clientSecret(CLIENT_SECRET).username(ADMIN_USER).password(ADMIN_PASSWORD).build();
+   
+    String token = getAccessToken(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET, ADMIN_USER, ADMIN_PASSWORD);
+    
+    return KeycloakBuilder.builder()
+      .serverUrl(SERVER_URL)
+      .realm(REALM)
+      .grantType(OAuth2Constants.PASSWORD)
+      .clientId(CLIENT_ID)
+      .clientSecret(CLIENT_SECRET)
+      .username(ADMIN_USER)
+      .password(ADMIN_PASSWORD)
+      .authorization(String.format("Bearer %s", token))
+      .build();
+  }
+  
+  /**
+   * Resolves an access token for realm, client, username and password
+   * 
+   * @param realm realm
+   * @param clientId clientId
+   * @param username username
+   * @param password password
+   * @return an access token
+   * @throws IOException thrown on communication failure
+   */
+  private String getAccessToken(String serverUrl, String realm, String clientId, String clientSecret, String username, String password) {
+    String uri = String.format("%s/realms/%s/protocol/openid-connect/token", serverUrl, realm);
+    
+    try (CloseableHttpClient client = HttpClients.createDefault()) {
+      HttpPost httpPost = new HttpPost(uri);
+      List<NameValuePair> params = new ArrayList<>();
+      params.add(new BasicNameValuePair("client_id", clientId));
+      params.add(new BasicNameValuePair("grant_type", "password"));
+      params.add(new BasicNameValuePair("username", username));
+      params.add(new BasicNameValuePair("password", password));
+      params.add(new BasicNameValuePair("client_secret", clientSecret));
+      httpPost.setEntity(new UrlEncodedFormEntity(params));
+      
+      try (CloseableHttpResponse response = client.execute(httpPost)) {
+        try (InputStream inputStream = response.getEntity().getContent()) {
+          Map<String, Object> responseMap = readJsonMap(inputStream);
+          return (String) responseMap.get("access_token");
+        }
+      }
+    } catch (IOException e) {
+      logger.debug("Failed to retrieve access token", e);
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Reads JSON src into Map
+   * 
+   * @param src input
+   * @return map
+   * @throws IOException throws IOException when there is error when reading the input 
+   */
+  private Map<String, Object> readJsonMap(InputStream src) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    return objectMapper.readValue(src, new TypeReference<Map<String, Object>>() {});
   }
 
   /**
@@ -326,14 +432,6 @@ public class AuthenticationController {
     return REALM;
   }
 
-  /**
-   * Returns String client id
-   * 
-   * @return String CLIENT_ID
-   */
-  private String getClientId() {
-    return CLIENT_ID;
-  }
 
   /**
    * Returns the ClientRepresentation based on client id

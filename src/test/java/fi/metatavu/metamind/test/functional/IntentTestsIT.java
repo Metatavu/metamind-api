@@ -16,7 +16,7 @@ import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
 public class IntentTestsIT extends AbstractFunctionalTest {
 
-  @Test
+  @Test  
   public void testCreateIntent() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
