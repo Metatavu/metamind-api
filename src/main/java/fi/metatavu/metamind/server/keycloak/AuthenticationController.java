@@ -64,12 +64,15 @@ import fi.metatavu.metamind.persistence.models.Story;
 @ApplicationScoped
 public class AuthenticationController {
   private static final String REALM = getRealm();
-  private static final String CLIENT_ID = getClientId();
+  private static final String ADMIN_CLIENT_ID = getAdminClientId();
   private static final String ADMIN_USER = getAdminUser();
   private static final String ADMIN_PASSWORD = getAdminPassword();
   private static final String SERVER_URL = getServerUrl();
-  private static final String CLIENT_SECRET = getClientSecret();
+  private static final String ADMIN_CLIENT_SECRET = getAdminClientSecret();
   private static final String AUTHORIZATION_EXCEPTION_MESSAGE = "Client representation is NULL";
+  
+  private static final String API_CLIENT_ID = getApiClientId();
+  private static final String API_CLIENT_SECRET = getApiClientSecret();
   
   @Inject 
   private static Logger logger;
@@ -78,7 +81,7 @@ public class AuthenticationController {
     return System.getenv("KEYCLOAK_REALM") != null ? System.getenv("KEYCLOAK_REALM") : System.getProperty("keycloak-admin-realm");
   }
   
-  private static final String getClientId() {
+  private static final String getAdminClientId() {
     return System.getenv("KEYCLOAK_ADMIN_CLIENT_ID") != null ? System.getenv("KEYCLOAK_ADMIN_CLIENT_ID") : System.getProperty("keycloak-admin-client-id");
   }
   
@@ -94,8 +97,16 @@ public class AuthenticationController {
     return System.getenv("KEYCLOAK_URL") != null ? System.getenv("KEYCLOAK_URL") : System.getProperty("keycloak-admin-server-url");
   }
   
-  private static final String getClientSecret() {
+  private static final String getAdminClientSecret() {
     return System.getenv("KEYCLOAK_ADMIN_CLIENT_SECRET") != null ? System.getenv("KEYCLOAK_ADMIN_CLIENT_SECRET") : System.getProperty("keycloak-admin-client-secret");
+  }
+  
+  private static final String getApiClientId () {
+    return System.getenv("KEYCLOAK_RESOURCE") != null ? System.getenv("KEYCLOAK_RESOURCE") : System.getProperty("keycloak-resource");
+  }
+  
+  private static final String getApiClientSecret () {
+    return System.getenv("KEYCLOAK_SECRET") != null ? System.getenv("KEYCLOAK_SECRET") : System.getProperty("keycloak-secret");
   }
   
   /**
@@ -111,41 +122,28 @@ public class AuthenticationController {
    */
   public UUID createProtectedResource(UUID ownerId, String name, String uri, String type, List<AuthorizationScope> scopes) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
-    ResourceOwnerRepresentation owner = new ResourceOwnerRepresentation();
-    owner.setId(getClientId());
-    owner.setName(getClientId());
-    
     ClientRepresentation client = getClient(keycloak);
+    ClientRepresentation apiClient = getClient(getApiClient());
     
     if (client == null) {
       throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
     
-    ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(client.getId()).authorization().resources();
-
+    ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(apiClient.getId()).authorization().resources();
     Set<ScopeRepresentation> scopeRepresentations = scopes.stream()
       .map(AuthorizationScope::getName)
       .map(ScopeRepresentation::new)
       .collect(Collectors.toSet());
     
-    System.out.println("--------------------------------");
-    System.out.println("1");
-    
     ResourceRepresentation resource = new ResourceRepresentation(name, scopeRepresentations, uri, type);
-    System.out.println("2");
+    resource.setOwner(ownerId.toString());
     
     Response createResponse = resources.create(resource);
-    System.out.println("3");
-    System.out.println(createResponse.getStatus());
-    System.out.println("4");
-    
-    System.out.println("--------------------------------");
-    
     List<ResourceRepresentation> foundResources = resources.findByName(name);
     if (foundResources.isEmpty()) {
       return null;
     }
-    System.out.println("we are getting resources");
+
     if (foundResources.size() > 1) {
       logger.warn("Found more than one resource with name {}", name);
     }
@@ -162,12 +160,13 @@ public class AuthenticationController {
   public UUID findProtectedResource(String name) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
+    ClientRepresentation apiClient = getClient(getApiClient());
     
     if (client == null) {
       throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
     
-    ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(client.getId()).authorization().resources();
+    ResourcesResource resources = keycloak.realm(getRealmName()).clients().get(apiClient.getId()).authorization().resources();
     List<ResourceRepresentation> foundResources = resources.findByName(name);
     List<String> foundResourcesIds = foundResources.stream().map(ResourceRepresentation::getId).collect(Collectors.toList());
     
@@ -192,6 +191,7 @@ public class AuthenticationController {
   public String upsertScopePermission(UUID resourceId, Collection<AuthorizationScope> scopes, String name, DecisionStrategy decisionStrategy, UUID policyId) throws AuthorizationException {
     Keycloak keycloak = getAdminClient();
     ClientRepresentation client = getClient(keycloak);
+    ClientRepresentation apiClient = getClient(getApiClient());
     String realmName = getRealmName();
     
     if (client == null) {
@@ -199,7 +199,7 @@ public class AuthenticationController {
     }
     
     RealmResource realm = keycloak.realm(realmName);
-    ScopePermissionsResource scopeResource = realm.clients().get(client.getId()).authorization().permissions().scope();
+    ScopePermissionsResource scopeResource = realm.clients().get(apiClient.getId()).authorization().permissions().scope();
     ScopePermissionRepresentation existingPermission = scopeResource.findByName(name);
 
     ScopePermissionRepresentation representation = new ScopePermissionRepresentation();
@@ -253,13 +253,14 @@ public class AuthenticationController {
     RealmResource realm = keycloak.realm(realmName);
     UsersResource users = realm.users();
     ClientRepresentation client = getClient(keycloak);
+    ClientRepresentation apiClient = getClient(getApiClient());
     String userIdString = userId.toString();
     
     if (client == null) {
       throw new AuthorizationException(AUTHORIZATION_EXCEPTION_MESSAGE);
     }
     
-    UserPoliciesResource userPolicies = realm.clients().get(client.getId()).authorization().policies().user();
+    UserPoliciesResource userPolicies = realm.clients().get(apiClient.getId()).authorization().policies().user();
     
     UserResource loggedUserResource = users.get(userIdString);
 
@@ -330,6 +331,7 @@ public class AuthenticationController {
       Keycloak keycloak = getAdminClient();
       RealmResource realm = keycloak.realm(REALM);
       ClientRepresentation client = getClient(keycloak);
+      ClientRepresentation apiClient = getClient(getApiClient());
       String userId = loggedUserId.toString();
       Map<Story, DecisionEffect> result = new HashMap<>();
       
@@ -338,7 +340,7 @@ public class AuthenticationController {
         String foundResourceName = String.format("story-%s", listedStoryId.toString());
         UUID foundResourceId = findProtectedResource(foundResourceName); 
         PolicyEvaluationRequest evaluationRequest = createEvaluationRequest(client, foundResourceId, foundResourceName, userId, scopes);
-        PolicyEvaluationResponse response = realm.clients().get(client.getId()).authorization().policies().evaluate(evaluationRequest);
+        PolicyEvaluationResponse response = realm.clients().get(apiClient.getId()).authorization().policies().evaluate(evaluationRequest);
         result.put(listedStory, response.getStatus());
       }
 
@@ -354,21 +356,41 @@ public class AuthenticationController {
   }
     
   /**
-   * Creates admin client for config
+   * Creates admin client
    * 
-   * @param configuration configuration
    * @return admin client
    */
   private Keycloak getAdminClient() {
    
-    String token = getAccessToken(SERVER_URL, REALM, CLIENT_ID, CLIENT_SECRET, ADMIN_USER, ADMIN_PASSWORD);
+    String token = getAccessToken(SERVER_URL, REALM, ADMIN_CLIENT_ID, ADMIN_CLIENT_SECRET, ADMIN_USER, ADMIN_PASSWORD);
     
     return KeycloakBuilder.builder()
       .serverUrl(SERVER_URL)
       .realm(REALM)
       .grantType(OAuth2Constants.PASSWORD)
-      .clientId(CLIENT_ID)
-      .clientSecret(CLIENT_SECRET)
+      .clientId(ADMIN_CLIENT_ID)
+      .clientSecret(ADMIN_CLIENT_SECRET)
+      .username(ADMIN_USER)
+      .password(ADMIN_PASSWORD)
+      .authorization(String.format("Bearer %s", token))
+      .build();
+  }
+  
+  /**
+   * Creates api client
+   * 
+   * @return api client
+   */
+  private Keycloak getApiClient() {
+   
+    String token = getAccessToken(SERVER_URL, REALM, API_CLIENT_ID, API_CLIENT_SECRET, ADMIN_USER, ADMIN_PASSWORD);
+    
+    return KeycloakBuilder.builder()
+      .serverUrl(SERVER_URL)
+      .realm(REALM)
+      .grantType(OAuth2Constants.PASSWORD)
+      .clientId(API_CLIENT_ID)
+      .clientSecret(API_CLIENT_SECRET)
       .username(ADMIN_USER)
       .password(ADMIN_PASSWORD)
       .authorization(String.format("Bearer %s", token))
@@ -440,7 +462,7 @@ public class AuthenticationController {
    * @return ClientRepresentation
    */
   private ClientRepresentation getClient(Keycloak keycloak) {
-    List<ClientRepresentation> clients = keycloak.realm(getRealmName()).clients().findByClientId(getClientId());
+    List<ClientRepresentation> clients = keycloak.realm(getRealmName()).clients().findByClientId(getApiClientId());
     return clients.isEmpty() ? null : clients.get(0);
   }
   
