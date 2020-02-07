@@ -102,7 +102,10 @@ public class AuthenticationController {
     
     ResourceRepresentation resource = new ResourceRepresentation(name, scopeRepresentations, uri, type);
     resource.setOwner(ownerId.toString());
-    resources.create(resource);
+    Response createResponse = resources.create(resource);
+    if (createResponse.getStatus() < 200 || createResponse.getStatus() > 299) {
+      throw new AuthorizationException("Failed to create resource");
+    }
     List<ResourceRepresentation> foundResources = resources.findByName(name);
     if (foundResources.isEmpty()) {
       return null;
