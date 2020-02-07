@@ -22,7 +22,7 @@ import io.restassured.specification.RequestSpecification;
  */
 public class DefaultAccessTokenProvider implements AccessTokenProvider {
   
-  private static final String AUTH_SERVER_URL = "http://localhost:8280";
+  private static final String AUTH_SERVER_URL = "http://test-keycloak:8080";
   private static final int EXPIRE_SLACK = 30;
 
   private String realm;
@@ -47,23 +47,24 @@ public class DefaultAccessTokenProvider implements AccessTokenProvider {
 
   @Override
   public String getAccessToken() throws IOException {
+    
     if (accessToken != null && expires != null && expires.isAfter(OffsetDateTime.now())) {
       return accessToken;
     }
-    
-    String path = String.format("/auth/realms/%s/protocol/openid-connect/token", realm);
 
+    String path = String.format("/auth/realms/%s/protocol/openid-connect/token", realm);
+      
     RequestSpecification request = given()
       .baseUri(AUTH_SERVER_URL)
       .formParam("client_id", clientId)
       .formParam("grant_type", "password")
       .formParam("username", username)
       .formParam("password", password);
-
+    
     if (clientSecret != null) {
       request.formParam("client_secret", clientSecret);
     }
-
+    
     String response = request.post(path)
       .getBody()
       .asString(); 

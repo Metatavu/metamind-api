@@ -18,7 +18,7 @@ import fi.metatavu.metamind.test.functional.builder.auth.TestBuilderAuthenticati
  */
 public class TestBuilder implements AutoCloseable {
 
-  private static final String REALM = "test";
+  private static final String REALM = "metamind";
   private static final String CLIENT_ID = "ui";
   private static final String ADMIN_USER = "admin";
   private static final String ADMIN_PASSWORD = "admin";

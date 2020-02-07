@@ -9,3 +9,4 @@
 /keycloak*
 /.DS_Store
 /.metadata/
+/.apt_generated/
