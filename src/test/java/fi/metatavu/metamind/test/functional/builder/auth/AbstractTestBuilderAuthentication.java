@@ -7,7 +7,10 @@ import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 import fi.metatavu.metamind.test.functional.builder.impl.IntentTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.impl.IntentTrainingMaterialTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.impl.KnotTestBuilderResource;
+import fi.metatavu.metamind.test.functional.builder.impl.ScriptTestBuilderResource;
+import fi.metatavu.metamind.test.functional.builder.impl.StoryExportTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.impl.StoryTestBuilderResource;
+import fi.metatavu.metamind.test.functional.builder.impl.VariableTestBuilderResource;
 
 /**
  * Abstract base class for all test builder authentication providers
@@ -21,6 +24,9 @@ public abstract class AbstractTestBuilderAuthentication {
   private KnotTestBuilderResource knots;
   private IntentTestBuilderResource intents;
   private IntentTrainingMaterialTestBuilderResource trainingMaterials;
+  private VariableTestBuilderResource variables;
+  private ScriptTestBuilderResource scripts;
+  private StoryExportTestBuilderResource storyExport;
   
   protected AbstractTestBuilderAuthentication(TestBuilder testBuilder) {
     this.testBuilder = testBuilder;
@@ -82,6 +88,48 @@ public abstract class AbstractTestBuilderAuthentication {
     }
     
     return new IntentTrainingMaterialTestBuilderResource(testBuilder, createClient());
+  }
+  
+  /**
+   * Returns test builder resource for scripts
+   * 
+   * @return test builder resource for products
+   * @throws IOException thrown when authentication fails
+   */
+  public ScriptTestBuilderResource scripts() throws IOException {
+    if (scripts != null) {
+      return scripts;
+    }
+    
+    return new ScriptTestBuilderResource(testBuilder, createClient());
+  }
+  
+  /**
+   * Returns test builder resource for variables
+   * 
+   * @return test builder resource for products
+   * @throws IOException thrown when authentication fails
+   */
+  public VariableTestBuilderResource variables() throws IOException {
+    if (variables != null) {
+      return variables;
+    }
+    
+    return new VariableTestBuilderResource(testBuilder, createClient());
+  }
+  
+  /**
+   * Returns test builder resource for exporting and importing stories
+   * 
+   * @return test builder resource for products
+   * @throws IOException thrown when authentication fails
+   */
+  public StoryExportTestBuilderResource storyExport() throws IOException {
+    if (storyExport != null) {
+      return storyExport;
+    }
+    
+    return new StoryExportTestBuilderResource(testBuilder, createClient());
   }
   
   /**

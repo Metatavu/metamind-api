@@ -7,7 +7,15 @@ import java.util.UUID;
 
 import org.junit.Test;
 
+import fi.metatavu.metamind.client.model.Intent;
+import fi.metatavu.metamind.client.model.IntentType;
+import fi.metatavu.metamind.client.model.Knot;
+import fi.metatavu.metamind.client.model.KnotType;
+import fi.metatavu.metamind.client.model.Script;
 import fi.metatavu.metamind.client.model.Story;
+import fi.metatavu.metamind.client.model.TrainingMaterial;
+import fi.metatavu.metamind.client.model.TrainingMaterialType;
+import fi.metatavu.metamind.client.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
 public class StoryTestsIT extends AbstractFunctionalTest {
@@ -100,6 +108,19 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
       builder.anonymous().stories().assertDeleteFailStatus(401, createdStory);
       builder.invalid().stories().assertDeleteFailStatus(403, createdStory);
+    }
+  }
+  
+  @Test
+  public void testExportImportStory() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
+      Knot knot1 = builder.admin().knots().create(story, KnotType.TEXT, "Test knot", "Content", 10.0, 20.0);
+      Knot knot2 = builder.admin().knots().create(story, KnotType.TEXT, "Test knot 2", "Content 2", 10.0, 50.0);
+      Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, null, null, null, null);
+      TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
+      Script script = builder.admin().scripts().create("Test content", "English", "Test script", "0.1");
+      
     }
   }
 
