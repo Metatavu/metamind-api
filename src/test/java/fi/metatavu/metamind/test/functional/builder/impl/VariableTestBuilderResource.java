@@ -1,9 +1,11 @@
 package fi.metatavu.metamind.test.functional.builder.impl;
 
+import java.util.List;
 import java.util.UUID;
 
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.VariablesApi;
+import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.client.model.Variable;
 import fi.metatavu.metamind.client.model.VariableType;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
@@ -21,6 +23,10 @@ public class VariableTestBuilderResource extends AbstractTestBuilderResource<Var
     variable.setValidationScript(validationScript);
     Variable createdVariable = getApi().createVariable(variable, storyId);
     return addClosable(createdVariable);
+  }
+  
+  public List<Variable> listVariables(Story story) {
+    return getApi().listVariables(story.getId());
   }
 
   @Override

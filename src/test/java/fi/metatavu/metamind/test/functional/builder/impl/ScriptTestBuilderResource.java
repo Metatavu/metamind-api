@@ -1,5 +1,7 @@
 package fi.metatavu.metamind.test.functional.builder.impl;
 
+import java.util.List;
+
 import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.ScriptsApi;
 import fi.metatavu.metamind.client.model.Script;
@@ -19,6 +21,10 @@ public class ScriptTestBuilderResource extends AbstractTestBuilderResource<Scrip
     script.setVersion(version);
     Script createdScript = getApi().createScript(script);
     return addClosable(createdScript);
+  }
+  
+  public List<Script> listScripts() {
+    return getApi().listScripts();
   }
 
   @Override

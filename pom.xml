@@ -110,7 +110,7 @@
     <reflections.version>0.9.10</reflections.version>
     <rest-assured.version>3.0.3</rest-assured.version>
     <mariadb-module.version>2.3.0</mariadb-module.version>
-    <metamind-api-client.version>2.0.13</metamind-api-client.version>
+    <metamind-api-client.version>2.0.14</metamind-api-client.version>
     <feign-uma.version>1.0.2</feign-uma.version>
   
     <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>

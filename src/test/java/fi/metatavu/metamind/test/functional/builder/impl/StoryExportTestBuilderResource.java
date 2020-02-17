@@ -1,6 +1,11 @@
 package fi.metatavu.metamind.test.functional.builder.impl;
 
+import java.util.UUID;
+
 import fi.metatavu.metamind.ApiClient;
+import fi.metatavu.metamind.client.StoryExportApi;
+import fi.metatavu.metamind.client.model.ExportedStory;
+import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
