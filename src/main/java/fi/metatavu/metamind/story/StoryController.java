@@ -13,6 +13,7 @@ import fi.metatavu.metamind.messages.MessageController;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.IntentTrainingMaterialDAO;
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
+import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
 import fi.metatavu.metamind.persistence.dao.StoryDAO;
 import fi.metatavu.metamind.persistence.dao.VariableDAO;
 import fi.metatavu.metamind.persistence.models.Intent;
@@ -22,6 +23,7 @@ import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
 import fi.metatavu.metamind.rest.model.TokenizerType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.rest.model.VariableType;
 import jersey.repackaged.com.google.common.base.Objects;
 
@@ -32,7 +34,8 @@ import jersey.repackaged.com.google.common.base.Objects;
  */
 @ApplicationScoped
 public class StoryController {
-
+  @Inject
+  private KnotIntentModelDAO knotIntentModelDAO;
   @Inject
   private StoryDAO storyDAO;
 
@@ -340,6 +343,18 @@ public class StoryController {
    * @param knot knot
    */
   public void deleteKnot(Knot knot) {
+    if (knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.INTENTOPENNLPDOCCAT) != null) {
+      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.INTENTOPENNLPDOCCAT));
+    }
+    if (knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.INTENTREGEX) != null) {
+      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.INTENTREGEX));
+    }
+    if (knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.VARIABLEOPENNLPNER) != null) {
+      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.VARIABLEOPENNLPNER));
+    }
+    if (knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.VARIABLEOPENNLPREGEX) != null) {
+      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.VARIABLEOPENNLPREGEX));
+    }
     knotDAO.delete(knot);
   }
 

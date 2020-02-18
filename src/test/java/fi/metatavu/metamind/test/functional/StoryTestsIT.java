@@ -13,13 +13,13 @@ import fi.metatavu.metamind.client.model.IntentTrainingMaterials;
 import fi.metatavu.metamind.client.model.IntentType;
 import fi.metatavu.metamind.client.model.Knot;
 import fi.metatavu.metamind.client.model.KnotType;
-import fi.metatavu.metamind.client.model.Script;
 import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.client.model.TrainingMaterial;
 import fi.metatavu.metamind.client.model.TrainingMaterialType;
 import fi.metatavu.metamind.client.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.client.model.Variable;
 import fi.metatavu.metamind.client.model.VariableType;
+import fi.metatavu.metamind.persistence.models.IntentTrainingMaterial;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
 
@@ -121,14 +121,10 @@ public class StoryTestsIT extends AbstractFunctionalTest {
    try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       Knot knot1 = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content", 10.0, 20.0);
-      Knot knot2 = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content", 10.0, 50.0);
+      Knot knot2 = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content", 10.0, 20.0);
       TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
-      Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, null, null, null, null);
-      IntentTrainingMaterials materials = new IntentTrainingMaterials();
-      materials.setIntentOpenNlpDoccatId(material.getId());
-      intent.setTrainingMaterials(materials);
-      builder.admin().intents().updateIntent(story, intent);
-      Script script = builder.admin().scripts().create("Test content", "English", "Test script", "0.1");
+      Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, material.getId(), null, null, null);      
+
       Variable variable = builder.admin().variables().create(story.getId(), "Test variable", VariableType.STRING, "");
       
       ExportedStory exportedStory = builder.admin().storyExport().exportStory(story.getId());
@@ -152,8 +148,6 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       assertEquals(intent.getName(), importedIntent.getName());
       assertEquals(intent.getQuickResponse(), importedIntent.getQuickResponse());
       assertEquals(intent.getQuickResponseOrder(), importedIntent.getQuickResponseOrder());
-      assertEquals(intent.getSourceKnotId(), importedIntent.getSourceKnotId());
-      assertEquals(intent.getTargetKnotId(), importedIntent.getTargetKnotId());
       assertEquals(intent.isGlobal(), importedIntent.isGlobal());
       
       TrainingMaterial importedMaterial = builder.admin().trainingMaterial().listTrainingMaterial(importedStory, material.getType(), material.getVisibility()).get(0);
@@ -163,12 +157,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       assertEquals(material.getName(), importedMaterial.getName());
       assertEquals(material.getVisibility(), importedMaterial.getVisibility());
       
-      Script importedScript = builder.admin().scripts().listScripts().get(1);
-      assertNotNull(importedScript);
-      assertEquals(script.getContent(), importedScript.getContent());
-      assertEquals(script.getVersion(), importedScript.getVersion());
-      assertEquals(script.getName(), importedScript.getName());
-      assertEquals(script.getLanguage(), importedScript.getLanguage());
+      assertEquals(importedIntent.getTrainingMaterials().getIntentOpenNlpDoccatId(), importedMaterial.getId());
       
       Variable importedVariable = builder.admin().variables().listVariables(importedStory).get(0);
       assertNotNull(importedVariable);
