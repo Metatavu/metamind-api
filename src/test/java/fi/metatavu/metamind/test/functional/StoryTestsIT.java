@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import fi.metatavu.metamind.client.model.ExportedStory;
 import fi.metatavu.metamind.client.model.Intent;
+import fi.metatavu.metamind.client.model.IntentTrainingMaterials;
 import fi.metatavu.metamind.client.model.IntentType;
 import fi.metatavu.metamind.client.model.Knot;
 import fi.metatavu.metamind.client.model.KnotType;
@@ -119,10 +120,13 @@ public class StoryTestsIT extends AbstractFunctionalTest {
   public void testExportImportStory() throws Exception {
    try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot knot1 = builder.admin().knots().create(story, KnotType.TEXT, "Test knot", "Content", 10.0, 20.0);
-      Knot knot2 = builder.admin().knots().create(story, KnotType.TEXT, "Test knot 2", "Content 2", 10.0, 50.0);
+      Knot knot1 = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content", 10.0, 20.0);
+      Knot knot2 = builder.admin().knots().create(story, KnotType.TEXT, "Test2", "Content", 10.0, 50.0);
       TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
-      Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, material.getId(), null, null, null);
+      Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, null, null, null, null);
+      IntentTrainingMaterials materials = new IntentTrainingMaterials();
+      materials.setIntentOpenNlpDoccatId(material.getId());
+      intent.setTrainingMaterials(materials);
       Script script = builder.admin().scripts().create("Test content", "English", "Test script", "0.1");
       Variable variable = builder.admin().variables().create(story.getId(), "Test variable", VariableType.STRING, "");
       
