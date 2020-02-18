@@ -2,6 +2,7 @@ package fi.metatavu.metamind.server.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.ejb.Stateful;
@@ -30,6 +31,7 @@ import fi.metatavu.metamind.rest.model.ExportedStoryVariable;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.scripts.ScriptController;
+import fi.metatavu.metamind.server.rest.translation.IntentTranslator;
 import fi.metatavu.metamind.story.StoryController;;
 
 /**
@@ -48,6 +50,8 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
   private TrainingMaterialController trainingMaterialController;
   @Inject
   private ScriptController scriptController;
+  @Inject
+  private IntentTranslator intentTranslator;
   
   @Override
   public Response exportStory(UUID storyId) {
@@ -59,7 +63,7 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
     }
     
     exportedStory.setName(storyToExport.getName());
-    exportedStory.setLocale(storyToExport.getLocale().toString());
+    exportedStory.setLocale(storyToExport.getLocale().toLanguageTag());
     exportedStory.setDefaultHint(storyToExport.getDefaultHint());
     
     List<Knot> knotsToExport = storyController.listKnotsByStory(storyToExport);
@@ -182,8 +186,68 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
   
   @Override
   public Response importStory(ExportedStory body) {
-    // TODO Auto-generated method stub
-    return null;
+    Story story = storyController.createStory(Locale.forLanguageTag(body.getLocale()), body.getName(), body.getDefaultHint(), getLoggerUserId());
+    
+    List<ExportedStoryKnot> knotsToCreate = body.getKnots();
+    List<ExportedStoryTrainingMaterial> trainingMaterialsToCreate = body.getTrainingMaterials();
+    
+    for (int i = 0; i < body.getIntents().size(); i++) {
+      Knot sourceKnot = null;
+      Knot targetKnot = null;
+      
+      if (body.getIntents().get(i).getSourceKnotId() != null) {
+        for (int j = 0; j < knotsToCreate.size(); j++) {
+          if (body.getIntents().get(i).getSourceKnotId() == knotsToCreate.get(j).getId()) {
+            ExportedStoryKnot knotToCreate = knotsToCreate.get(j);
+            sourceKnot = storyController.createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, getLoggerUserId(), knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+            knotsToCreate.remove(knotToCreate);
+          }
+        }
+      }
+      
+      if (body.getIntents().get(i).getTargetKnotId() != null) {
+        for (int j = 0; j < knotsToCreate.size(); j++) {
+          if (body.getIntents().get(i).getTargetKnotId() == knotsToCreate.get(j).getId()) {
+            ExportedStoryKnot knotToCreate = knotsToCreate.get(j);
+            targetKnot = storyController.createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, getLoggerUserId(), knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+            knotsToCreate.remove(knotToCreate);
+          }
+        }
+      }
+      
+      ExportedStoryIntent intentToCreate = body.getIntents().get(i);
+      Intent intent = storyController.createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.isisGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), getLoggerUserId());      
+      for (int x = 0; x < trainingMaterialsToCreate.size(); x++) {
+        for (int y = 0; y < intentToCreate.getTrainingMaterialIds().size(); y++) {
+          if (trainingMaterialsToCreate.get(x).getId() == intentToCreate.getTrainingMaterialIds().get(y)) {
+            ExportedStoryTrainingMaterial materialToCreate = trainingMaterialsToCreate.get(x);
+            TrainingMaterial material = trainingMaterialController.createTrainingMaterial(materialToCreate.getType(), materialToCreate.getName(), materialToCreate.getText(), story, getLoggerUserId(), TrainingMaterialVisibility.fromValue(materialToCreate.getVisibility()));
+            trainingMaterialController.setIntentTrainingMaterial(intent, material.getType(), material);
+            trainingMaterialsToCreate.remove(materialToCreate);
+          }
+        }
+      }
+    }
+    for (int i = 0; i < trainingMaterialsToCreate.size(); i++) {
+      ExportedStoryTrainingMaterial materialToCreate = trainingMaterialsToCreate.get(i);
+      trainingMaterialController.createTrainingMaterial(materialToCreate.getType(), materialToCreate.getName(), materialToCreate.getText(), story, getLoggerUserId(), TrainingMaterialVisibility.fromValue(materialToCreate.getVisibility()));
+    }
+    for (int i = 0; i < knotsToCreate.size(); i++) {
+      ExportedStoryKnot knotToCreate = knotsToCreate.get(i);
+      storyController.createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, getLoggerUserId(), knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+    }
+    
+    for (int i  = 0; i < body.getVariables().size(); i++) {
+      ExportedStoryVariable variableToCreate = body.getVariables().get(i);
+      storyController.createVariable(variableToCreate.getType(), story, variableToCreate.getName(), variableToCreate.getValidationScript(), getLoggerUserId());
+    }
+    
+    for (int i = 0; i < body.getScripts().size(); i++) {
+      ExportedStoryScript scriptToCreate = body.getScripts().get(i);
+      scriptController.createScript(scriptToCreate.getName(), scriptToCreate.getContent(), scriptToCreate.getVersion(), scriptToCreate.getLanguage(), getLoggerUserId());
+    }
+    
+    return createOk(story);
   }
 
 }

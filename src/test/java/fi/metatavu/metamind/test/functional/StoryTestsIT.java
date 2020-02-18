@@ -127,6 +127,7 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       IntentTrainingMaterials materials = new IntentTrainingMaterials();
       materials.setIntentOpenNlpDoccatId(material.getId());
       intent.setTrainingMaterials(materials);
+      builder.admin().intents().updateIntent(story, intent);
       Script script = builder.admin().scripts().create("Test content", "English", "Test script", "0.1");
       Variable variable = builder.admin().variables().create(story.getId(), "Test variable", VariableType.STRING, "");
       
