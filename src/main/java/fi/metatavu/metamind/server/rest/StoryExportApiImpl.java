@@ -3,6 +3,7 @@ package fi.metatavu.metamind.server.rest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
@@ -40,6 +41,7 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
 
   @Inject
   private StoryController storyController;
+  
   @Inject
   private TrainingMaterialController trainingMaterialController;
 
@@ -58,32 +60,26 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
     exportedStory.setDefaultHint(storyToExport.getDefaultHint());
     
     List<Knot> knotsToExport = storyController.listKnotsByStory(storyToExport);
-    List<ExportedStoryKnot> storyToExportKnots = new ArrayList<ExportedStoryKnot>();
-    
-    for (int i = 0; i < knotsToExport.size(); i++) {
-      Knot knotToExport = knotsToExport.get(i);
+
+    exportedStory.setKnots(knotsToExport.stream().map(var -> {
       ExportedStoryKnot exportedKnot = new ExportedStoryKnot();
-      
       Coordinates coordinates = new Coordinates();
-      coordinates.setX(knotToExport.getCoordinateX());
-      coordinates.setY(knotToExport.getCoordinateY());
-      
-      exportedKnot.setContent(knotToExport.getContent());
+      coordinates.setX(var.getCoordinateX());
+      coordinates.setY(var.getCoordinateY());
+      exportedKnot.setContent(var.getContent());
       exportedKnot.setCoordinates(coordinates);
-      exportedKnot.setId(knotToExport.getId());
-      exportedKnot.setType(knotToExport.getType());
-      exportedKnot.setTokenizer(knotToExport.getTokenizerType());
-      exportedKnot.setName(knotToExport.getName());
-      exportedKnot.setHint(knotToExport.getHint());
+      exportedKnot.setId(var.getId());
+      exportedKnot.setType(var.getType());
+      exportedKnot.setTokenizer(var.getTokenizerType());
+      exportedKnot.setName(var.getName());
+      exportedKnot.setHint(var.getHint());
       
-      storyToExportKnots.add(exportedKnot);
-    }
-    
-    exportedStory.setKnots(storyToExportKnots);
+      return exportedKnot;
+    }).collect(Collectors.toList()));
 
     
     List<Intent> intentsToExport = storyController.listIntentsByStory(storyToExport);
-    List<ExportedStoryIntent> storyToExportIntents = new ArrayList<ExportedStoryIntent>();
+    List<ExportedStoryIntent> storyToExportIntents = new ArrayList<>();
     
     for (int i = 0; i < intentsToExport.size(); i++) {
       Intent intentToExport = intentsToExport.get(i);
@@ -99,7 +95,7 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
       exportedIntent.setGlobal(intentToExport.getGlobal());
       
       List<TrainingMaterial> intentMaterial = trainingMaterialController.listTrainingMaterialByIntent(intentToExport);
-      List<UUID> intentMaterialIds = new ArrayList<UUID>();
+      List<UUID> intentMaterialIds = new ArrayList<>();
       for (int j = 0; j < intentMaterial.size(); j++) {
         intentMaterialIds.add(intentMaterial.get(j).getId());
       }
@@ -122,38 +118,28 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
     
     trainingMaterialsToExport.addAll(trainingMaterialController.listTrainingMaterials(storyToExport, TrainingMaterialType.VARIABLEOPENNLPREGEX, TrainingMaterialVisibility.STORY));
     trainingMaterialsToExport.addAll(trainingMaterialController.listTrainingMaterials(storyToExport, TrainingMaterialType.VARIABLEOPENNLPREGEX, TrainingMaterialVisibility.LOCAL));
-    
-    List<ExportedStoryTrainingMaterial> storyToExportTrainingMaterials = new ArrayList<ExportedStoryTrainingMaterial>();
-    
-    for (int i = 0; i < trainingMaterialsToExport.size(); i++) {
-      TrainingMaterial materialToExport = trainingMaterialsToExport.get(i);
+ 
+    exportedStory.setTrainingMaterials(trainingMaterialsToExport.stream().map(var -> {
       ExportedStoryTrainingMaterial exportedMaterial = new ExportedStoryTrainingMaterial();
-      
-      exportedMaterial.setId(materialToExport.getId());
-      exportedMaterial.setType(materialToExport.getType());
-      exportedMaterial.setText(materialToExport.getText());
-      exportedMaterial.setVisibility(materialToExport.getVisibility().toString());
-      exportedMaterial.setName(materialToExport.getName());
-      
-      storyToExportTrainingMaterials.add(exportedMaterial);
-    }
-    
-    exportedStory.setTrainingMaterials(storyToExportTrainingMaterials);
+      exportedMaterial.setId(var.getId());
+      exportedMaterial.setType(var.getType());
+      exportedMaterial.setText(var.getText());
+      exportedMaterial.setVisibility(var.getVisibility().toString());
+      exportedMaterial.setName(var.getName());
+      return exportedMaterial;
+    }).collect(Collectors.toList()));
     
     List<Variable> variablesToExport = storyController.listVariablesByStory(storyToExport);
-    List<ExportedStoryVariable> exportedStoryVariables = new ArrayList<ExportedStoryVariable>();
-    
-    for (int i = 0; i < variablesToExport.size(); i++) {
-      Variable variableToExport = variablesToExport.get(i);
-      ExportedStoryVariable exportedVariable = new ExportedStoryVariable();
-      
-      exportedVariable.setName(variableToExport.getName());
-      exportedVariable.setType(variableToExport.getType());
-      exportedVariable.setValidationScript(variableToExport.getValidationScript());
-      
-      exportedStoryVariables.add(exportedVariable);
-    }
-    exportedStory.setVariables(exportedStoryVariables);
+
+    exportedStory.setVariables(variablesToExport
+        .stream()
+        .map((var) -> {
+            ExportedStoryVariable exportedVariable = new ExportedStoryVariable();
+            exportedVariable.setName(var.getName());
+            exportedVariable.setType(var.getType());
+            exportedVariable.setValidationScript(var.getValidationScript());
+            return exportedVariable;
+        }).collect(Collectors.toList()));
     
     return createOk(exportedStory);
   }

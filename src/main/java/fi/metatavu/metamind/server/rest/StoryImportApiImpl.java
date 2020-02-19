@@ -37,8 +37,10 @@ public class StoryImportApiImpl extends AbstractRestApi implements StoryImportAp
 
   @Inject
   private StoryController storyController;
+  
   @Inject
   private TrainingMaterialController trainingMaterialController;
+  
   @Inject
   private StoryTranslator storyTranslator;
   
