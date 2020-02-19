@@ -20,6 +20,8 @@ import fi.metatavu.metamind.persistence.models.Intent;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.Variable;
+import fi.metatavu.metamind.rest.model.Coordinates;
+import fi.metatavu.metamind.rest.model.ExportedStoryKnot;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
 import fi.metatavu.metamind.rest.model.TokenizerType;
@@ -376,6 +378,27 @@ public class StoryController {
    */
   public void deleteVariable(Variable variable) {
     variableDAO.delete(variable);
+  }
+  
+  /**
+   * Exports a knot
+   * 
+   * @param knot to be exported
+   * @return exported knot
+   */
+  public ExportedStoryKnot exportKnot(Knot knot) {
+    ExportedStoryKnot exportedKnot = new ExportedStoryKnot();
+    Coordinates coordinates = new Coordinates();
+    coordinates.setX(knot.getCoordinateX());
+    coordinates.setY(knot.getCoordinateY());
+    exportedKnot.setContent(knot.getContent());
+    exportedKnot.setCoordinates(coordinates);
+    exportedKnot.setId(knot.getId());
+    exportedKnot.setType(knot.getType());
+    exportedKnot.setTokenizer(knot.getTokenizerType());
+    exportedKnot.setName(knot.getName());
+    exportedKnot.setHint(knot.getHint());
+    return exportedKnot;
   }
 
 }

@@ -61,21 +61,7 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
     
     List<Knot> knotsToExport = storyController.listKnotsByStory(storyToExport);
 
-    exportedStory.setKnots(knotsToExport.stream().map(var -> {
-      ExportedStoryKnot exportedKnot = new ExportedStoryKnot();
-      Coordinates coordinates = new Coordinates();
-      coordinates.setX(var.getCoordinateX());
-      coordinates.setY(var.getCoordinateY());
-      exportedKnot.setContent(var.getContent());
-      exportedKnot.setCoordinates(coordinates);
-      exportedKnot.setId(var.getId());
-      exportedKnot.setType(var.getType());
-      exportedKnot.setTokenizer(var.getTokenizerType());
-      exportedKnot.setName(var.getName());
-      exportedKnot.setHint(var.getHint());
-      
-      return exportedKnot;
-    }).collect(Collectors.toList()));
+    exportedStory.setKnots(knotsToExport.stream().map(knot -> storyController.exportKnot(knot)).collect(Collectors.toList()));
 
     
     List<Intent> intentsToExport = storyController.listIntentsByStory(storyToExport);
@@ -119,13 +105,12 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
     trainingMaterialsToExport.addAll(trainingMaterialController.listTrainingMaterials(storyToExport, TrainingMaterialType.VARIABLEOPENNLPREGEX, TrainingMaterialVisibility.STORY));
     trainingMaterialsToExport.addAll(trainingMaterialController.listTrainingMaterials(storyToExport, TrainingMaterialType.VARIABLEOPENNLPREGEX, TrainingMaterialVisibility.LOCAL));
  
-    exportedStory.setTrainingMaterials(trainingMaterialsToExport.stream().map(var -> {
+    exportedStory.setTrainingMaterials(trainingMaterialsToExport.stream().map(trainingMaterial -> {
       ExportedStoryTrainingMaterial exportedMaterial = new ExportedStoryTrainingMaterial();
-      exportedMaterial.setId(var.getId());
-      exportedMaterial.setType(var.getType());
-      exportedMaterial.setText(var.getText());
-      exportedMaterial.setVisibility(var.getVisibility().toString());
-      exportedMaterial.setName(var.getName());
+      exportedMaterial.setId(trainingMaterial.getId());
+      exportedMaterial.setType(trainingMaterial.getType());
+      exportedMaterial.setText(trainingMaterial.getText());
+      exportedMaterial.setVisibility(trainingMaterial.getVisibility().toString());
       return exportedMaterial;
     }).collect(Collectors.toList()));
     
@@ -133,11 +118,11 @@ public class StoryExportApiImpl extends AbstractRestApi implements StoryExportAp
 
     exportedStory.setVariables(variablesToExport
         .stream()
-        .map((var) -> {
+        .map((variable) -> {
             ExportedStoryVariable exportedVariable = new ExportedStoryVariable();
-            exportedVariable.setName(var.getName());
-            exportedVariable.setType(var.getType());
-            exportedVariable.setValidationScript(var.getValidationScript());
+            exportedVariable.setName(variable.getName());
+            exportedVariable.setType(variable.getType());
+            exportedVariable.setValidationScript(variable.getValidationScript());
             return exportedVariable;
         }).collect(Collectors.toList()));
     
