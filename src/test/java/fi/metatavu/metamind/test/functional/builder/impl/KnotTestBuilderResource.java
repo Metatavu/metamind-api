@@ -66,7 +66,7 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
    * Lists story knots
    * 
    * @param story story
-   * @return
+   * @return all knots from the given story
    */
   public List<Knot> listKnots(Story story) {
     return getApi().listKnots(story.getId());

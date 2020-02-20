@@ -413,6 +413,42 @@ public class StoryController {
   }
   
   /**
+   * Imports a story
+   * 
+   * @param story that was previously exported
+   * @param id of user doing the import
+   * @return imported story
+   */
+  public Story importStory(ExportedStory body, UUID userId) {
+    Story story = createStory(Locale.forLanguageTag(body.getLocale()), body.getName(), body.getDefaultHint(), userId);
+    
+    List<ExportedStoryKnot> knotsToCreate = body.getKnots();
+    List<ExportedStoryTrainingMaterial> trainingMaterialsToCreate = body.getTrainingMaterials();
+    List<ExportedStoryIntent> intentsToCreate = body.getIntents();
+    List<ExportedStoryVariable> variablesToCreate = body.getVariables();
+    
+    variablesToCreate.forEach(variable -> {
+      createVariable(variable.getType(), story, variable.getName(), variable.getValidationScript(), userId);
+    });
+    
+    Map <UUID, Knot> originalKnotIds = new HashMap<UUID, Knot>();
+    knotsToCreate.forEach(knotToCreate -> {
+      Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+      originalKnotIds.put(knotToCreate.getId(), knot);
+    });
+    
+    Map <UUID, TrainingMaterial> originalTrainingMaterialIds = new HashMap<UUID, TrainingMaterial>();
+    trainingMaterialsToCreate.forEach(trainingMaterialToCreate -> {
+      TrainingMaterial trainingMaterial = trainingMaterialController.createTrainingMaterial(trainingMaterialToCreate.getType(), trainingMaterialToCreate.getName(), trainingMaterialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(trainingMaterialToCreate.getVisibility()));
+      originalTrainingMaterialIds.put(trainingMaterialToCreate.getId(), trainingMaterial);
+    });
+
+    intentsToCreate.forEach(intentToCreate -> importIntent(intentToCreate, userId, originalKnotIds, originalTrainingMaterialIds));
+
+    return story;
+  }
+  
+  /**
    * Exports a knot
    * 
    * @param knot to be exported
@@ -472,66 +508,31 @@ public class StoryController {
     exportedVariable.setValidationScript(variable.getValidationScript());
     return exportedVariable;
   }
-  
-  /**
-   * Imports a story
-   * 
-   * @param story that was previously exported
-   * @param id of user doing the import
-   * @return imported story
-   */
-  public Story importStory(ExportedStory body, UUID userId) {
-    Story story = createStory(Locale.forLanguageTag(body.getLocale()), body.getName(), body.getDefaultHint(), userId);
     
-    List<ExportedStoryKnot> knotsToCreate = body.getKnots();
-    List<ExportedStoryTrainingMaterial> trainingMaterialsToCreate = body.getTrainingMaterials();
-    List<ExportedStoryIntent> intentsToCreate = body.getIntents();
-    List<ExportedStoryVariable> variablesToCreate = body.getVariables();
+  private void importIntent(ExportedStoryIntent intentToCreate, UUID userId, Map<UUID, Knot> originalKnotIds, Map<UUID, TrainingMaterial> originalTrainingMaterialIds) {
+    Knot sourceKnot = null;
+    Knot targetKnot = null;
+    if(intentToCreate.getTargetKnotId() != null) {
+      targetKnot = originalKnotIds.get(intentToCreate.getTargetKnotId());
+    } 
     
-    variablesToCreate.forEach(variable -> {
-      createVariable(variable.getType(), story, variable.getName(), variable.getValidationScript(), userId);
-    });
+    if (intentToCreate.getSourceKnotId() != null) {
+      sourceKnot = originalKnotIds.get(intentToCreate.getSourceKnotId());
+    }
     
-    Map <UUID, Knot> originalKnotIds = new HashMap<UUID, Knot>();
-    knotsToCreate.forEach(knotToCreate -> {
-      Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
-      originalKnotIds.put(knotToCreate.getId(), knot);
-    });
-    
-    Map <UUID, TrainingMaterial> originalTrainingMaterialIds = new HashMap<UUID, TrainingMaterial>();
-    trainingMaterialsToCreate.forEach(trainingMaterialToCreate -> {
-      TrainingMaterial trainingMaterial = trainingMaterialController.createTrainingMaterial(trainingMaterialToCreate.getType(), trainingMaterialToCreate.getName(), trainingMaterialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(trainingMaterialToCreate.getVisibility()));
-      originalTrainingMaterialIds.put(trainingMaterialToCreate.getId(), trainingMaterial);
-    });
-
-    intentsToCreate.forEach(intentToCreate -> {
-      Knot sourceKnot = null;
-      Knot targetKnot = null;
-      if(intentToCreate.getTargetKnotId() != null) {
-        targetKnot = originalKnotIds.get(intentToCreate.getTargetKnotId());
-      } 
+    if (targetKnot != null) {
+      Intent intent = createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.isisGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), userId);
       
-      if (intentToCreate.getSourceKnotId() != null) {
-        sourceKnot = originalKnotIds.get(intentToCreate.getSourceKnotId());
-      }
+      List<TrainingMaterial> intentTrainingMaterials = intentToCreate.getTrainingMaterialIds().stream().map(id -> {
+        return originalTrainingMaterialIds.get(id);
+      }).collect(Collectors.toList());
       
-      if (targetKnot != null) {
-        Intent intent = createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.isisGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), userId);
-        
-        List<TrainingMaterial> intentTrainingMaterials = intentToCreate.getTrainingMaterialIds().stream().map(id -> {
-          return originalTrainingMaterialIds.get(id);
-        }).collect(Collectors.toList());
-        
-        intentTrainingMaterials.forEach(trainingMaterial -> {
-          if (trainingMaterial != null) {
-            trainingMaterialController.setIntentTrainingMaterial(intent, trainingMaterial.getType(), trainingMaterial);
-          }
-        });
-      }
-
-    });
-
-    return story;
+      intentTrainingMaterials.forEach(trainingMaterial -> {
+        if (trainingMaterial != null) {
+          trainingMaterialController.setIntentTrainingMaterial(intent, trainingMaterial.getType(), trainingMaterial);
+        }
+      });
+    }
   }
 
 }

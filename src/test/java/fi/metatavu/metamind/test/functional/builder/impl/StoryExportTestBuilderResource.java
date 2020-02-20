@@ -9,6 +9,10 @@ import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
+/**
+ * Test builder resource for importing and exporting stories
+ *
+ */
 public class StoryExportTestBuilderResource extends AbstractTestBuilderResource<ExportedStory, StoryExportApi>{
   public StoryExportTestBuilderResource(TestBuilder testBuilder, ApiClient apiClient) {
     super(testBuilder, apiClient);

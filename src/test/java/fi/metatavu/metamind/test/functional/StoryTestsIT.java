@@ -3,6 +3,7 @@ package fi.metatavu.metamind.test.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -123,7 +124,6 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       Knot knot2 = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content", 10.0, 20.0);
       TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
       Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, material.getId(), null, null, null);      
-
       Variable variable = builder.admin().variables().create(story.getId(), "Test variable", VariableType.STRING, "");
       
       ExportedStory exportedStory = builder.admin().storyExport().exportStory(story.getId());
@@ -135,21 +135,28 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       assertEquals(story.getDafaultHint(), importedStory.getDafaultHint());
       assertEquals(story.getLocale(), importedStory.getLocale());
       
-      Knot importedKnot = builder.admin().knots().listKnots(importedStory).get(0);
+      List<Knot> importedKnots = builder.admin().knots().listKnots(importedStory);
+      assertEquals(2, importedKnots.size());
+      Knot importedKnot = importedKnots.get(0);
       assertNotNull(importedKnot);
       assertEquals(knot1.getName(), importedKnot.getName());
       assertEquals(knot1.getType(), importedKnot.getType());
       assertEquals(knot1.getContent(), importedKnot.getContent());
-      assertEquals(knot1.getCoordinates(), importedKnot.getCoordinates());
+      assertEquals(knot1.getCoordinates().getX(), importedKnot.getCoordinates().getX());
+      assertEquals(knot1.getCoordinates().getY(), importedKnot.getCoordinates().getY());
       
-      Intent importedIntent = builder.admin().intents().listIntents(importedStory).get(0);
+      List<Intent> importedIntents = builder.admin().intents().listIntents(importedStory);
+      assertEquals(1, importedIntents.size());
+      Intent importedIntent = importedIntents.get(0);
       assertNotNull(importedIntent);
       assertEquals(intent.getName(), importedIntent.getName());
       assertEquals(intent.getQuickResponse(), importedIntent.getQuickResponse());
       assertEquals(intent.getQuickResponseOrder(), importedIntent.getQuickResponseOrder());
       assertEquals(intent.isGlobal(), importedIntent.isGlobal());
       
-      TrainingMaterial importedMaterial = builder.admin().trainingMaterial().listTrainingMaterial(importedStory, material.getType(), material.getVisibility()).get(0);
+      List<TrainingMaterial> importedMaterials = builder.admin().trainingMaterial().listTrainingMaterial(importedStory, material.getType(), material.getVisibility());
+      assertEquals(1, importedMaterials.size());
+      TrainingMaterial importedMaterial = importedMaterials.get(0);
       assertNotNull(importedMaterial);
       assertEquals(material.getType(), importedMaterial.getType());
       assertEquals(material.getText(), importedMaterial.getText());
@@ -158,7 +165,9 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       
       assertEquals(importedIntent.getTrainingMaterials().getIntentOpenNlpDoccatId(), importedMaterial.getId());
       
-      Variable importedVariable = builder.admin().variables().listVariables(importedStory).get(0);
+      List<Variable> importedVariables = builder.admin().variables().listVariables(importedStory);
+      assertEquals(1, importedVariables.size());
+      Variable importedVariable = importedVariables.get(0);
       assertNotNull(importedVariable);
       assertEquals(variable.getName(), importedVariable.getName());
       assertEquals(variable.getType(), importedVariable.getType());

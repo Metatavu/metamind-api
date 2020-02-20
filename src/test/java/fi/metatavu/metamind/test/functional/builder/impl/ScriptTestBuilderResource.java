@@ -8,6 +8,10 @@ import fi.metatavu.metamind.client.model.Script;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
+/**
+ * Test builder resource for scripts
+ *
+ */
 public class ScriptTestBuilderResource extends AbstractTestBuilderResource<Script, ScriptsApi>{
   public ScriptTestBuilderResource(TestBuilder testBuilder, ApiClient apiClient) {
     super(testBuilder, apiClient);

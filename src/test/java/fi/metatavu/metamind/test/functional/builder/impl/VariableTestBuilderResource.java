@@ -11,6 +11,10 @@ import fi.metatavu.metamind.client.model.VariableType;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
+/**
+ * Test builder resource for variables
+ *
+ */
 public class VariableTestBuilderResource extends AbstractTestBuilderResource<Variable, VariablesApi> {
   public VariableTestBuilderResource(TestBuilder testBuilder, ApiClient apiClient) {
     super(testBuilder, apiClient);
