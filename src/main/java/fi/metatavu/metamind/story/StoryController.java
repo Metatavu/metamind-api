@@ -28,11 +28,13 @@ import fi.metatavu.metamind.rest.model.Coordinates;
 import fi.metatavu.metamind.rest.model.ExportedStory;
 import fi.metatavu.metamind.rest.model.ExportedStoryIntent;
 import fi.metatavu.metamind.rest.model.ExportedStoryKnot;
+import fi.metatavu.metamind.rest.model.ExportedStoryTrainingMaterial;
 import fi.metatavu.metamind.rest.model.ExportedStoryVariable;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
 import fi.metatavu.metamind.rest.model.TokenizerType;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.rest.model.VariableType;
 import jersey.repackaged.com.google.common.base.Objects;
 
@@ -401,6 +403,17 @@ public class StoryController {
     exportedStory.setName(story.getName());
     exportedStory.setLocale(story.getLocale().toLanguageTag());
     exportedStory.setDefaultHint(story.getDefaultHint());
+    
+    List<Knot> knotsToExport = listKnotsByStory(story);
+    List<Intent> intentsToExport = listIntentsByStory(story);
+    List<TrainingMaterial> trainingMaterialsToExport = trainingMaterialController.listTrainingMaterials(story, null, null);
+    List<Variable> variablesToExport = listVariablesByStory(story);
+    
+    exportedStory.setKnots(knotsToExport.stream().map(knot -> exportKnot(knot)).collect(Collectors.toList()));
+    exportedStory.setIntents(intentsToExport.stream().map(intent -> exportIntent(intent)).collect(Collectors.toList()));
+    exportedStory.setTrainingMaterials(trainingMaterialsToExport.stream().map(trainingMaterial -> trainingMaterialController.exportTrainingMaterial(trainingMaterial)).collect(Collectors.toList()));
+    exportedStory.setVariables(variablesToExport.stream().map((variable) -> exportVariable(variable)).collect(Collectors.toList()));
+    
     return exportedStory;
   }
   
@@ -463,6 +476,65 @@ public class StoryController {
     exportedVariable.setType(variable.getType());
     exportedVariable.setValidationScript(variable.getValidationScript());
     return exportedVariable;
+  }
+  
+  public Story importStory(ExportedStory body, UUID userId) throws Exception {
+    Story story = createStory(Locale.forLanguageTag(body.getLocale()), body.getName(), body.getDefaultHint(), userId);
+    
+    List<ExportedStoryKnot> knotsToCreate = body.getKnots();
+    List<ExportedStoryTrainingMaterial> trainingMaterialsToCreate = body.getTrainingMaterials();
+    
+    for (int i = 0; i < body.getIntents().size(); i++) {
+      Knot sourceKnot = null;
+      if (body.getIntents().get(i).getSourceKnotId() != null) {
+        for (int j = 0; j < knotsToCreate.size(); j++) {
+          if (body.getIntents().get(i).getSourceKnotId().equals(knotsToCreate.get(j).getId())) {
+            ExportedStoryKnot knotToCreate = knotsToCreate.get(j);
+            sourceKnot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+            knotsToCreate.remove(knotToCreate);
+          }
+        }
+      }
+      ExportedStoryKnot targetKnotToCreate = null;
+      for (int j = 0; j < knotsToCreate.size(); j++) {
+        if (body.getIntents().get(i).getTargetKnotId().equals(knotsToCreate.get(j).getId())) {
+          targetKnotToCreate = knotsToCreate.get(j);
+          knotsToCreate.remove(knotsToCreate.get(j));
+        }
+      }
+      
+      if (targetKnotToCreate == null) {
+        throw new Exception("Target knot not found! Intent id: " + body.getIntents().get(i).getId());
+      }
+      Knot targetKnot = createKnot(targetKnotToCreate.getType(), targetKnotToCreate.getTokenizer(), targetKnotToCreate.getName(), targetKnotToCreate.getContent(), targetKnotToCreate.getHint(), story, userId, targetKnotToCreate.getCoordinates().getX(), targetKnotToCreate.getCoordinates().getY());
+      
+      ExportedStoryIntent intentToCreate = body.getIntents().get(i);
+      Intent intent = createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.isisGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), userId);      
+      for (int x = 0; x < trainingMaterialsToCreate.size(); x++) {
+        for (int y = 0; y < intentToCreate.getTrainingMaterialIds().size(); y++) {
+          if (trainingMaterialsToCreate.get(x).getId().equals(intentToCreate.getTrainingMaterialIds().get(y))) {
+            ExportedStoryTrainingMaterial materialToCreate = trainingMaterialsToCreate.get(x);
+            TrainingMaterial material = trainingMaterialController.createTrainingMaterial(materialToCreate.getType(), materialToCreate.getName(), materialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(materialToCreate.getVisibility()));
+            trainingMaterialController.setIntentTrainingMaterial(intent, material.getType(), material);
+            trainingMaterialsToCreate.remove(materialToCreate);
+          }
+        }
+      }
+    }
+    for (int i = 0; i < trainingMaterialsToCreate.size(); i++) {
+      ExportedStoryTrainingMaterial materialToCreate = trainingMaterialsToCreate.get(i);
+      trainingMaterialController.createTrainingMaterial(materialToCreate.getType(), materialToCreate.getName(), materialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(materialToCreate.getVisibility()));
+    }
+    for (int i = 0; i < knotsToCreate.size(); i++) {
+      ExportedStoryKnot knotToCreate = knotsToCreate.get(i);
+      createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+    }
+    
+    for (int i  = 0; i < body.getVariables().size(); i++) {
+      ExportedStoryVariable variableToCreate = body.getVariables().get(i);
+      createVariable(variableToCreate.getType(), story, variableToCreate.getName(), variableToCreate.getValidationScript(), userId);
+    }
+    return story;
   }
 
 }

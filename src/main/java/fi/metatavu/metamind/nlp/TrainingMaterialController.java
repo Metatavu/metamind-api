@@ -253,29 +253,6 @@ public class TrainingMaterialController {
   }
   
   /**
-   * Lists all training materials in a given story
-   * 
-   * @param story
-   * @return training materials
-   */
-  public List<TrainingMaterial> listTrainingMaterials(Story story) {
-    List<TrainingMaterial> trainingMaterials = new ArrayList<>();
-    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTOPENNLPDOCCAT, TrainingMaterialVisibility.LOCAL));
-    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTOPENNLPDOCCAT, TrainingMaterialVisibility.STORY));
-    
-    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTREGEX, TrainingMaterialVisibility.LOCAL));
-    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTREGEX, TrainingMaterialVisibility.STORY));
-    
-    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.VARIABLEOPENNLPNER, TrainingMaterialVisibility.LOCAL));
-    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.VARIABLEOPENNLPNER, TrainingMaterialVisibility.STORY));
-    
-    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.VARIABLEOPENNLPREGEX, TrainingMaterialVisibility.LOCAL));
-    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.VARIABLEOPENNLPREGEX, TrainingMaterialVisibility.STORY));
-    
-    return trainingMaterials;
-  }
-
-  /**
    * Deletes a training material entity
    * 
    * @param trainingMaterial training material entity
