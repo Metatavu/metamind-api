@@ -1,8 +1,10 @@
 package fi.metatavu.metamind.story;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
@@ -10,6 +12,7 @@ import javax.inject.Inject;
 
 import fi.metatavu.metamind.bot.KnotTrainingMaterialUpdateRequestEvent;
 import fi.metatavu.metamind.messages.MessageController;
+import fi.metatavu.metamind.nlp.TrainingMaterialController;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.IntentTrainingMaterialDAO;
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
@@ -19,9 +22,13 @@ import fi.metatavu.metamind.persistence.dao.VariableDAO;
 import fi.metatavu.metamind.persistence.models.Intent;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.rest.model.Coordinates;
+import fi.metatavu.metamind.rest.model.ExportedStory;
+import fi.metatavu.metamind.rest.model.ExportedStoryIntent;
 import fi.metatavu.metamind.rest.model.ExportedStoryKnot;
+import fi.metatavu.metamind.rest.model.ExportedStoryVariable;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
 import fi.metatavu.metamind.rest.model.TokenizerType;
@@ -58,6 +65,9 @@ public class StoryController {
 
   @Inject
   private Event<KnotTrainingMaterialUpdateRequestEvent> knotTrainingMaterialUpdateRequestEvent;
+  
+  @Inject
+  private TrainingMaterialController trainingMaterialController;
 
   /**
    * Finds story by id
@@ -381,6 +391,20 @@ public class StoryController {
   }
   
   /**
+   * Exports a story
+   * 
+   * @param story to be exported
+   * @return exported story
+   */
+  public ExportedStory exportStory(Story story) {
+    ExportedStory exportedStory = new ExportedStory();
+    exportedStory.setName(story.getName());
+    exportedStory.setLocale(story.getLocale().toLanguageTag());
+    exportedStory.setDefaultHint(story.getDefaultHint());
+    return exportedStory;
+  }
+  
+  /**
    * Exports a knot
    * 
    * @param knot to be exported
@@ -399,6 +423,40 @@ public class StoryController {
     exportedKnot.setName(knot.getName());
     exportedKnot.setHint(knot.getHint());
     return exportedKnot;
+  }
+  
+  /**
+   * Exports an intent
+   * 
+   * @param intent to be exported
+   * @return exported intent
+   */
+  public ExportedStoryIntent exportIntent(Intent intent) {
+    ExportedStoryIntent exportedIntent = new ExportedStoryIntent();
+    
+    exportedIntent.setId(intent.getId());
+    exportedIntent.setName(intent.getName());
+    exportedIntent.setQuickResponse(intent.getQuickResponse());
+    exportedIntent.setQuickResponseOrder(intent.getQuickResponseOrder());
+    exportedIntent.setType(intent.getType());
+    exportedIntent.setSourceKnotId(intent.getSourceKnot().getId());
+    exportedIntent.setTargetKnotId(intent.getTargetKnot().getId());
+    exportedIntent.setGlobal(intent.getGlobal());
+    
+    List<TrainingMaterial> intentMaterial = trainingMaterialController.listTrainingMaterialByIntent(intent);
+    exportedIntent.setTrainingMaterialIds(intentMaterial.stream().map(trainingMaterial -> {
+      return trainingMaterial.getId();
+    }).collect(Collectors.toList()));
+    
+    return exportedIntent;
+  }
+  
+  public ExportedStoryVariable exportVariable(Variable variable) {
+    ExportedStoryVariable exportedVariable = new ExportedStoryVariable();
+    exportedVariable.setName(variable.getName());
+    exportedVariable.setType(variable.getType());
+    exportedVariable.setValidationScript(variable.getValidationScript());
+    return exportedVariable;
   }
 
 }

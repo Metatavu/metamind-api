@@ -43,6 +43,7 @@ import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
+import fi.metatavu.metamind.rest.model.ExportedStoryTrainingMaterial;
 import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.utils.RegexUtils;
@@ -250,6 +251,23 @@ public class TrainingMaterialController {
   public List<TrainingMaterial> listTrainingMaterials(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
     return trainingMaterialDAO.list(true, story, type, visibility);
   }
+  
+  public List<TrainingMaterial> listTrainingMaterials(Story story) {
+    List<TrainingMaterial> trainingMaterials = new ArrayList<>();
+    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTOPENNLPDOCCAT, TrainingMaterialVisibility.LOCAL));
+    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTOPENNLPDOCCAT, TrainingMaterialVisibility.STORY));
+    
+    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTREGEX, TrainingMaterialVisibility.LOCAL));
+    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTREGEX, TrainingMaterialVisibility.STORY));
+    
+    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.VARIABLEOPENNLPNER, TrainingMaterialVisibility.LOCAL));
+    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.VARIABLEOPENNLPNER, TrainingMaterialVisibility.STORY));
+    
+    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.VARIABLEOPENNLPREGEX, TrainingMaterialVisibility.LOCAL));
+    trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.VARIABLEOPENNLPREGEX, TrainingMaterialVisibility.STORY));
+    
+    return trainingMaterials;
+  }
 
   /**
    * Deletes a training material entity
@@ -260,6 +278,22 @@ public class TrainingMaterialController {
     trainingMaterialDAO.delete(trainingMaterial);
   }
   
+  /**
+   * Exports a training material
+   * 
+   * @param training material to be exported
+   * @return exported training material
+   */
+  public ExportedStoryTrainingMaterial exportTrainingMaterial(TrainingMaterial trainingMaterial) {
+    ExportedStoryTrainingMaterial exportedMaterial = new ExportedStoryTrainingMaterial();
+    exportedMaterial.setId(trainingMaterial.getId());
+    exportedMaterial.setName(trainingMaterial.getName());
+    exportedMaterial.setType(trainingMaterial.getType());
+    exportedMaterial.setText(trainingMaterial.getText());
+    exportedMaterial.setVisibility(trainingMaterial.getVisibility().toString());
+    return exportedMaterial;
+  }
+   
   /**
    * Resolves training materials for given list of intents and training material type
    * 
