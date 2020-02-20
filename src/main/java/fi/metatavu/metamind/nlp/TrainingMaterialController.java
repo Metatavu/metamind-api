@@ -252,6 +252,12 @@ public class TrainingMaterialController {
     return trainingMaterialDAO.list(true, story, type, visibility);
   }
   
+  /**
+   * Lists all training materials in a given story
+   * 
+   * @param story
+   * @return training materials
+   */
   public List<TrainingMaterial> listTrainingMaterials(Story story) {
     List<TrainingMaterial> trainingMaterials = new ArrayList<>();
     trainingMaterials.addAll(listTrainingMaterials(story, TrainingMaterialType.INTENTOPENNLPDOCCAT, TrainingMaterialVisibility.LOCAL));
