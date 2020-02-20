@@ -1,8 +1,10 @@
 package fi.metatavu.metamind.story;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -21,6 +23,7 @@ import fi.metatavu.metamind.persistence.dao.StoryDAO;
 import fi.metatavu.metamind.persistence.dao.VariableDAO;
 import fi.metatavu.metamind.persistence.models.Intent;
 import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.KnotIntentModel;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
@@ -33,7 +36,6 @@ import fi.metatavu.metamind.rest.model.ExportedStoryVariable;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
 import fi.metatavu.metamind.rest.model.TokenizerType;
-import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.rest.model.VariableType;
 import jersey.repackaged.com.google.common.base.Objects;
@@ -357,8 +359,9 @@ public class StoryController {
    * @param knot knot
    */
   public void deleteKnot(Knot knot) {
-    if (knotIntentModelDAO.findByKnot(knot) != null) {
-      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnot(knot));
+    KnotIntentModel modelKnot = knotIntentModelDAO.findByKnot(knot); 
+    if (modelKnot != null) {
+      knotIntentModelDAO.delete(modelKnot);
     }
    
     knotDAO.delete(knot);
@@ -470,62 +473,63 @@ public class StoryController {
     return exportedVariable;
   }
   
-  public Story importStory(ExportedStory body, UUID userId) throws Exception {
+  /**
+   * Imports a story
+   * 
+   * @param story that was previously exported
+   * @param id of user doing the import
+   * @return imported story
+   */
+  public Story importStory(ExportedStory body, UUID userId) {
     Story story = createStory(Locale.forLanguageTag(body.getLocale()), body.getName(), body.getDefaultHint(), userId);
     
     List<ExportedStoryKnot> knotsToCreate = body.getKnots();
     List<ExportedStoryTrainingMaterial> trainingMaterialsToCreate = body.getTrainingMaterials();
+    List<ExportedStoryIntent> intentsToCreate = body.getIntents();
+    List<ExportedStoryVariable> variablesToCreate = body.getVariables();
     
-    for (int i = 0; i < body.getIntents().size(); i++) {
+    variablesToCreate.forEach(variable -> {
+      createVariable(variable.getType(), story, variable.getName(), variable.getValidationScript(), userId);
+    });
+    Map <UUID, Knot> originalKnotIds = new HashMap<UUID, Knot>();
+    knotsToCreate.forEach(knotToCreate -> {
+      Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+      originalKnotIds.put(knotToCreate.getId(), knot);
+    });
+    
+    Map <UUID, TrainingMaterial> originalTrainingMaterialIds = new HashMap<UUID, TrainingMaterial>();
+    trainingMaterialsToCreate.forEach(trainingMaterialToCreate -> {
+      TrainingMaterial trainingMaterial = trainingMaterialController.createTrainingMaterial(trainingMaterialToCreate.getType(), trainingMaterialToCreate.getName(), trainingMaterialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(trainingMaterialToCreate.getVisibility()));
+      originalTrainingMaterialIds.put(trainingMaterialToCreate.getId(), trainingMaterial);
+    });
+
+    intentsToCreate.forEach(intentToCreate -> {
       Knot sourceKnot = null;
-      if (body.getIntents().get(i).getSourceKnotId() != null) {
-        for (int j = 0; j < knotsToCreate.size(); j++) {
-          if (body.getIntents().get(i).getSourceKnotId().equals(knotsToCreate.get(j).getId())) {
-            ExportedStoryKnot knotToCreate = knotsToCreate.get(j);
-            sourceKnot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
-            knotsToCreate.remove(knotToCreate);
-          }
-        }
-      }
-      ExportedStoryKnot targetKnotToCreate = null;
-      for (int j = 0; j < knotsToCreate.size(); j++) {
-        if (body.getIntents().get(i).getTargetKnotId().equals(knotsToCreate.get(j).getId())) {
-          targetKnotToCreate = knotsToCreate.get(j);
-          knotsToCreate.remove(knotsToCreate.get(j));
-        }
+      Knot targetKnot = null;
+      if(intentToCreate.getTargetKnotId() != null) {
+        targetKnot = originalKnotIds.get(intentToCreate.getTargetKnotId());
+      } 
+      
+      if (intentToCreate.getSourceKnotId() != null) {
+        sourceKnot = originalKnotIds.get(intentToCreate.getSourceKnotId());
       }
       
-      if (targetKnotToCreate == null) {
-        throw new Exception("Target knot not found! Intent id: " + body.getIntents().get(i).getId());
-      }
-      Knot targetKnot = createKnot(targetKnotToCreate.getType(), targetKnotToCreate.getTokenizer(), targetKnotToCreate.getName(), targetKnotToCreate.getContent(), targetKnotToCreate.getHint(), story, userId, targetKnotToCreate.getCoordinates().getX(), targetKnotToCreate.getCoordinates().getY());
-      
-      ExportedStoryIntent intentToCreate = body.getIntents().get(i);
-      Intent intent = createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.isisGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), userId);      
-      for (int x = 0; x < trainingMaterialsToCreate.size(); x++) {
-        for (int y = 0; y < intentToCreate.getTrainingMaterialIds().size(); y++) {
-          if (trainingMaterialsToCreate.get(x).getId().equals(intentToCreate.getTrainingMaterialIds().get(y))) {
-            ExportedStoryTrainingMaterial materialToCreate = trainingMaterialsToCreate.get(x);
-            TrainingMaterial material = trainingMaterialController.createTrainingMaterial(materialToCreate.getType(), materialToCreate.getName(), materialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(materialToCreate.getVisibility()));
-            trainingMaterialController.setIntentTrainingMaterial(intent, material.getType(), material);
-            trainingMaterialsToCreate.remove(materialToCreate);
+      if (targetKnot != null) {
+        Intent intent = createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.isisGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), userId);
+        
+        List<TrainingMaterial> intentTrainingMaterials = intentToCreate.getTrainingMaterialIds().stream().map(id -> {
+          return originalTrainingMaterialIds.get(id);
+        }).collect(Collectors.toList());
+        
+        intentTrainingMaterials.forEach(trainingMaterial -> {
+          if (trainingMaterial != null) {
+            trainingMaterialController.setIntentTrainingMaterial(intent, trainingMaterial.getType(), trainingMaterial);
           }
-        }
+        });
       }
-    }
-    for (int i = 0; i < trainingMaterialsToCreate.size(); i++) {
-      ExportedStoryTrainingMaterial materialToCreate = trainingMaterialsToCreate.get(i);
-      trainingMaterialController.createTrainingMaterial(materialToCreate.getType(), materialToCreate.getName(), materialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(materialToCreate.getVisibility()));
-    }
-    for (int i = 0; i < knotsToCreate.size(); i++) {
-      ExportedStoryKnot knotToCreate = knotsToCreate.get(i);
-      createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
-    }
-    
-    for (int i  = 0; i < body.getVariables().size(); i++) {
-      ExportedStoryVariable variableToCreate = body.getVariables().get(i);
-      createVariable(variableToCreate.getType(), story, variableToCreate.getName(), variableToCreate.getValidationScript(), userId);
-    }
+
+    });
+
     return story;
   }
 

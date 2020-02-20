@@ -31,12 +31,10 @@ public class StoryImportApiImpl extends AbstractRestApi implements StoryImportAp
   
   @Override
   public Response importStory(ExportedStory body) {
-    try {
-      Story story = storyController.importStory(body, getLoggerUserId());
-      return createOk(storyTranslator.translateStory(story));
-    } catch (Exception e) {
-      return createBadRequest(e.getMessage());
-    }
+
+    Story story = storyController.importStory(body, getLoggerUserId());
+    return createOk(storyTranslator.translateStory(story));
+   
   }
 
 }
