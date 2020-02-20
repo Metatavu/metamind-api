@@ -1,8 +1,12 @@
 package fi.metatavu.metamind.story;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
@@ -10,18 +14,29 @@ import javax.inject.Inject;
 
 import fi.metatavu.metamind.bot.KnotTrainingMaterialUpdateRequestEvent;
 import fi.metatavu.metamind.messages.MessageController;
+import fi.metatavu.metamind.nlp.TrainingMaterialController;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.IntentTrainingMaterialDAO;
 import fi.metatavu.metamind.persistence.dao.KnotDAO;
+import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
 import fi.metatavu.metamind.persistence.dao.StoryDAO;
 import fi.metatavu.metamind.persistence.dao.VariableDAO;
 import fi.metatavu.metamind.persistence.models.Intent;
 import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.KnotIntentModel;
 import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.persistence.models.Variable;
+import fi.metatavu.metamind.rest.model.Coordinates;
+import fi.metatavu.metamind.rest.model.ExportedStory;
+import fi.metatavu.metamind.rest.model.ExportedStoryIntent;
+import fi.metatavu.metamind.rest.model.ExportedStoryKnot;
+import fi.metatavu.metamind.rest.model.ExportedStoryTrainingMaterial;
+import fi.metatavu.metamind.rest.model.ExportedStoryVariable;
 import fi.metatavu.metamind.rest.model.IntentType;
 import fi.metatavu.metamind.rest.model.KnotType;
 import fi.metatavu.metamind.rest.model.TokenizerType;
+import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.rest.model.VariableType;
 import jersey.repackaged.com.google.common.base.Objects;
 
@@ -32,7 +47,8 @@ import jersey.repackaged.com.google.common.base.Objects;
  */
 @ApplicationScoped
 public class StoryController {
-
+  @Inject
+  private KnotIntentModelDAO knotIntentModelDAO;
   @Inject
   private StoryDAO storyDAO;
 
@@ -53,6 +69,9 @@ public class StoryController {
 
   @Inject
   private Event<KnotTrainingMaterialUpdateRequestEvent> knotTrainingMaterialUpdateRequestEvent;
+  
+  @Inject
+  private TrainingMaterialController trainingMaterialController;
 
   /**
    * Finds story by id
@@ -340,6 +359,11 @@ public class StoryController {
    * @param knot knot
    */
   public void deleteKnot(Knot knot) {
+    KnotIntentModel modelKnot = knotIntentModelDAO.findByKnot(knot); 
+    if (modelKnot != null) {
+      knotIntentModelDAO.delete(modelKnot);
+    }
+   
     knotDAO.delete(knot);
   }
 
@@ -361,6 +385,154 @@ public class StoryController {
    */
   public void deleteVariable(Variable variable) {
     variableDAO.delete(variable);
+  }
+  
+  /**
+   * Exports a story
+   * 
+   * @param story to be exported
+   * @return exported story
+   */
+  public ExportedStory exportStory(Story story) {
+    ExportedStory exportedStory = new ExportedStory();
+    exportedStory.setName(story.getName());
+    exportedStory.setLocale(story.getLocale().toLanguageTag());
+    exportedStory.setDefaultHint(story.getDefaultHint());
+    
+    List<Knot> knotsToExport = listKnotsByStory(story);
+    List<Intent> intentsToExport = listIntentsByStory(story);
+    List<TrainingMaterial> trainingMaterialsToExport = trainingMaterialController.listTrainingMaterials(story, null, null);
+    List<Variable> variablesToExport = listVariablesByStory(story);
+    
+    exportedStory.setKnots(knotsToExport.stream().map(knot -> exportKnot(knot)).collect(Collectors.toList()));
+    exportedStory.setIntents(intentsToExport.stream().map(intent -> exportIntent(intent)).collect(Collectors.toList()));
+    exportedStory.setTrainingMaterials(trainingMaterialsToExport.stream().map(trainingMaterial -> trainingMaterialController.exportTrainingMaterial(trainingMaterial)).collect(Collectors.toList()));
+    exportedStory.setVariables(variablesToExport.stream().map((variable) -> exportVariable(variable)).collect(Collectors.toList()));
+    
+    return exportedStory;
+  }
+  
+  /**
+   * Imports a story
+   * 
+   * @param story that was previously exported
+   * @param id of user doing the import
+   * @return imported story
+   */
+  public Story importStory(ExportedStory body, UUID userId) {
+    Story story = createStory(Locale.forLanguageTag(body.getLocale()), body.getName(), body.getDefaultHint(), userId);
+    
+    List<ExportedStoryKnot> knotsToCreate = body.getKnots();
+    List<ExportedStoryTrainingMaterial> trainingMaterialsToCreate = body.getTrainingMaterials();
+    List<ExportedStoryIntent> intentsToCreate = body.getIntents();
+    List<ExportedStoryVariable> variablesToCreate = body.getVariables();
+    
+    variablesToCreate.forEach(variable -> {
+      createVariable(variable.getType(), story, variable.getName(), variable.getValidationScript(), userId);
+    });
+    
+    Map <UUID, Knot> originalKnotIds = new HashMap<UUID, Knot>();
+    knotsToCreate.forEach(knotToCreate -> {
+      Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+      originalKnotIds.put(knotToCreate.getId(), knot);
+    });
+    
+    Map <UUID, TrainingMaterial> originalTrainingMaterialIds = new HashMap<UUID, TrainingMaterial>();
+    trainingMaterialsToCreate.forEach(trainingMaterialToCreate -> {
+      TrainingMaterial trainingMaterial = trainingMaterialController.createTrainingMaterial(trainingMaterialToCreate.getType(), trainingMaterialToCreate.getName(), trainingMaterialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(trainingMaterialToCreate.getVisibility()));
+      originalTrainingMaterialIds.put(trainingMaterialToCreate.getId(), trainingMaterial);
+    });
+
+    intentsToCreate.forEach(intentToCreate -> importIntent(intentToCreate, userId, originalKnotIds, originalTrainingMaterialIds));
+
+    return story;
+  }
+  
+  /**
+   * Exports a knot
+   * 
+   * @param knot to be exported
+   * @return exported knot
+   */
+  private ExportedStoryKnot exportKnot(Knot knot) {
+    ExportedStoryKnot exportedKnot = new ExportedStoryKnot();
+    Coordinates coordinates = new Coordinates();
+    coordinates.setX(knot.getCoordinateX());
+    coordinates.setY(knot.getCoordinateY());
+    exportedKnot.setContent(knot.getContent());
+    exportedKnot.setCoordinates(coordinates);
+    exportedKnot.setId(knot.getId());
+    exportedKnot.setType(knot.getType());
+    exportedKnot.setTokenizer(knot.getTokenizerType());
+    exportedKnot.setName(knot.getName());
+    exportedKnot.setHint(knot.getHint());
+    return exportedKnot;
+  }
+  
+  /**
+   * Exports an intent
+   * 
+   * @param intent to be exported
+   * @return exported intent
+   */
+  private ExportedStoryIntent exportIntent(Intent intent) {
+    ExportedStoryIntent exportedIntent = new ExportedStoryIntent();
+    
+    exportedIntent.setId(intent.getId());
+    exportedIntent.setName(intent.getName());
+    exportedIntent.setQuickResponse(intent.getQuickResponse());
+    exportedIntent.setQuickResponseOrder(intent.getQuickResponseOrder());
+    exportedIntent.setType(intent.getType());
+    exportedIntent.setSourceKnotId(intent.getSourceKnot().getId());
+    exportedIntent.setTargetKnotId(intent.getTargetKnot().getId());
+    exportedIntent.setGlobal(intent.getGlobal());
+    
+    List<TrainingMaterial> intentMaterial = trainingMaterialController.listTrainingMaterialByIntent(intent);
+    exportedIntent.setTrainingMaterialIds(intentMaterial.stream().map(trainingMaterial -> {
+      return trainingMaterial.getId();
+    }).collect(Collectors.toList()));
+    
+    return exportedIntent;
+  }
+  
+  /**
+   * Exports a variable
+   * 
+   * @param variable to be exported
+   * @return exported variable
+   */
+  private ExportedStoryVariable exportVariable(Variable variable) {
+    ExportedStoryVariable exportedVariable = new ExportedStoryVariable();
+    exportedVariable.setName(variable.getName());
+    exportedVariable.setType(variable.getType());
+    exportedVariable.setValidationScript(variable.getValidationScript());
+    return exportedVariable;
+  }
+    
+  private void importIntent(ExportedStoryIntent intentToCreate, UUID userId, Map<UUID, Knot> originalKnotIds, Map<UUID, TrainingMaterial> originalTrainingMaterialIds) {
+    Knot sourceKnot = null;
+    Knot targetKnot = null;
+    if(intentToCreate.getTargetKnotId() != null) {
+      targetKnot = originalKnotIds.get(intentToCreate.getTargetKnotId());
+    } 
+    
+    if (intentToCreate.getSourceKnotId() != null) {
+      sourceKnot = originalKnotIds.get(intentToCreate.getSourceKnotId());
+    }
+    
+    if (targetKnot != null) {
+      Intent intent = createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.isisGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), userId);
+      
+      List<TrainingMaterial> intentTrainingMaterials = intentToCreate.getTrainingMaterialIds().stream().map(id -> {
+        return originalTrainingMaterialIds.get(id);
+      }).collect(Collectors.toList());
+      
+      intentTrainingMaterials.forEach(trainingMaterial -> {
+        if (trainingMaterial != null) {
+          trainingMaterialController.setIntentTrainingMaterial(intent, trainingMaterial.getType(), trainingMaterial);
+        }
+      });
+    }
   }
 
 }

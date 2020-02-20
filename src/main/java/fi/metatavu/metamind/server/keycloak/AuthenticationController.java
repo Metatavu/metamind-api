@@ -391,7 +391,7 @@ public class AuthenticationController {
    * @return ClientRepresentation
    */
   private ClientRepresentation getApiClient(Keycloak keycloak) {
-    List<ClientRepresentation> clients = keycloak.realm(REALM).clients().findByClientId(getApiClientId());
+    List<ClientRepresentation> clients = keycloak.realm(REALM).clients().findByClientId(API_CLIENT_ID);
     return clients.isEmpty() ? null : clients.get(0);
   }
   
