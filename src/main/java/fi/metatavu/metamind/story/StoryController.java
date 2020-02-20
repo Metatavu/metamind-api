@@ -418,7 +418,7 @@ public class StoryController {
    * @param knot to be exported
    * @return exported knot
    */
-  public ExportedStoryKnot exportKnot(Knot knot) {
+  private ExportedStoryKnot exportKnot(Knot knot) {
     ExportedStoryKnot exportedKnot = new ExportedStoryKnot();
     Coordinates coordinates = new Coordinates();
     coordinates.setX(knot.getCoordinateX());
@@ -439,7 +439,7 @@ public class StoryController {
    * @param intent to be exported
    * @return exported intent
    */
-  public ExportedStoryIntent exportIntent(Intent intent) {
+  private ExportedStoryIntent exportIntent(Intent intent) {
     ExportedStoryIntent exportedIntent = new ExportedStoryIntent();
     
     exportedIntent.setId(intent.getId());
@@ -465,7 +465,7 @@ public class StoryController {
    * @param variable to be exported
    * @return exported variable
    */
-  public ExportedStoryVariable exportVariable(Variable variable) {
+  private ExportedStoryVariable exportVariable(Variable variable) {
     ExportedStoryVariable exportedVariable = new ExportedStoryVariable();
     exportedVariable.setName(variable.getName());
     exportedVariable.setType(variable.getType());
