@@ -357,18 +357,10 @@ public class StoryController {
    * @param knot knot
    */
   public void deleteKnot(Knot knot) {
-    if (knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.INTENTOPENNLPDOCCAT) != null) {
-      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.INTENTOPENNLPDOCCAT));
+    if (knotIntentModelDAO.findByKnot(knot) != null) {
+      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnot(knot));
     }
-    if (knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.INTENTREGEX) != null) {
-      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.INTENTREGEX));
-    }
-    if (knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.VARIABLEOPENNLPNER) != null) {
-      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.VARIABLEOPENNLPNER));
-    }
-    if (knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.VARIABLEOPENNLPREGEX) != null) {
-      knotIntentModelDAO.delete(knotIntentModelDAO.findByKnotAndType(knot, TrainingMaterialType.VARIABLEOPENNLPREGEX));
-    }
+   
     knotDAO.delete(knot);
   }
 
