@@ -19,7 +19,6 @@ import fi.metatavu.metamind.client.model.TrainingMaterialType;
 import fi.metatavu.metamind.client.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.client.model.Variable;
 import fi.metatavu.metamind.client.model.VariableType;
-import fi.metatavu.metamind.persistence.models.IntentTrainingMaterial;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
 
 
