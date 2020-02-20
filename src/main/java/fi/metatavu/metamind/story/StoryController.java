@@ -491,6 +491,7 @@ public class StoryController {
     variablesToCreate.forEach(variable -> {
       createVariable(variable.getType(), story, variable.getName(), variable.getValidationScript(), userId);
     });
+    
     Map <UUID, Knot> originalKnotIds = new HashMap<UUID, Knot>();
     knotsToCreate.forEach(knotToCreate -> {
       Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
