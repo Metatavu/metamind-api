@@ -17,6 +17,15 @@ public class ScriptTestBuilderResource extends AbstractTestBuilderResource<Scrip
     super(testBuilder, apiClient);
   }
   
+  /*
+   * Creates a script for testing purposes
+   * 
+   * @param content of the script
+   * @param language of the script
+   * @param name of the script
+   * @param version of the script
+   * @return created script
+   */
   public Script create(String content, String language, String name, String version) {
     Script script = new Script();
     script.setContent(content);
@@ -27,6 +36,9 @@ public class ScriptTestBuilderResource extends AbstractTestBuilderResource<Scrip
     return addClosable(createdScript);
   }
   
+  /*
+   * Lists all scripts created during testing
+   */
   public List<Script> listScripts() {
     return getApi().listScripts();
   }

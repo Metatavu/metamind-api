@@ -20,6 +20,15 @@ public class VariableTestBuilderResource extends AbstractTestBuilderResource<Var
     super(testBuilder, apiClient);
   }
   
+  /*
+   * Creates a variable for testing purposes
+   * 
+   * @param id of the story
+   * @param name of the variable
+   * @param type of the variable
+   * @param validation script of the variable
+   * @return created variable
+   */
   public Variable create(UUID storyId, String name, VariableType type, String validationScript) {
     Variable variable = new Variable();
     variable.setName(name);
@@ -29,6 +38,9 @@ public class VariableTestBuilderResource extends AbstractTestBuilderResource<Var
     return addClosable(createdVariable);
   }
   
+  /*
+   * Lists all variables created during testing
+   */
   public List<Variable> listVariables(Story story) {
     return getApi().listVariables(story.getId());
   }

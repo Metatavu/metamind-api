@@ -431,13 +431,13 @@ public class StoryController {
       createVariable(variable.getType(), story, variable.getName(), variable.getValidationScript(), userId);
     });
     
-    Map <UUID, Knot> originalKnotIds = new HashMap<UUID, Knot>();
+    Map <UUID, Knot> originalKnotIds = new HashMap<>();
     knotsToCreate.forEach(knotToCreate -> {
       Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
       originalKnotIds.put(knotToCreate.getId(), knot);
     });
     
-    Map <UUID, TrainingMaterial> originalTrainingMaterialIds = new HashMap<UUID, TrainingMaterial>();
+    Map <UUID, TrainingMaterial> originalTrainingMaterialIds = new HashMap<>();
     trainingMaterialsToCreate.forEach(trainingMaterialToCreate -> {
       TrainingMaterial trainingMaterial = trainingMaterialController.createTrainingMaterial(trainingMaterialToCreate.getType(), trainingMaterialToCreate.getName(), trainingMaterialToCreate.getText(), story, userId, TrainingMaterialVisibility.fromValue(trainingMaterialToCreate.getVisibility()));
       originalTrainingMaterialIds.put(trainingMaterialToCreate.getId(), trainingMaterial);
@@ -483,9 +483,15 @@ public class StoryController {
     exportedIntent.setQuickResponse(intent.getQuickResponse());
     exportedIntent.setQuickResponseOrder(intent.getQuickResponseOrder());
     exportedIntent.setType(intent.getType());
-    exportedIntent.setSourceKnotId(intent.getSourceKnot().getId());
-    exportedIntent.setTargetKnotId(intent.getTargetKnot().getId());
     exportedIntent.setGlobal(intent.getGlobal());
+    
+    if (intent.getSourceKnot() != null) {
+    	exportedIntent.setSourceKnotId(intent.getSourceKnot().getId());
+    }
+    
+    if (intent.getTargetKnot() != null) {
+    	exportedIntent.setTargetKnotId(intent.getTargetKnot().getId());
+    }
     
     List<TrainingMaterial> intentMaterial = trainingMaterialController.listTrainingMaterialByIntent(intent);
     exportedIntent.setTrainingMaterialIds(intentMaterial.stream().map(trainingMaterial -> {
@@ -508,11 +514,19 @@ public class StoryController {
     exportedVariable.setValidationScript(variable.getValidationScript());
     return exportedVariable;
   }
-    
+  
+  /**
+   * Imports an intent from a previously exported story
+   * 
+   * @param an intent from previously exported story
+   * @param id of the user doing the import
+   * @param map with original knot ids and imported knots
+   * @param map with original training material ids and imported training materials
+   */
   private void importIntent(ExportedStoryIntent intentToCreate, UUID userId, Map<UUID, Knot> originalKnotIds, Map<UUID, TrainingMaterial> originalTrainingMaterialIds) {
     Knot sourceKnot = null;
     Knot targetKnot = null;
-    if(intentToCreate.getTargetKnotId() != null) {
+    if (intentToCreate.getTargetKnotId() != null) {
       targetKnot = originalKnotIds.get(intentToCreate.getTargetKnotId());
     } 
     

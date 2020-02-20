@@ -17,11 +17,24 @@ public class StoryExportTestBuilderResource extends AbstractTestBuilderResource<
   public StoryExportTestBuilderResource(TestBuilder testBuilder, ApiClient apiClient) {
     super(testBuilder, apiClient);
   }
-
+  
+  /*
+   * Exports a story for testing purposes
+   * 
+   * @param id of the story to be exported
+   * @return exported story
+   */
   public ExportedStory exportStory(UUID storyId) {
     return getApi().exportStory(storyId);
   }
   
+  /**
+   * Imports a story for testing purposes
+   * 
+   * @param a previously exported story
+   * 
+   * @return imported story
+   */
   public Story importStory(ExportedStory story) {
     return getApi().importStory(story);
   }
