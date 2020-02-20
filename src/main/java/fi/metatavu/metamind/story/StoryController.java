@@ -451,6 +451,12 @@ public class StoryController {
     return exportedIntent;
   }
   
+  /**
+   * Exports a variable
+   * 
+   * @param variable to be exported
+   * @return exported variable
+   */
   public ExportedStoryVariable exportVariable(Variable variable) {
     ExportedStoryVariable exportedVariable = new ExportedStoryVariable();
     exportedVariable.setName(variable.getName());
