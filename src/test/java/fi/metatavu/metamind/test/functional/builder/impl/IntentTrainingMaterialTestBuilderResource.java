@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.json.JSONException;
@@ -13,6 +14,7 @@ import fi.metatavu.metamind.ApiClient;
 import fi.metatavu.metamind.client.model.TrainingMaterial;
 import fi.metatavu.metamind.client.model.TrainingMaterialType;
 import fi.metatavu.metamind.client.model.TrainingMaterialVisibility;
+import fi.metatavu.metamind.client.model.Story;
 import fi.metatavu.metamind.client.TrainingMaterialsApi;
 import fi.metatavu.metamind.test.functional.builder.AbstractTestBuilderResource;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
@@ -57,6 +59,14 @@ public class IntentTrainingMaterialTestBuilderResource extends AbstractTestBuild
     return getApi().findTrainingMaterial(trainingMaterial.getId());
   }
   
+  /**
+   * List training material
+   * 
+   * @return
+   */
+  public List<TrainingMaterial> listTrainingMaterial(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
+    return getApi().listTrainingMaterials(story.getId(), type, visibility);
+  }
   /**
    * Updates training material
    * 

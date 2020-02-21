@@ -58,6 +58,28 @@ public class KnotIntentModelDAO extends AbstractDAO<KnotIntentModel> {
   }
   
   /**
+   * Find knot intent model
+   * 
+   * @param knot
+   * @return found knot intent model or null if not found
+   */
+  public KnotIntentModel findByKnot(Knot knot) {
+    EntityManager entityManager = getEntityManager();
+
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<KnotIntentModel> criteria = criteriaBuilder.createQuery(KnotIntentModel.class);
+    Root<KnotIntentModel> root = criteria.from(KnotIntentModel.class);
+    criteria.select(root);
+    criteria.where(
+      criteriaBuilder.and(
+        criteriaBuilder.equal(root.get(KnotIntentModel_.knot), knot)
+      )
+    );
+    
+    return getSingleResult(entityManager.createQuery(criteria));
+  }
+  
+  /**
    * Updates data
    *
    * @param data data

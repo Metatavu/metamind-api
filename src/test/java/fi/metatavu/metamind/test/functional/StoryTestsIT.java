@@ -3,12 +3,25 @@ package fi.metatavu.metamind.test.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.Test;
 
+import fi.metatavu.metamind.client.model.ExportedStory;
+import fi.metatavu.metamind.client.model.Intent;
+import fi.metatavu.metamind.client.model.IntentTrainingMaterials;
+import fi.metatavu.metamind.client.model.IntentType;
+import fi.metatavu.metamind.client.model.Knot;
+import fi.metatavu.metamind.client.model.KnotType;
 import fi.metatavu.metamind.client.model.Story;
+import fi.metatavu.metamind.client.model.TrainingMaterial;
+import fi.metatavu.metamind.client.model.TrainingMaterialType;
+import fi.metatavu.metamind.client.model.TrainingMaterialVisibility;
+import fi.metatavu.metamind.client.model.Variable;
+import fi.metatavu.metamind.client.model.VariableType;
 import fi.metatavu.metamind.test.functional.builder.TestBuilder;
+
 
 public class StoryTestsIT extends AbstractFunctionalTest {
 
@@ -101,6 +114,65 @@ public class StoryTestsIT extends AbstractFunctionalTest {
       builder.anonymous().stories().assertDeleteFailStatus(401, createdStory);
       builder.invalid().stories().assertDeleteFailStatus(403, createdStory);
     }
+  }
+  
+  @Test
+  public void testExportImportStory() throws Exception {
+   try (TestBuilder builder = new TestBuilder()) {
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
+      Knot knot1 = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content", 10.0, 20.0);
+      Knot knot2 = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content", 10.0, 20.0);
+      TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
+      Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, material.getId(), null, null, null);      
+      Variable variable = builder.admin().variables().create(story.getId(), "Test variable", VariableType.STRING, "");
+      
+      ExportedStory exportedStory = builder.admin().storyExport().exportStory(story.getId());
+      assertNotNull(exportedStory);
+      Story importedStory = builder.admin().storyExport().importStory(exportedStory);
+      assertNotNull(importedStory);
+      assertNotNull(builder.admin().stories().findStory(importedStory.getId()));     
+      assertEquals(story.getName(), importedStory.getName());
+      assertEquals(story.getDafaultHint(), importedStory.getDafaultHint());
+      assertEquals(story.getLocale(), importedStory.getLocale());
+      
+      List<Knot> importedKnots = builder.admin().knots().listKnots(importedStory);
+      assertEquals(2, importedKnots.size());
+      Knot importedKnot = importedKnots.get(0);
+      assertNotNull(importedKnot);
+      assertEquals(knot1.getName(), importedKnot.getName());
+      assertEquals(knot1.getType(), importedKnot.getType());
+      assertEquals(knot1.getContent(), importedKnot.getContent());
+      assertEquals(knot1.getCoordinates().getX(), importedKnot.getCoordinates().getX());
+      assertEquals(knot1.getCoordinates().getY(), importedKnot.getCoordinates().getY());
+      
+      List<Intent> importedIntents = builder.admin().intents().listIntents(importedStory);
+      assertEquals(1, importedIntents.size());
+      Intent importedIntent = importedIntents.get(0);
+      assertNotNull(importedIntent);
+      assertEquals(intent.getName(), importedIntent.getName());
+      assertEquals(intent.getQuickResponse(), importedIntent.getQuickResponse());
+      assertEquals(intent.getQuickResponseOrder(), importedIntent.getQuickResponseOrder());
+      assertEquals(intent.isGlobal(), importedIntent.isGlobal());
+      
+      List<TrainingMaterial> importedMaterials = builder.admin().trainingMaterial().listTrainingMaterial(importedStory, material.getType(), material.getVisibility());
+      assertEquals(1, importedMaterials.size());
+      TrainingMaterial importedMaterial = importedMaterials.get(0);
+      assertNotNull(importedMaterial);
+      assertEquals(material.getType(), importedMaterial.getType());
+      assertEquals(material.getText(), importedMaterial.getText());
+      assertEquals(material.getName(), importedMaterial.getName());
+      assertEquals(material.getVisibility(), importedMaterial.getVisibility());
+      
+      assertEquals(importedIntent.getTrainingMaterials().getIntentOpenNlpDoccatId(), importedMaterial.getId());
+      
+      List<Variable> importedVariables = builder.admin().variables().listVariables(importedStory);
+      assertEquals(1, importedVariables.size());
+      Variable importedVariable = importedVariables.get(0);
+      assertNotNull(importedVariable);
+      assertEquals(variable.getName(), importedVariable.getName());
+      assertEquals(variable.getType(), importedVariable.getType());
+      assertEquals(variable.getValidationScript(), importedVariable.getValidationScript());
+   }
   }
 
 }

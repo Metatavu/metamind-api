@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.json.JSONException;
@@ -61,6 +62,16 @@ public class KnotTestBuilderResource extends AbstractTestBuilderResource<Knot, K
     return getApi().findKnot(story.getId(), knot.getId());
   }
 
+  /**
+   * Lists story knots
+   * 
+   * @param story story
+   * @return all knots from the given story
+   */
+  public List<Knot> listKnots(Story story) {
+    return getApi().listKnots(story.getId());
+  }
+  
   /**
    * Updates a story knot
    * 

@@ -23,7 +23,6 @@ public class KnotTestsIT extends AbstractFunctionalTest {
       assertNotNull(builder.admin().knots().create(story, KnotType.TEXT, "Test Null", "Content", null, null));
     }
   }
-  
 
   @Test
   public void testCreateKnotPermissions() throws Exception {

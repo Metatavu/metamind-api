@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -91,6 +92,16 @@ public class IntentTestBuilderResource extends AbstractTestBuilderResource<Inten
 
   public Intent findIntent(Story story, Intent intent) {
     return getApi().findIntent(story.getId(), intent.getId());
+  }
+  
+  /**
+   * Lists story knots
+   * 
+   * @param story story
+   * @return
+   */
+  public List<Intent> listIntents(Story story) {
+    return getApi().listIntents(story.getId());
   }
 
   /**
