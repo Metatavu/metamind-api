@@ -10,3 +10,6 @@
 /.DS_Store
 /.metadata/
 /.apt_generated/
+/.idea/
+metamind.iml
+test-volumes/images/*

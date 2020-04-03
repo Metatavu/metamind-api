@@ -101,6 +101,10 @@
 
     <!-- Weka -->
     <weka.version>3.8.3</weka.version>
+
+    <!-- AWS SDK -->
+
+    <aws-java-sdk.version>1.11.673</aws-java-sdk.version>
     
     <!-- Test -->
     
@@ -146,6 +150,7 @@
       <plugin>
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
+        <version>3.3.3</version>
         <executions>
           <execution>
             <id>process</id>
@@ -542,6 +547,13 @@
       <version>${weka.version}</version>
     </dependency>
 
+    <!-- Amazon aws -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>${aws-java-sdk.version}</version>
+    </dependency>
+
   </dependencies>
   
 
@@ -646,6 +658,7 @@
                       <KEYCLOAK_ADMIN_CLIENT_ID>admin-cli</KEYCLOAK_ADMIN_CLIENT_ID>
                       <KEYCLOAK_ADMIN_CLIENT_SECRET></KEYCLOAK_ADMIN_CLIENT_SECRET>
                       <KEYCLOAK_CONFIG_PATH>/opt/docker/scripts/keycloak.json</KEYCLOAK_CONFIG_PATH>
+                      <IMAGE_UPLOAD_PATH>/opt/images/</IMAGE_UPLOAD_PATH>
                       <KUBERNETES_NAMESPACE>test</KUBERNETES_NAMESPACE>
                       <KUBERNETES_LABELS>test</KUBERNETES_LABELS>
                       <IT_HOST>localhost</IT_HOST>
@@ -655,6 +668,7 @@
                     <volumes>
                       <bind>
                         <volume>${project.basedir}/scripts:/opt/docker/scripts</volume>
+                        <volume>${project.basedir}/test-volumes/images:/opt/images</volume>
                       </bind>
                     </volumes>
                   </run>
