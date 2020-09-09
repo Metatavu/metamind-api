@@ -63,12 +63,12 @@
     
     <!-- Keycloak -->
     
-    <keycloak.version>5.0.0</keycloak.version>
+    <keycloak.version>11.0.0</keycloak.version>
     
     <!--  Logging -->
     
     <commons-logging.version>1.2</commons-logging.version>
-    <log4j.version>2.11.1</log4j.version>
+    <log4j.version>2.13.2</log4j.version>
 	<slf4j-api.version>1.7.22</slf4j-api.version>
     
     <!-- Liquibase -->
@@ -634,7 +634,7 @@
                       <METAMIND_API_DB_HOST>test-mysql</METAMIND_API_DB_HOST>
                       <METAMIND_API_DB_PORT>3306</METAMIND_API_DB_PORT>
                       <METAMIND_API_DB_NAME>db</METAMIND_API_DB_NAME>
-                      <METAMIND_API_DB_OPTS></METAMIND_API_DB_OPTS>
+                      <METAMIND_API_DB_OPTS/>
                       <METAMIND_API_DB_USERNAME>root</METAMIND_API_DB_USERNAME>
                       <METAMIND_API_DB_PASSWORD>rootpass</METAMIND_API_DB_PASSWORD>
                       <KEYCLOAK_REALM>metamind</KEYCLOAK_REALM>
@@ -644,7 +644,7 @@
                       <KEYCLOAK_ADMIN_USER>admin</KEYCLOAK_ADMIN_USER>
                       <KEYCLOAK_ADMIN_PASS>admin</KEYCLOAK_ADMIN_PASS>
                       <KEYCLOAK_ADMIN_CLIENT_ID>admin-cli</KEYCLOAK_ADMIN_CLIENT_ID>
-                      <KEYCLOAK_ADMIN_CLIENT_SECRET></KEYCLOAK_ADMIN_CLIENT_SECRET>
+                      <KEYCLOAK_ADMIN_CLIENT_SECRET/>
                       <KEYCLOAK_CONFIG_PATH>/opt/docker/scripts/keycloak.json</KEYCLOAK_CONFIG_PATH>
                       <KUBERNETES_NAMESPACE>test</KUBERNETES_NAMESPACE>
                       <KUBERNETES_LABELS>test</KUBERNETES_LABELS>
