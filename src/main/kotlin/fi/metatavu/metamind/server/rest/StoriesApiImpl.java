@@ -13,21 +13,14 @@ import fi.metatavu.metamind.persistence.models.Session;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.api.spec.StoriesApi;
 import fi.metatavu.metamind.api.spec.model.*;
-import fi.metatavu.metamind.server.keycloak.AuthenticationController;
-import fi.metatavu.metamind.server.keycloak.AuthorizationScope;
 import fi.metatavu.metamind.server.rest.translation.*;
 import fi.metatavu.metamind.sessions.SessionController;
 import fi.metatavu.metamind.story.StoryController;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.security.authorization.AuthorizationException;
-import org.keycloak.representations.idm.authorization.DecisionStrategy;
 
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,9 +37,6 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   private static final int MAX_KNOT_REDIRECTS = 50;
   
   private static final String STORY_NAME_TEMPLATE = "story-%s";
-  
-  @Inject
-  private AuthenticationController authenticationController;
   
   @Inject
   private SessionController sessionController;
@@ -270,17 +260,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
   public Response createStory(Story body) {
     UUID loggedUserId = getLoggerUserId();
     Locale locale = LocaleUtils.toLocale(body.getLocale());
-    List<AuthorizationScope> authorisationScopesList = Arrays.asList(AuthorizationScope.STORY_ACCESS, AuthorizationScope.STORY_MANAGE);
     fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
-    try {
-      UUID createdResourceId = authenticationController.createProtectedResource(loggedUserId, String.format(STORY_NAME_TEMPLATE, story.getId()), String.format("/v2/stories/%s", story.getId()), "story", authorisationScopesList);
-      UUID policyId = authenticationController.ensureUserPolicyExists(loggedUserId);
-      authenticationController.upsertScopePermission(createdResourceId, authorisationScopesList, String.format("Permission for story-%s", story.getId()), DecisionStrategy.AFFIRMATIVE, policyId);
-    } catch (AuthorizationException e) {
-      
-      return createInternalServerError(String.format("Failed to apply authorization rules for story: %s", e.getMessage()));
-    }
-    
+
     return createOk(storyTranslator.translateStory(story));
   }
 
@@ -464,9 +445,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listStories() {
-    UUID loggedUserId = getLoggerUserId();
-    
-    return createOk(authenticationController.getPermittedStories(loggedUserId, storyController.listStories()).stream().map(storyTranslator::translateStory).collect(Collectors.toList()));
+    return createOk(storyController.listStories().stream().map(storyTranslator::translateStory).collect(Collectors.toList()));
   }
 
   @Override
