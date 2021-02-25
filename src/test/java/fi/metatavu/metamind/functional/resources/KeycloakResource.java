@@ -19,8 +19,8 @@ public class KeycloakResource implements QuarkusTestResourceLifecycleManager {
         config.put("metamind.keycloak.host", keycloak.getAuthServerUrl());
         config.put("metamind.keycloak.realm", "metamind");
         config.put("metamind.keycloak.user", "admin");
-        config.put("metamind.keycloak.password", "admin-cli");
-        config.put("metamind.keycloak.admin_client_id", "");
+        config.put("metamind.keycloak.password", "admin");
+        config.put("metamind.keycloak.admin_client_id", "admin-cli");
 
         return config;
     }

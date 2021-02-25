@@ -1,0 +1,437 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+  <changeSet id="initial-database-v2" author="antti.leppa">
+    
+    <createTable tableName="story">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="locale" type="VARCHAR(191)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+  	<createTable tableName="knot">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="story_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_KNOT_STORY" referencedColumnNames="id" referencedTableName="story"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="content" type="longtext">
+        <constraints nullable="false"/>
+      </column> 
+    </createTable>
+    
+    <createTable tableName="trainingmaterial">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="story_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_TRAININGMATERIAL_STORY" referencedColumnNames="id" referencedTableName="story"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="text" type="LONGTEXT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  
+    <createTable tableName="intent">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="quickresponse" type="varchar(191)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="sourceknot_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_INTENT_SOURCE_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+      <column name="targetknot_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_INTENT_TARGET_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+      <column name="global" type="boolean">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="session">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="locale" type="VARCHAR(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="visitor" type="VARCHAR(191)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="story_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_SESSION_STORY" referencedColumnNames="id" referencedTableName="story"/>
+      </column>      
+      <column name="timezone" type="VARCHAR(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="currentknot_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_SESSION_CURRENT_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>      
+    </createTable>
+    
+    <createTable tableName="message">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="session_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_MESSAGE_SESSION" referencedColumnNames="id" referencedTableName="session"/>
+      </column>
+      <column name="content" type="longtext">
+        <constraints nullable="false"/>
+      </column> 
+      <column name="hint" type="varchar(191)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="confidence" type="double">
+        <constraints nullable="false"/>
+      </column>
+      <column name="sourceknot_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_MESSAGE_SOURCE_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+      <column name="targetknot_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_SESSION_TARGET_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+      <column name="matchedintent_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_MESSAGE_MATCHED_INTENT" referencedColumnNames="id" referencedTableName="intent"/>
+      </column>      
+    </createTable>
+    
+    <createTable tableName="quickresponse">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="text" type="VARCHAR(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="message_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_QUICK_RESPONSE_MESSAGE" referencedColumnNames="id" referencedTableName="message"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="messageresponse">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="text" type="longtext">
+        <constraints nullable="false"/>
+      </column> 
+      <column name="message_id" type="binary(16)">
+        <constraints nullable="true" foreignKeyName="FK_MESSAGE_RESPONSE_MESSAGE" referencedColumnNames="id" referencedTableName="message"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="script">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="version" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="language" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="content" type="longtext">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  
+    <addUniqueConstraint constraintName="UN_SCRIPT_NAME_VERSION" columnNames="name,version" tableName="script"/>
+    
+    <createTable tableName="variable">
+      <column name="id" type="binary(16)">
+        <constraints unique="true" nullable="false" primaryKey="true"/>
+      </column>
+      <column name="creatorid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lastmodifierid" type="binary(16)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="createdat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="modifiedat" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="story_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_VARIABLE_STORY" referencedColumnNames="id" referencedTableName="story"/>
+      </column>    
+      <column name="name" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>  
+      <column name="validationscript" type="longtext">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <createTable tableName="systemsetting">
+      <column name="id" type="bigint(20)" autoIncrement="true">
+        <constraints nullable="false" primaryKey="true"/>
+      </column>
+      <column name="settingKey" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="value" type="longtext">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <addUniqueConstraint constraintName="UN-SYSTEM-SETTING-SETTING-KEY" columnNames="settingkey" tableName="systemsetting"/>
+    
+    <createTable tableName="knotintentmodel">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="data" type="LONGBLOB">
+        <constraints nullable="false"/>
+      </column>
+      <column name="knot_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_KNOT_INTENT_MODEL_KNOT" referencedColumnNames="id" referencedTableName="knot"/>
+      </column>
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>      
+    </createTable>
+    
+    <createTable tableName="storyglobalintentmodel">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="data" type="LONGBLOB">
+        <constraints nullable="false"/>
+      </column>
+      <column name="story_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_STORY_GLOBAL_INTENT_MODEL_STORY" referencedColumnNames="id" referencedTableName="story"/>
+      </column>
+      <column name="type" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="intenttrainingmaterial">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="intent_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_INTENT_TRA_MAT_INTENT" referencedColumnNames="id" referencedTableName="intent"/>
+      </column>
+      <column name="trainingmaterial_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_INTENT_TRA_MATL_TRAINING_MATERIAL" referencedColumnNames="id" referencedTableName="trainingmaterial"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="sessionvariablevalue">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="session_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_SESSION_VARIABLE_VALUE_SESSION" referencedColumnNames="id" referencedTableName="session"/>
+      </column>
+      <column name="variable_id" type="binary(16)">
+        <constraints nullable="false" foreignKeyName="FK_SESSION_VARIABLE_VALUE_VARIABLE" referencedColumnNames="id" referencedTableName="variable"/>
+      </column>
+      <column name="value" type="longtext">
+        <constraints nullable="false"/>
+      </column> 
+    </createTable>
+    
+    <addUniqueConstraint columnNames="session_id,variable_id" tableName="sessionvariablevalue" constraintName="UN_SESSION_VARIABLE_SESSION_ID_VARIABLE_ID"/>
+  </changeSet>
+  
+  <changeSet id="knothints" author="Antti Leppä">
+  
+    <addColumn tableName="knot">
+      <column name="hint" type="varchar(191)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  
+  </changeSet>
+  
+  <changeSet id="intenttypes" author="Antti Leppä">
+    <sql>UPDATE intent set type = 'NORMAL' WHERE type in ('OPENNLP', 'TEMPLATE')</sql>
+  </changeSet>
+  
+  <changeSet id="tokenizer" author="Antti Leppä">
+    <addColumn tableName="knot">
+      <column name="tokenizertype" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+    
+    <sql>UPDATE knot set tokenizertype = 'WHITESPACE'</sql>
+  </changeSet>
+  
+  <changeSet id="quick-response-order" author="Antti Leppä">
+    <addColumn tableName="intent">
+      <column name="quickresponseorder" type="integer" defaultValue="0">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  
+  <changeSet id="default-hint-for-story" author="Daniil Smirnov">
+    <addColumn tableName="story">
+      <column name="defaulthint" type="varchar(191)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+    
+  <changeSet id="knotstorymodel-fk-remove" author="Daniil Smirnov" >
+    <dropForeignKeyConstraint baseTableName="knot" constraintName="FK_KNOT_STORY"/>
+  </changeSet>
+  
+  <changeSet id="knotstorymodel-fk-correct" author="Daniil Smirnov" >
+    <addForeignKeyConstraint baseColumnNames="story_id"
+            baseTableName="knot" constraintName="FK_KNOT_STORY" onDelete="CASCADE" onUpdate="CASCADE" referencedColumnNames="id" referencedTableName="story"/>
+  </changeSet>
+  
+  <changeSet id="training-material-visibility" author="Daniil Smirnov">
+    <addColumn tableName="trainingmaterial">
+      <column name="visibility" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  
+  <changeSet id="intent-coordinates" author="Daniil Smirnov">
+    <addColumn tableName="intent">
+      <column name="coordinatex" type="double">
+        <constraints nullable="true"/>
+      </column>
+      <column name="coordinatey" type="double">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  
+  <changeSet id="knot-coordinates" author="Daniil Smirnov">
+    <addColumn tableName="knot">
+      <column name="coordinatex" type="double">
+        <constraints nullable="true"/>
+      </column>
+      <column name="coordinatey" type="double">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  
+</databaseChangeLog>
