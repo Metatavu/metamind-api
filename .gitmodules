@@ -1,0 +1,3 @@
+[submodule "metamind-spec"]
+	path = metamind-spec
+	url = git@github.com:Metatavu/metamind-spec.git
