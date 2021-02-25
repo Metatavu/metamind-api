@@ -1,2 +1,0 @@
-embed-server --server-config=standalone-full-ha.xml
-/subsystem=undertow/server=default-server/host=metamind-api:add(alias=["${env.METAMIND_API_HOST}"],default-web-module="metamind-api.war")
