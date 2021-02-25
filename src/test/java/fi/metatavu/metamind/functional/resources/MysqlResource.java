@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MysqlResource implements QuarkusTestResourceLifecycleManager {
-      private static final String DATABASE = "metamind-api";
-      private static final String USERNAME = "metamind-api";
-      private static final String PASSWORD = "password";
+      private static final String DATABASE = "db";
+      private static final String USERNAME = "user";
+      private static final String PASSWORD = "pass";
 
     static final MySQLContainer db = new SpecifiedMySQLContainer("mysql:5.7")
         .withDatabaseName(DATABASE)
