@@ -36,6 +36,8 @@ dependencies {
     implementation "com.optimaize.languagedetector:language-detector:0.6"
     implementation "one.util:streamex:0.7.3"
     implementation "org.glassfish.jersey.bundles.repackaged:jersey-guava:2.6"
+    implementation "nz.ac.waikato.cms.weka:weka-stable:3.8.3"
+    implementation 'org.eclipse.microprofile.jwt:microprofile-jwt-auth-api:1.2'
 
     testImplementation "com.squareup.moshi:moshi-kotlin:1.9.2"
     testImplementation "com.squareup.moshi:moshi-adapters:1.9.2"
@@ -45,6 +47,8 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.15.1'
     testImplementation "fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:$jaxrs_functional_test_builder_version"
     testImplementation "com.github.dasniko:testcontainers-keycloak:1.5.0"
+
+    kapt "org.hibernate:hibernate-jpamodelgen:5.4.27.SP1"
 }
 
 group 'fi.metatavu.metamind'

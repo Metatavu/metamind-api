@@ -1,6 +1,7 @@
 package fi.metatavu.metamind.persistence.dao;
 
 import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.Story_;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;

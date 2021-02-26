@@ -1,5 +1,7 @@
 package fi.metatavu.metamind.bot.tokenization;
 
+import fi.metatavu.metamind.api.spec.model.TokenizerType;
+
 /**
  * Factory class for tokenizers
  * 
@@ -17,7 +19,7 @@ public class TokenizerFactory {
    * @param type type
    * @return tokenizer
    */
-  public static Tokenizer createTokenizer(fi.metatavu.metamind.rest.model.TokenizerType type) {
+  public static Tokenizer createTokenizer(TokenizerType type) {
     switch (type) {
       case UNTOKENIZED:
         return new UntokenizedTokenizer();

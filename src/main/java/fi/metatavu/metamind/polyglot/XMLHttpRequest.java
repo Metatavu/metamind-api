@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Class to use with polyglot javascripts to provide XMLHttpRequest
+ * Class to use with fi.metatavu.metamind.polyglot javascripts to provide XMLHttpRequest
  *
  * @author Heikki Kurhinen
  */

@@ -134,7 +134,7 @@ public class BotController {
   /**
    * Lists intent matchers for story
    * 
-   * @param sourceKnot source knot
+   * @param story source knot
    * @return list of intent matchers
    */
   private List<IntentMatcher> getStoryGlobalIntentMatches(Story story) {

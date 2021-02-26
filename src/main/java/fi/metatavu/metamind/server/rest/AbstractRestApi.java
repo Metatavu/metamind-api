@@ -1,8 +1,8 @@
 package fi.metatavu.metamind.server.rest;
 
 import fi.metatavu.metamind.api.spec.model.ErrorResponse;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.keycloak.representations.JsonWebToken;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;

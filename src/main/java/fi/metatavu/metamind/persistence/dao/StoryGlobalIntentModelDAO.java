@@ -3,6 +3,7 @@ package fi.metatavu.metamind.persistence.dao;
 import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
 import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
+import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel_;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;

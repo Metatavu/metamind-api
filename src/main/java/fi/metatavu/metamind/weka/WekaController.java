@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.Collections;
  * 
  * @author Simeon Platonov
  */
+@ApplicationScoped
 public class WekaController {
   @Inject 
   private Logger logger;

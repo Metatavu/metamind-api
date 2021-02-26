@@ -1,9 +1,6 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import fi.metatavu.metamind.persistence.models.Intent;
-import fi.metatavu.metamind.persistence.models.Knot;
-import fi.metatavu.metamind.persistence.models.Message;
-import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;

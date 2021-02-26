@@ -3,6 +3,7 @@ package fi.metatavu.metamind.persistence.dao;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.KnotIntentModel;
 import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
+import fi.metatavu.metamind.persistence.models.KnotIntentModel_;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;

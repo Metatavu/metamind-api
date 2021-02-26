@@ -4,6 +4,7 @@ import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
 import fi.metatavu.metamind.api.spec.model.TrainingMaterialVisibility;
+import fi.metatavu.metamind.persistence.models.TrainingMaterial_;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
