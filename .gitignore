@@ -10,3 +10,5 @@
 /.DS_Store
 /.metadata/
 /.apt_generated/
+build
+.gradle
