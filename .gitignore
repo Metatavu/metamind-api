@@ -12,3 +12,4 @@
 /.apt_generated/
 build
 .gradle
+/.idea/
