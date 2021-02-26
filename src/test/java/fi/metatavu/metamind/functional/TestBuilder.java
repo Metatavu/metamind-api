@@ -24,12 +24,6 @@ public class TestBuilder implements AutoCloseable {
   private TestBuilderAuthentication invalid;
   private TestBuilderAuthentication anonymous;
 
-  private static final String REALM = "metamind";
-  private static final String CLIENT_ID = "ui";
-  private static final String ADMIN_USER = "admin";
-  private static final String ADMIN_PASSWORD = "admin";
-  private static final String CLIENT_SECRET = null;
-
   private List<CloseableResource<?, ?>> closables = new ArrayList<>();
 
   /**
@@ -44,6 +38,12 @@ public class TestBuilder implements AutoCloseable {
     }
 
     String serverUrl = ConfigProvider.getConfig().getValue("metamind.keycloak.host", String.class);
+    String REALM = ConfigProvider.getConfig().getValue("metamind.keycloak.realm", String.class);
+    String CLIENT_ID = ConfigProvider.getConfig().getValue("quarkus.oidc.client-id", String.class);
+    String ADMIN_USER = ConfigProvider.getConfig().getValue("metamind.keycloak.user", String.class);
+    String ADMIN_PASSWORD = ConfigProvider.getConfig().getValue("metamind.keycloak.password", String.class);
+    String CLIENT_SECRET = null;
+
 
     return admin = new TestBuilderAuthentication(this,
             new KeycloakAccessTokenProvider(serverUrl, REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, CLIENT_SECRET));
