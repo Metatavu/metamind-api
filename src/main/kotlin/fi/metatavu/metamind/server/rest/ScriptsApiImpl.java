@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
  * @author Antti Leppä
  */
 @RequestScoped
+@Transactional
 public class ScriptsApiImpl extends AbstractRestApi implements ScriptsApi {
 
   @Inject

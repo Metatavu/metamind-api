@@ -1,11 +1,9 @@
 package fi.metatavu.metamind.functional.auth;
 
-import feign.Feign;
 import fi.metatavu.jaxrs.test.functional.builder.auth.AccessTokenProvider;
-import fi.metatavu.metamind.ApiClient;
 
+import fi.metatavu.metamind.api.client.infrastructure.ApiClient;
 import fi.metatavu.metamind.functional.TestBuilder;
-import fi.metatavu.metamind.functional.TestSettings;
 
 import java.io.IOException;
 
@@ -28,7 +26,7 @@ public class TestBuilderAuthentication extends AbstractTestBuilderAuthentication
    * @param accessTokenProvider access token builder
    */
   public TestBuilderAuthentication(TestBuilder testBuilder, AccessTokenProvider accessTokenProvider) {
-    super(testBuilder);
+    super(testBuilder, accessTokenProvider);
     this.accessTokenProvider = accessTokenProvider;
   }
   
@@ -41,10 +39,9 @@ public class TestBuilderAuthentication extends AbstractTestBuilderAuthentication
   @Override
   protected ApiClient createClient() throws IOException {
     String accessToken = accessTokenProvider.getAccessToken();
-    String authorization = accessToken != null ? String.format("Bearer %s", accessToken) : null;
-    ApiClient apiClient = authorization != null ? new ApiClient("BearerAuth", authorization) : new ApiClient();
-    apiClient.setBasePath(basePath);
-    return apiClient;
+    ApiClient client = new ApiClient(basePath);
+    ApiClient.Companion.setAccessToken(accessToken);
+    return client;
   }
   
 }

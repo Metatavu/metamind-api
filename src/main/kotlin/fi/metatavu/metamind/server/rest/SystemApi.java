@@ -1,6 +1,5 @@
 package fi.metatavu.metamind.server.rest;
 
-import com.sun.xml.ws.developer.Stateful;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Response;
  *
  */
 @Path("/system")
-@Stateful
 public class SystemApi extends AbstractRestApi {
 
   /**

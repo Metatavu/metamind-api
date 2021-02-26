@@ -1,6 +1,5 @@
 package fi.metatavu.metamind.server.rest;
 
-import com.sun.xml.ws.developer.Stateful;
 import fi.metatavu.metamind.bot.BotController;
 import fi.metatavu.metamind.bot.BotResponse;
 import fi.metatavu.metamind.bot.BotRuntimeContext;
@@ -19,7 +18,9 @@ import fi.metatavu.metamind.story.StoryController;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 import java.util.*;
@@ -31,7 +32,8 @@ import java.util.stream.Collectors;
  * @author Heikki Kurhinen
  * @author Antti Leppä
  */
-@Stateful
+@Transactional
+@RequestScoped
 public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   private static final int MAX_KNOT_REDIRECTS = 50;
@@ -445,6 +447,7 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listStories() {
+    System.out.println("CALLD LIST STORIES");
     return createOk(storyController.listStories().stream().map(storyTranslator::translateStory).collect(Collectors.toList()));
   }
 

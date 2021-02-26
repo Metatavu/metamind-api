@@ -26,7 +26,6 @@ dependencies {
     implementation 'io.quarkus:quarkus-resteasy'
     implementation 'io.quarkus:quarkus-arc'
 
-    implementation 'com.sun.xml.ws:jaxws-rt:3.0.0'
     implementation 'commons-logging:commons-logging:1.1.1'
     implementation 'javax.enterprise:cdi-api:2.0.SP1'
     implementation 'org.apache.commons:commons-lang3'
@@ -45,9 +44,7 @@ dependencies {
     testImplementation 'org.testcontainers:mysql:1.15.1'
     testImplementation 'org.testcontainers:junit-jupiter:1.15.1'
     testImplementation "fi.metatavu.jaxrs.testbuilder:jaxrs-functional-test-builder:$jaxrs_functional_test_builder_version"
-    testImplementation "fi.metatavu.metamind.client:metamind-api-client:2.0.14"
     testImplementation "com.github.dasniko:testcontainers-keycloak:1.5.0"
-
 }
 
 group 'fi.metatavu.metamind'

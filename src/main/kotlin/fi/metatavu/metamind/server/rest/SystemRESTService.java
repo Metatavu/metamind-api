@@ -1,7 +1,6 @@
 package fi.metatavu.metamind.server.rest;
 
 import javax.enterprise.context.RequestScoped;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -29,7 +28,7 @@ public class SystemRESTService {
   @GET
   @Path ("/ping")
   @Produces (MediaType.TEXT_PLAIN)
-  public Response getPing(@Context HttpServletRequest request) {
+  public Response getPing() {
     return Response.ok("pong").build();
   }
   

@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import fi.metatavu.jaxrs.test.functional.builder.CloseableApiResource;
-import fi.metatavu.metamind.ApiClient;
-import fi.metatavu.metamind.ApiClient.Api;
-import fi.metatavu.metamind.auth.ApiKeyAuth;
+import fi.metatavu.metamind.api.client.infrastructure.ApiClient;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -32,7 +30,7 @@ import static org.junit.Assert.assertTrue;
  * @param <T> type of resource
  * @param <A> type of API
  */
-public abstract class AbstractTestBuilderResource <T, A extends Api> implements TestBuilderResource <T> {
+public abstract class AbstractTestBuilderResource <T, A extends ApiClient> implements TestBuilderResource <T> {
   
   private TestBuilder testBuilder;
   private ApiClient apiClient;
@@ -77,9 +75,7 @@ public abstract class AbstractTestBuilderResource <T, A extends Api> implements 
    * 
    * @return API client
    */
-  protected A getApi() {
-    return apiClient.buildClient(getApiClass());    
-  }
+  protected abstract A getApi() throws IOException;
   
   /**
    * Returns API class from generic type arguments
@@ -116,20 +112,7 @@ public abstract class AbstractTestBuilderResource <T, A extends Api> implements 
     CustomComparator customComparator = new CustomComparator(JSONCompareMode.LENIENT);
     return JSONCompare.compareJSON(toJSONString(expected), toJSONString(actual), customComparator);
   }  
-  
-  /**
-   * Download binary data using API client authorization
-   * 
-   * @param apiClient API client
-   * @param url URL
-   * @return downloaded data
-   * @throws IOException thrown when downloading fails
-   */
-  protected byte[] getBinaryData(ApiClient apiClient, URL url) throws IOException {
-    ApiKeyAuth bearerAuth = (ApiKeyAuth) apiClient.getAuthorization("BearerAuth");
-    String authorization = bearerAuth.getApiKey();
-    return getBinaryData(authorization, url);
-  }  
+
   
   /**
    * Downloads binary data

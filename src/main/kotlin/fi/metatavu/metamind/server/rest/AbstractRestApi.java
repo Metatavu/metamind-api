@@ -24,7 +24,6 @@ import java.util.UUID;
  * @author Heikki Kurhinen
  * @author Antti Leppä
  */
-@RequestScoped
 public abstract class AbstractRestApi {
 
   private static final UUID ANONYMOUS_USER_ID = new UUID(0L, 0L);

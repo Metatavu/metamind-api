@@ -1,6 +1,6 @@
 package fi.metatavu.metamind.functional;
 
-import fi.metatavu.metamind.ApiClient.Api;
+import fi.metatavu.metamind.api.client.infrastructure.ApiClient;
 
 /**
  * Describes closeable resource
@@ -10,7 +10,7 @@ import fi.metatavu.metamind.ApiClient.Api;
  * @param <T> entity class
  * @param <A> API class
  */
-public class CloseableResource<T, A extends Api> implements AutoCloseable {
+public class CloseableResource<T, A extends ApiClient> implements AutoCloseable {
 
   private AbstractTestBuilderResource<T, A> builder;
   private T resource;

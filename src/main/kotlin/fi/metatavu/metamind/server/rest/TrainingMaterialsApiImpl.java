@@ -1,6 +1,5 @@
 package fi.metatavu.metamind.server.rest;
 
-import com.sun.xml.ws.developer.Stateful;
 import fi.metatavu.metamind.nlp.TrainingMaterialController;
 import fi.metatavu.metamind.api.spec.TrainingMaterialsApi;
 import fi.metatavu.metamind.api.spec.model.TrainingMaterial;
@@ -9,7 +8,9 @@ import fi.metatavu.metamind.api.spec.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.server.rest.translation.TrainingMaterialTranslator;
 import fi.metatavu.metamind.story.StoryController;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
@@ -20,7 +21,8 @@ import java.util.stream.Collectors;
  * 
  * @author Antti Leppä
  */
-@Stateful
+@RequestScoped
+@Transactional
 public class TrainingMaterialsApiImpl extends AbstractRestApi implements TrainingMaterialsApi {
 
   @Inject
