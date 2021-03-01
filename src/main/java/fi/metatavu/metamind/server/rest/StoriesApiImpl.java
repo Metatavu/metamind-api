@@ -447,7 +447,8 @@ public class StoriesApiImpl extends AbstractRestApi implements StoriesApi {
 
   @Override
   public Response listStories() {
-    System.out.println("CALLD LIST STORIES");
+    System.out.println("CALLD LIST STORIES"+ getLoggerUserId() );
+
     return createOk(storyController.listStories().stream().map(storyTranslator::translateStory).collect(Collectors.toList()));
   }
 

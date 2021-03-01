@@ -1,12 +1,14 @@
 package fi.metatavu.metamind.server.rest;
 
 import fi.metatavu.metamind.api.spec.model.ErrorResponse;
+import io.vertx.core.http.HttpServerRequest;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -31,14 +33,10 @@ public abstract class AbstractRestApi {
   private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
   private static final String FAILED_TO_STREAM_DATA_TO_CLIENT = "Failed to stream data to client";
   
-  @Inject
   private Logger logger;
 
   @Inject
   private JsonWebToken jsonWebToken;
-
-  @Inject
-  private HttpRequest request;
 
   /**
    * Returns logged user id
@@ -47,15 +45,6 @@ public abstract class AbstractRestApi {
    */
   protected UUID getLoggerUserId() {
     return UUID.fromString(jsonWebToken.getSubject());
-  }
-
-  /**
-   * Returns request locale
-   * 
-   * @return request locale
-   */
-  protected Locale getLocale() {
-    return request.getHttpHeaders().getLanguage();
   }
 
   /**

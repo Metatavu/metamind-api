@@ -11,7 +11,7 @@ public class MysqlResource implements QuarkusTestResourceLifecycleManager {
       private static final String USERNAME = "user";
       private static final String PASSWORD = "pass";
 
-    static final MySQLContainer db = new SpecifiedMySQLContainer("mysql:5.7")
+    static final MySQLContainer db = new SpecifiedMySQLContainer("mysql:5.6")
         .withDatabaseName(DATABASE)
         .withUsername(USERNAME)
         .withPassword(PASSWORD)

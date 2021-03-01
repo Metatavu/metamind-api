@@ -40,7 +40,7 @@
       <column name="createdat" type="timestamp">
         <constraints nullable="false"/>
       </column>
-      <column name="modifiedat" type="timestamp">
+      <column name="modifiedat" type="datetime(6)">
         <constraints nullable="false"/>
       </column>
       <column name="type" type="varchar(191)">
