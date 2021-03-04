@@ -1,8 +1,8 @@
-package fi.metatavu.metamind.functional;
+package fi.metatavu.metamind.functional.impl;
 
-import fi.metatavu.jaxrs.test.functional.builder.auth.InvalidAccessTokenProvider;
-import fi.metatavu.jaxrs.test.functional.builder.auth.KeycloakAccessTokenProvider;
-import fi.metatavu.jaxrs.test.functional.builder.auth.NullAccessTokenProvider;
+import fi.metatavu.jaxrs.test.functional.builder.AbstractTestBuilder;
+import fi.metatavu.jaxrs.test.functional.builder.auth.*;
+import fi.metatavu.metamind.api.client.infrastructure.ApiClient;
 import fi.metatavu.metamind.functional.auth.TestBuilderAuthentication;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.keycloak.Config;
@@ -18,13 +18,12 @@ import java.util.stream.Collectors;
  * 
  * @author Antti Leppä
  */
-public class TestBuilder implements AutoCloseable {
+public class TestBuilder extends AbstractTestBuilder<ApiClient> {
 
   private TestBuilderAuthentication admin;
   private TestBuilderAuthentication invalid;
   private TestBuilderAuthentication anonymous;
 
-  private List<CloseableResource<?, ?>> closables = new ArrayList<>();
 
   /**
    * Returns admin authenticated authentication resource
@@ -47,6 +46,18 @@ public class TestBuilder implements AutoCloseable {
 
     return admin = new TestBuilderAuthentication(this,
             new KeycloakAccessTokenProvider(serverUrl, REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, CLIENT_SECRET));
+  }
+
+  /**
+   * Creates new authorized test builder authentication
+   *
+   * @param abstractTestBuilder this instance
+   * @param accessTokenProvider access token provider
+   * @return initialized test builder authentication
+   */
+  @Override
+  public AuthorizedTestBuilderAuthentication<ApiClient> createTestBuilderAuthentication(AbstractTestBuilder<ApiClient> abstractTestBuilder, AccessTokenProvider accessTokenProvider) {
+    return new TestBuilderAuthentication(abstractTestBuilder, accessTokenProvider);
   }
 
   /**
@@ -73,43 +84,6 @@ public class TestBuilder implements AutoCloseable {
     }
 
     return anonymous = new TestBuilderAuthentication(this, new NullAccessTokenProvider());
-  }
-
-  /**
-   * Adds closable to clean queue
-   * 
-   * @param closable closable
-   * @return given instance
-   */
-  protected <T extends CloseableResource<?, ?>> T addClosable(T closable) {
-    closables.add(closable);
-    return closable;
-  }
-
-  /**
-   * Removes a closable from clean queue
-   * 
-   * @param predicate filter predicate
-   */
-  protected <T> void removeCloseable(Predicate<Object> predicate) {
-    closables = closables.stream().filter((closeable) -> {
-//      if (closeable.getResource().getClass().isInstance(clazz)) {
-//        T resource = (T) ;
-//      return predicate.test(resource);
-//      }
-//      return false;
-//      
-//      
-      return predicate.test(closeable.getResource());
-    }).collect(Collectors.toList());
-  }
-
-  @Override
-  public void close() throws Exception {
-    for (int i = closables.size() - 1; i >= 0; i--) {
-      closables.get(i).close();
-    }
-    admin = null;
   }
 
 }
