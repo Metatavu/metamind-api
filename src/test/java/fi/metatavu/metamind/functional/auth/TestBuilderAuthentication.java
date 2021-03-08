@@ -5,10 +5,7 @@ import fi.metatavu.jaxrs.test.functional.builder.auth.AccessTokenProvider;
 
 import fi.metatavu.jaxrs.test.functional.builder.auth.AuthorizedTestBuilderAuthentication;
 import fi.metatavu.metamind.api.client.infrastructure.ApiClient;
-import fi.metatavu.metamind.functional.impl.IntentTestBuilderResource;
-import fi.metatavu.metamind.functional.impl.KnotTestBuilderResource;
-import fi.metatavu.metamind.functional.impl.StoryTestBuilderResource;
-import fi.metatavu.metamind.functional.impl.TrainingMaterialTestBuilderResource;
+import fi.metatavu.metamind.functional.impl.*;
 
 import java.io.IOException;
 
@@ -27,7 +24,8 @@ public class TestBuilderAuthentication extends AuthorizedTestBuilderAuthenticati
   private KnotTestBuilderResource knotTestBuilderResource;
   private IntentTestBuilderResource intentTestBuilderResource;
   private TrainingMaterialTestBuilderResource trainingMaterialTestBuilderResource;
-
+  private VariableTestBuilderResource variableTestBuilderResource;
+  private StoryExportTestBuilderResource exportTestBuilderResource;
 
   /**
    * Constructor
@@ -79,5 +77,21 @@ public class TestBuilderAuthentication extends AuthorizedTestBuilderAuthenticati
     }
 
     return trainingMaterialTestBuilderResource;
+  }
+
+  public VariableTestBuilderResource variables() throws IOException {
+    if (variableTestBuilderResource == null) {
+      variableTestBuilderResource = new VariableTestBuilderResource(testBuilder, accessTokenProvider, createClient());
+    }
+
+    return variableTestBuilderResource;
+  }
+
+  public StoryExportTestBuilderResource storyExport() throws IOException {
+    if (exportTestBuilderResource == null) {
+      exportTestBuilderResource = new StoryExportTestBuilderResource(testBuilder, accessTokenProvider, createClient());
+    }
+
+    return exportTestBuilderResource;
   }
 }

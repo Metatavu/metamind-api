@@ -24,7 +24,6 @@ dependencies {
     implementation 'io.quarkus:quarkus-jdbc-mysql'
     implementation 'io.quarkus:quarkus-keycloak-admin-client'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    implementation 'io.quarkus:quarkus-resteasy'
     implementation 'io.quarkus:quarkus-oidc'
 
     implementation 'commons-logging:commons-logging:1.1.1'

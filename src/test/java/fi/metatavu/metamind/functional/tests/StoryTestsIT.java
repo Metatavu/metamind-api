@@ -1,12 +1,6 @@
 package fi.metatavu.metamind.functional.tests;
 
-import fi.metatavu.metamind.api.client.models.Intent;
-import fi.metatavu.metamind.api.client.models.Story;
-import fi.metatavu.metamind.api.client.models.Knot;
-import fi.metatavu.metamind.api.client.models.TrainingMaterial;
-import fi.metatavu.metamind.api.spec.model.ExportedStory;
-import fi.metatavu.metamind.api.spec.model.KnotType;
-import fi.metatavu.metamind.api.spec.model.Variable;
+import fi.metatavu.metamind.api.client.models.*;
 import fi.metatavu.metamind.functional.impl.TestBuilder;
 import fi.metatavu.metamind.functional.resources.KeycloakResource;
 import fi.metatavu.metamind.functional.resources.MysqlResource;
@@ -113,16 +107,16 @@ public class StoryTestsIT {
       builder.invalid().stories().assertDeleteFailStatus(403, createdStory);
     }
   }*/
-/*
-  @Test
+
+ /* @Test
   public void testExportImportStory() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot knot1 = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content", 10.0, 20.0);
-      Knot knot2 = builder.admin().knots().create(story, KnotType.TEXT, "Test1", "Content", 10.0, 20.0);
-      TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.INTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.STORY);
-      Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.DEFAULT, false, "quickresponse", 1, material.getId(), null, null, null);
-      Variable variable = builder.admin().variables().create(story.getId(), "Test variable", VariableType.STRING, "");
+      Knot knot1 = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot knot2 = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY);
+      Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, material.getId(), null, null, null);
+      fi.metatavu.metamind.api.client.models.Variable variable = builder.admin().variables().create(story.getId(), "Test variable", VariableType.sTRING, "");
 
       ExportedStory exportedStory = builder.admin().storyExport().exportStory(story.getId());
       assertNotNull(exportedStory);
@@ -150,7 +144,7 @@ public class StoryTestsIT {
       assertEquals(intent.getName(), importedIntent.getName());
       assertEquals(intent.getQuickResponse(), importedIntent.getQuickResponse());
       assertEquals(intent.getQuickResponseOrder(), importedIntent.getQuickResponseOrder());
-      assertEquals(intent.isGlobal(), importedIntent.isGlobal());
+      assertEquals(intent.getGlobal(), importedIntent.getGlobal());
 
       List<TrainingMaterial> importedMaterials = builder.admin().trainingMaterial().listTrainingMaterial(importedStory, material.getType(), material.getVisibility());
       assertEquals(1, importedMaterials.size());
@@ -163,7 +157,7 @@ public class StoryTestsIT {
 
       assertEquals(importedIntent.getTrainingMaterials().getIntentOpenNlpDoccatId(), importedMaterial.getId());
 
-      List<Variable> importedVariables = builder.admin().variables().listVariables(importedStory);
+      List<fi.metatavu.metamind.api.client.models.Variable> importedVariables = builder.admin().variables().listVariables(importedStory);
       assertEquals(1, importedVariables.size());
       Variable importedVariable = importedVariables.get(0);
       assertNotNull(importedVariable);
