@@ -111,7 +111,7 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
     getApi().deleteTrainingMaterial(trainingMaterial.getId());
     removeCloseable(closable -> {
       if (closable instanceof TrainingMaterial) {
-        return !((TrainingMaterial) closable).getId().equals(trainingMaterial.getId());
+        return ((TrainingMaterial) closable).getId().equals(trainingMaterial.getId());
       }
 
       return false;
@@ -196,8 +196,6 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
 
   @Override
   public void clean(TrainingMaterial trainingMaterial) {
-    getApi().deleteTrainingMaterial(trainingMaterial.getId());
-
-
+      getApi().deleteTrainingMaterial(trainingMaterial.getId());
   }
 }

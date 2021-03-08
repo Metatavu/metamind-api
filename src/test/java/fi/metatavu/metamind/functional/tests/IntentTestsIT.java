@@ -6,8 +6,7 @@ import fi.metatavu.metamind.functional.resources.KeycloakResource;
 import fi.metatavu.metamind.functional.resources.MysqlResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import liquibase.pro.packaged.U;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -75,7 +74,7 @@ public class IntentTestsIT {
     }
   }*/
 
-  //@Test
+  @Test
   public void testUpdateIntent() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
@@ -83,9 +82,9 @@ public class IntentTestsIT {
       Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
 
-      Intent updateIntent = new Intent(2, IntentType.cONFUSED, null, false,
-              null, null, "Updated intent", "veryquickresponse", null, null,
-              null);
+      Intent updateIntent = new Intent(2, IntentType.cONFUSED, createdIntent.getTargetKnotId(), false,
+              createdIntent.getTrainingMaterials(), createdIntent.getId(), "Updated intent", "veryquickresponse", createdIntent.getSourceKnotId(), createdIntent.getCreatedAt(),
+              createdIntent.getModifiedAt());
 
       Intent updatedIntent = builder.admin().intents().updateIntent(story, updateIntent);
       assertEquals(createdIntent.getId(), updatedIntent.getId());

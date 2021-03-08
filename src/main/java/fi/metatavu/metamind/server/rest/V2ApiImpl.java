@@ -798,7 +798,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
         UUID loggedUserId = getLoggerUserId();
 
-        return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.updateTrainingMaterial(foundTrainingMaterial, foundTrainingMaterial.getName(), foundTrainingMaterial.getText(), loggedUserId, foundTrainingMaterial.getVisibility())));
+        return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.updateTrainingMaterial(foundTrainingMaterial, trainingMaterial.getName(), trainingMaterial.getText(), loggedUserId, trainingMaterial.getVisibility())));
 
     }
 

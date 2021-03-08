@@ -65,9 +65,10 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    */
   @Override
   public void clean(Intent intent) {
-    getApi().deleteIntent(intentStoryMap.get(intent.getId()), intent.getId());
-    intentStoryMap.remove(intent.getId());
+      getApi().deleteIntent(intentStoryMap.get(intent.getId()), intent.getId());
+      intentStoryMap.remove(intent.getId());
   }
+
   /**
    * Creates a new intent
    *
@@ -83,18 +84,17 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param intentRegexId UUID
    * @param variableOpenNlpNerId UUID
    * @param variableOpenNlpRegexId UUID
-   * @return
+   * @return created intent
    */
   public Intent create(UUID storyId, Knot sourceKnot, Knot targetKnot, String name, IntentType type, boolean global, String quickResponse,
                        int quickResponseOrder, UUID intentOpenNlpDoccatId, UUID intentRegexId, UUID variableOpenNlpNerId, UUID variableOpenNlpRegexId) {
 
-    IntentTrainingMaterials intentTrainingMaterials = new IntentTrainingMaterials(intentOpenNlpDoccatId, null, null, null);
+    IntentTrainingMaterials intentTrainingMaterials = new IntentTrainingMaterials(intentOpenNlpDoccatId, intentRegexId, variableOpenNlpNerId, variableOpenNlpRegexId);
     Intent intent = new Intent(quickResponseOrder, type, targetKnot.getId(), global, intentTrainingMaterials, null, name, quickResponse, sourceKnot.getId(), null, null);
 
     Intent createdIntent = getApi().createIntent(storyId, intent);
     intentStoryMap.put(createdIntent.getId(), storyId);
     return addClosable(createdIntent);
-
   }
 
   /**
@@ -102,7 +102,7 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    *
    * @param story story
    * @param intent intent
-   * @return
+   * @return found intent
    */
 
   public Intent findIntent(Story story, Intent intent) {
@@ -113,7 +113,7 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * Lists story knots
    *
    * @param story story
-   * @return
+   * @return intents of the story
    */
   public List<Intent> listIntents(Story story) {
     return getApi().listIntents(story.getId());
@@ -124,7 +124,7 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    *
    * @param story story
    * @param intent intent
-   * @return
+   * @return updated intent
    */
 
   public Intent updateIntent(Story story, Intent intent) {
@@ -142,7 +142,7 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
     getApi().deleteIntent(story.getId(), intent.getId());
     removeCloseable(closable -> {
       if (closable instanceof Intent) {
-        return !((Intent) closable).getId().equals(intent.getId());
+        return ((Intent) closable).getId().equals(intent.getId());
       }
 
       return false;

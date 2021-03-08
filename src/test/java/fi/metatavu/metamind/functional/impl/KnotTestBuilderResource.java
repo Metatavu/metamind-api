@@ -16,6 +16,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -122,7 +123,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
     getApi().deleteKnot(story.getId(), knot.getId());
     removeCloseable(closable -> {
       if (closable instanceof Knot) {
-        return !((Knot) closable).getId().equals(knot.getId());
+        return ((Knot) closable).getId().equals(knot.getId());
       }
 
       return false;
@@ -140,7 +141,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
   public void assertCreateFailStatus(int expectedStatus, String content, String name, Story story) {
     try {
       Knot knot = new Knot(null, null, name, content, null, null, null, null, null, null);
-      getApi().createKnot(story.getId(), knot);
+      getApi().createKnot(Objects.requireNonNull(story.getId()), knot);
       fail(String.format("Expected create to fail with status %d", expectedStatus));
     } catch (ClientException e) {
       assertEquals(expectedStatus, e.getStatusCode());
@@ -151,7 +152,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
   /**
    * Asserts find status fails with given status code
    *
-   * @param story story UUID
+   * @param storyId story UUID
    * @param expectedStatus status code
    * @param knotId knotId UUID
    */
@@ -175,7 +176,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
 
   public void assertUpdateFailStatus(Story story, int expectedStatus, Knot knot) {
     try {
-      getApi().updateKnot(story.getId(), knot.getId(), knot);
+      getApi().updateKnot(Objects.requireNonNull(story.getId()), Objects.requireNonNull(knot.getId()), knot);
       fail(String.format("Expected update to fail with status %d", expectedStatus));
     } catch (ClientException e) {
       assertEquals(expectedStatus, e.getStatusCode());
@@ -205,7 +206,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
 
   public void assertDeleteFailStatus(Story story, int expectedStatus, Knot knot) {
     try {
-      getApi().deleteKnot(story.getId(), knot.getId());
+      getApi().deleteKnot(Objects.requireNonNull(story.getId()), Objects.requireNonNull(knot.getId()));
       fail(String.format("Expected delete to fail with status %d", expectedStatus));
     } catch (ClientException e) {
       assertEquals(expectedStatus, e.getStatusCode());
@@ -214,7 +215,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
 
   @Override
   public void clean(Knot knot) {
-    getApi().deleteKnot(knot.getStoryId(), knot.getId());
+      getApi().deleteKnot(knot.getStoryId(), knot.getId());
 
   }
 }

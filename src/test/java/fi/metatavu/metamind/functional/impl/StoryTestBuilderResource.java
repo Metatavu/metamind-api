@@ -95,7 +95,7 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
     getApi().deleteStory(story.getId());  
     removeCloseable(closable -> {
       if (closable instanceof Story) {
-        return !((Story) closable).getId().equals(story.getId());
+        return ((Story) closable).getId().equals(story.getId());
       }
       
       return false;

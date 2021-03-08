@@ -9,7 +9,7 @@ import fi.metatavu.metamind.functional.resources.KeycloakResource;
 import fi.metatavu.metamind.functional.resources.MysqlResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -115,7 +115,7 @@ public class KnotTestsIT {
       builder.admin().knots().assertDeleteFailStatus(story, 404, createdKnot);
     }
   }
-  
+
 /*
   @Test
   public void testDeleteKnotPermissions() throws Exception {

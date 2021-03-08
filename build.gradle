@@ -25,6 +25,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-keycloak-admin-client'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'io.quarkus:quarkus-oidc'
+    implementation 'io.quarkus:quarkus-resteasy-jackson'
 
     implementation 'commons-logging:commons-logging:1.1.1'
     implementation 'org.apache.commons:commons-lang3'
@@ -34,7 +35,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation "com.optimaize.languagedetector:language-detector:0.6"
     implementation "one.util:streamex:0.7.3"
-    implementation "org.glassfish.jersey.bundles.repackaged:jersey-guava:2.6"
     implementation "nz.ac.waikato.cms.weka:weka-stable:3.8.3"
     implementation 'org.eclipse.microprofile.jwt:microprofile-jwt-auth-api:1.2'
 
