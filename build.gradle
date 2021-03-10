@@ -92,7 +92,8 @@ task generateApiClient(type: org.openapitools.generator.gradle.plugin.tasks.Gene
 
     packageName = "fi.metatavu.metamind.api.client"
     configOptions = [
-            dateLibrary: "string"
+            dateLibrary: "string",
+            collectionType: "array"
     ]
 }
 
