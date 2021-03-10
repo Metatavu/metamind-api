@@ -21,14 +21,17 @@ public class StoryExportTestBuilderResource extends ApiTestBuilderResource<Expor
     private AccessTokenProvider accessTokenProvider;
 
     /**
-     * Constructor
+     * Constructor for StoryExportTestBuilderResource
      *
      * @param testBuilder testBuilder
-     * @param apiClient
+     * @param accessTokenProvider accessTokenProvider
+     * @param apiClient apiClient
      */
-    public StoryExportTestBuilderResource(AbstractTestBuilder<ApiClient> testBuilder,
-                                       AccessTokenProvider accessTokenProvider,
-                                       ApiClient apiClient) {
+    public StoryExportTestBuilderResource(
+            AbstractTestBuilder<ApiClient> testBuilder,
+            AccessTokenProvider accessTokenProvider,
+            ApiClient apiClient
+    ) {
         super(testBuilder, apiClient);
         this.accessTokenProvider = accessTokenProvider;
     }
@@ -55,9 +58,7 @@ public class StoryExportTestBuilderResource extends ApiTestBuilderResource<Expor
      */
     @Override
     public void clean(ExportedStory variable) {
-
     }
-
 
     /*
      * Exports a story for testing purposes

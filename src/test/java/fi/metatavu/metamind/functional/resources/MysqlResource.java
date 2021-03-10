@@ -1,28 +1,33 @@
 package fi.metatavu.metamind.functional.resources;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Starts test container for mysql
+ */
 public class MysqlResource implements QuarkusTestResourceLifecycleManager {
-      private static final String DATABASE = "db";
-      private static final String USERNAME = "user";
-      private static final String PASSWORD = "pass";
+    private static final String DATABASE = "db";
+    private static final String USERNAME = "user";
+    private static final String PASSWORD = "pass";
 
-    static final MySQLContainer db = new SpecifiedMySQLContainer("mysql:5.6")
-        .withDatabaseName(DATABASE)
-        .withUsername(USERNAME)
-        .withPassword(PASSWORD)
-        .withCommand(
-            "--character-set-server=utf8mb4",
-                    "--collation-server=utf8mb4_unicode_ci",
-                    "--lower_case_table_names=1"
-    );
+    static final JdbcDatabaseContainer db = new MySQLContainerProvider().newInstance("5.6")
+            .withDatabaseName(DATABASE)
+            .withUsername(USERNAME)
+            .withPassword(PASSWORD);
+
 
     @Override
     public Map<String, String> start() {
+        final Map<String, String> dbParams = Map.of("character-set-server", "utf8mb4",
+                "collation-server", "utf8mb4_unicode_ci", "lower_case_table_names", "1");
+        db.withCommand("--character-set-server=utf8mb4",
+                "--collation-server=utf8mb4_unicode_ci",
+                "--lower_case_table_names=1");
         db.start();
 
         HashMap config = new HashMap<String, String>();
@@ -36,13 +41,4 @@ public class MysqlResource implements QuarkusTestResourceLifecycleManager {
     public void stop() {
         db.stop();
     }
-
-}
-
-class SpecifiedMySQLContainer extends MySQLContainer<SpecifiedMySQLContainer>
-{
-    public SpecifiedMySQLContainer(String image){
-        super(image);
-    }
-
 }

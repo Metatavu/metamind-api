@@ -31,18 +31,19 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
   private AccessTokenProvider accessTokenProvider;
 
   /**
-   * Constructor
+   * Constructor for TrainingMaterialTestBuilderResource
    *
    * @param testBuilder testBuilder
-   * @param apiClient
+   * @param apiClient apiClient
    */
-  public TrainingMaterialTestBuilderResource(AbstractTestBuilder<ApiClient> testBuilder,
-                                             AccessTokenProvider accessTokenProvider,
-                                             ApiClient apiClient) {
+  public TrainingMaterialTestBuilderResource(
+          AbstractTestBuilder<ApiClient> testBuilder,
+          AccessTokenProvider accessTokenProvider,
+          ApiClient apiClient
+  ) {
     super(testBuilder, apiClient);
     this.accessTokenProvider = accessTokenProvider;
   }
-
 
   /**
    * Builds API client
@@ -89,9 +90,10 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
    *
    * @return
    */
-  public List<TrainingMaterial> listTrainingMaterial(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
+  public TrainingMaterial[] listTrainingMaterial(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
     return getApi().listTrainingMaterials(story.getId(), type, visibility);
   }
+
   /**
    * Updates training material
    *

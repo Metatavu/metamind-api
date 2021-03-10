@@ -32,18 +32,20 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
   private AccessTokenProvider accessTokenProvider;
 
   /**
-   * Constructor
+   * Constructor for KnotTestBuilderResource
    *
    * @param testBuilder testBuilder
-   * @param apiClient
+   * @param accessTokenProvider accessTokenProvider
+   * @param apiClient apiClient
    */
-  public KnotTestBuilderResource(AbstractTestBuilder<ApiClient> testBuilder,
-                                 AccessTokenProvider accessTokenProvider,
-                                 ApiClient apiClient) {
+  public KnotTestBuilderResource(
+          AbstractTestBuilder<ApiClient> testBuilder,
+          AccessTokenProvider accessTokenProvider,
+          ApiClient apiClient
+  ) {
     super(testBuilder, apiClient);
     this.accessTokenProvider = accessTokenProvider;
   }
-
 
   /**
    * Builds API client
@@ -97,7 +99,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
    * @param story story
    * @return all knots from the given story
    */
-  public List<Knot> listKnots(Story story) {
+  public Knot[] listKnots(Story story) {
     return getApi().listKnots(story.getId());
   }
 
@@ -108,7 +110,6 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
    * @param knot knot content
    * @return
    */
-
   public Knot updateKnot(Story story, Knot knot) {
     return getApi().updateKnot(story.getId(), knot.getId(), knot);
   }
@@ -173,7 +174,6 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
    * @param expectedStatus status code
    * @param knot knot
    */
-
   public void assertUpdateFailStatus(Story story, int expectedStatus, Knot knot) {
     try {
       getApi().updateKnot(Objects.requireNonNull(story.getId()), Objects.requireNonNull(knot.getId()), knot);
@@ -191,7 +191,6 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
    * @throws IOException
    * @throws JSONException
    */
-
   public void assertKnotsEqual(Knot expected, Knot actual) throws IOException, JSONException {
     assertJsonsEqual(expected, actual);
   }
@@ -203,7 +202,6 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
    * @param expectedStatus status code
    * @param knot knot
    */
-
   public void assertDeleteFailStatus(Story story, int expectedStatus, Knot knot) {
     try {
       getApi().deleteKnot(Objects.requireNonNull(story.getId()), Objects.requireNonNull(knot.getId()));
@@ -216,6 +214,5 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
   @Override
   public void clean(Knot knot) {
       getApi().deleteKnot(knot.getStoryId(), knot.getId());
-
   }
 }

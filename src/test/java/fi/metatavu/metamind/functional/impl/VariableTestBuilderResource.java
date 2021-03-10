@@ -22,14 +22,17 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
     private AccessTokenProvider accessTokenProvider;
 
     /**
-     * Constructor
+     * Constructor for VariableTestBuilderResource
      *
      * @param testBuilder testBuilder
-     * @param apiClient
+     * @param accessTokenProvider accessTokenProvider
+     * @param apiClient apiClient
      */
-    public VariableTestBuilderResource(AbstractTestBuilder<ApiClient> testBuilder,
-                                     AccessTokenProvider accessTokenProvider,
-                                     ApiClient apiClient) {
+    public VariableTestBuilderResource(
+            AbstractTestBuilder<ApiClient> testBuilder,
+            AccessTokenProvider accessTokenProvider,
+            ApiClient apiClient
+    ) {
         super(testBuilder, apiClient);
         this.accessTokenProvider = accessTokenProvider;
     }
@@ -62,7 +65,7 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
     /*
      * Lists all variables created during testing
      */
-    public List<Variable> listVariables(Story story) {
+    public Variable[] listVariables(Story story) {
         return getApi().listVariables(story.getId());
     }
 

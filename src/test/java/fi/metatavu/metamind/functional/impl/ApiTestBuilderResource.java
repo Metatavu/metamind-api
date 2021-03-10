@@ -11,8 +11,12 @@ import org.junit.Assert;
 
 import java.io.IOException;
 
-abstract class ApiTestBuilderResource<T, A> extends
-        AbstractApiTestBuilderResource<T, A, ApiClient> {
+/**
+ * Abstract base class for API test resource builders
+ * @param <T> resource
+ * @param <A> ApiClient for the resource
+ */
+abstract class ApiTestBuilderResource<T, A> extends AbstractApiTestBuilderResource<T, A, ApiClient> {
 
     private final ApiClient apiClient;
 
@@ -35,6 +39,5 @@ abstract class ApiTestBuilderResource<T, A> extends
         super(testBuilder);
         this.apiClient = apiClient;
     }
-
 
 }

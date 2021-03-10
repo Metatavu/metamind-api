@@ -127,43 +127,43 @@ public class StoryTestsIT {
       assertEquals(story.getDafaultHint(), importedStory.getDafaultHint());
       assertEquals(story.getLocale(), importedStory.getLocale());
 
-      List importedKnots = builder.admin().knots().listKnots(importedStory);
-      assertEquals(2, importedKnots.size());
-/*      Knot importedKnot = importedKnots.get(0);
+      Knot[] importedKnots = builder.admin().knots().listKnots(importedStory);
+      assertEquals(2, importedKnots.length);
+      Knot importedKnot = importedKnots[0];
       assertNotNull(importedKnot);
       assertEquals(knot1.getName(), importedKnot.getName());
       assertEquals(knot1.getType(), importedKnot.getType());
       assertEquals(knot1.getContent(), importedKnot.getContent());
       assertEquals(knot1.getCoordinates().getX(), importedKnot.getCoordinates().getX());
-      assertEquals(knot1.getCoordinates().getY(), importedKnot.getCoordinates().getY());*/
+      assertEquals(knot1.getCoordinates().getY(), importedKnot.getCoordinates().getY());
 
-      List importedIntents = builder.admin().intents().listIntents(importedStory);
-      assertEquals(1, importedIntents.size());
-   /*   Intent importedIntent = importedIntents.get(0);
+      Intent[] importedIntents = builder.admin().intents().listIntents(importedStory);
+      assertEquals(1, importedIntents.length);
+      Intent importedIntent = importedIntents[0];
       assertNotNull(importedIntent);
       assertEquals(intent.getName(), importedIntent.getName());
       assertEquals(intent.getQuickResponse(), importedIntent.getQuickResponse());
       assertEquals(intent.getQuickResponseOrder(), importedIntent.getQuickResponseOrder());
-      assertEquals(intent.getGlobal(), importedIntent.getGlobal());*/
+      assertEquals(intent.getGlobal(), importedIntent.getGlobal());
 
-      List importedMaterials = builder.admin().trainingMaterial().listTrainingMaterial(importedStory, material.getType(), material.getVisibility());
-      assertEquals(1, importedMaterials.size());
-   /*   TrainingMaterial importedMaterial = importedMaterials.get(0);
+      TrainingMaterial[] importedMaterials = builder.admin().trainingMaterial().listTrainingMaterial(importedStory, material.getType(), material.getVisibility());
+      assertEquals(1, importedMaterials.length);
+      TrainingMaterial importedMaterial = importedMaterials[0];
       assertNotNull(importedMaterial);
       assertEquals(material.getType(), importedMaterial.getType());
       assertEquals(material.getText(), importedMaterial.getText());
       assertEquals(material.getName(), importedMaterial.getName());
       assertEquals(material.getVisibility(), importedMaterial.getVisibility());
 
-      assertEquals(importedIntent.getTrainingMaterials().getIntentOpenNlpDoccatId(), importedMaterial.getId());*/
+      assertEquals(importedIntent.getTrainingMaterials().getIntentOpenNlpDoccatId(), importedMaterial.getId());
 
-      List importedVariables = builder.admin().variables().listVariables(importedStory);
-      assertEquals(1, importedVariables.size());
-     /* Variable importedVariable = importedVariables.get(0);
+      Variable[] importedVariables = builder.admin().variables().listVariables(importedStory);
+      assertEquals(1, importedVariables.length);
+      Variable importedVariable = importedVariables[0];
       assertNotNull(importedVariable);
       assertEquals(variable.getName(), importedVariable.getName());
       assertEquals(variable.getType(), importedVariable.getType());
-      assertEquals(variable.getValidationScript(), importedVariable.getValidationScript());*/
+      assertEquals(variable.getValidationScript(), importedVariable.getValidationScript());
     }
   }
 }

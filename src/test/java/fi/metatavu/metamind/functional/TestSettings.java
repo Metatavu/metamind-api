@@ -1,6 +1,5 @@
 package fi.metatavu.metamind.functional;
 
-
 /**
  * Utility class for retrieving functional test settings
  * 

@@ -24,7 +24,6 @@ public class TestBuilder extends AbstractTestBuilder<ApiClient> {
   private TestBuilderAuthentication invalid;
   private TestBuilderAuthentication anonymous;
 
-
   /**
    * Returns admin authenticated authentication resource
    * 
@@ -43,9 +42,7 @@ public class TestBuilder extends AbstractTestBuilder<ApiClient> {
     String ADMIN_PASSWORD = ConfigProvider.getConfig().getValue("metamind.keycloak.password", String.class);
     String CLIENT_SECRET = null;
 
-
-    return admin = new TestBuilderAuthentication(this,
-            new KeycloakAccessTokenProvider(serverUrl, REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, CLIENT_SECRET));
+    return admin = new TestBuilderAuthentication(this, new KeycloakAccessTokenProvider(serverUrl, REALM, CLIENT_ID, ADMIN_USER, ADMIN_PASSWORD, CLIENT_SECRET));
   }
 
   /**
@@ -56,7 +53,10 @@ public class TestBuilder extends AbstractTestBuilder<ApiClient> {
    * @return initialized test builder authentication
    */
   @Override
-  public AuthorizedTestBuilderAuthentication<ApiClient> createTestBuilderAuthentication(AbstractTestBuilder<ApiClient> abstractTestBuilder, AccessTokenProvider accessTokenProvider) {
+  public AuthorizedTestBuilderAuthentication<ApiClient> createTestBuilderAuthentication(
+          AbstractTestBuilder<ApiClient> abstractTestBuilder,
+          AccessTokenProvider accessTokenProvider
+  ) {
     return new TestBuilderAuthentication(abstractTestBuilder, accessTokenProvider);
   }
 

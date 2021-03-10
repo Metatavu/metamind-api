@@ -30,14 +30,17 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
   private AccessTokenProvider accessTokenProvider;
 
   /**
-   * Constructor
+   * Constructor for IntentTestBuilderResource
    *
    * @param testBuilder testBuilder
-   * @param apiClient
+   * @param accessTokenProvider accessTokenProvider
+   * @param apiClient apiClient
    */
-  public IntentTestBuilderResource(AbstractTestBuilder<ApiClient> testBuilder,
-                                   AccessTokenProvider accessTokenProvider,
-                                   ApiClient apiClient) {
+  public IntentTestBuilderResource(
+          AbstractTestBuilder<ApiClient> testBuilder,
+          AccessTokenProvider accessTokenProvider,
+          ApiClient apiClient
+  ) {
     super(testBuilder, apiClient);
     this.accessTokenProvider = accessTokenProvider;
   }
@@ -56,7 +59,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
     }
     return new IntentsApi(TestSettings.basePath);
   }
-
 
   /**
    * Cleans given resource
@@ -86,9 +88,19 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param variableOpenNlpRegexId UUID
    * @return created intent
    */
-  public Intent create(UUID storyId, Knot sourceKnot, Knot targetKnot, String name, IntentType type, boolean global, String quickResponse,
-                       int quickResponseOrder, UUID intentOpenNlpDoccatId, UUID intentRegexId, UUID variableOpenNlpNerId, UUID variableOpenNlpRegexId) {
-
+  public Intent create(UUID storyId,
+                       Knot sourceKnot,
+                       Knot targetKnot,
+                       String name,
+                       IntentType type,
+                       boolean global,
+                       String quickResponse,
+                       int quickResponseOrder,
+                       UUID intentOpenNlpDoccatId,
+                       UUID intentRegexId,
+                       UUID variableOpenNlpNerId,
+                       UUID variableOpenNlpRegexId
+  ) {
     IntentTrainingMaterials intentTrainingMaterials = new IntentTrainingMaterials(intentOpenNlpDoccatId, intentRegexId, variableOpenNlpNerId, variableOpenNlpRegexId);
     Intent intent = new Intent(quickResponseOrder, type, targetKnot.getId(), global, intentTrainingMaterials, null, name, quickResponse, sourceKnot.getId(), null, null);
 
@@ -104,7 +116,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param intent intent
    * @return found intent
    */
-
   public Intent findIntent(Story story, Intent intent) {
     return getApi().findIntent(story.getId(), intent.getId());
   }
@@ -115,7 +126,7 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param story story
    * @return intents of the story
    */
-  public List<Intent> listIntents(Story story) {
+  public Intent[] listIntents(Story story) {
     return getApi().listIntents(story.getId());
   }
 
@@ -126,7 +137,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param intent intent
    * @return updated intent
    */
-
   public Intent updateIntent(Story story, Intent intent) {
     return getApi().updateIntent(story.getId(), intent.getId(), intent);
   }
@@ -137,7 +147,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param story story
    * @param intent intent
    */
-
   public void delete(Story story, Intent intent) {
     getApi().deleteIntent(story.getId(), intent.getId());
     removeCloseable(closable -> {
@@ -158,7 +167,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param targetKnot knot
    * @param story story
    */
-
   public void assertCreateFailStatus(int expectedStatus, String name, Knot sourceKnot, Knot targetKnot, Story story) {
     try {
       Intent intent = new Intent(0, IntentType.nORMAL, targetKnot.getId(), false, null, null,  name, null, sourceKnot.getId(), null, null);
@@ -177,7 +185,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param expectedStatus status code
    * @param intentId intentId
    */
-
   public void assertFindFailStatus(UUID storyId, int expectedStatus, UUID intentId) {
     try {
       getApi().findIntent(storyId, intentId);
@@ -194,7 +201,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param expectedStatus status code
    * @param intent intent
    */
-
   public void assertUpdateFailStatus(Story story, int expectedStatus, Intent intent) {
     try {
       getApi().updateIntent(story.getId(), intent.getId(), intent);
@@ -211,7 +217,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @param expectedStatus status code
    * @param intent intent
    */
-
   public void assertDeleteFailStatus(Story story, int expectedStatus, Intent intent) {
     try {
       getApi().deleteIntent(story.getId(), intent.getId());
@@ -229,7 +234,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
    * @throws IOException
    * @throws JSONException
    */
-
   public void assertIntentsEqual(Intent expected, Intent actual) throws IOException, JSONException {
     assertJsonsEqual(expected, actual);
   }

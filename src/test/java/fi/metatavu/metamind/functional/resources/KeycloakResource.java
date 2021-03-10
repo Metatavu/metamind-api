@@ -6,6 +6,9 @@ import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Starts test container for keycloak
+ */
 public class KeycloakResource implements QuarkusTestResourceLifecycleManager {
     static final KeycloakContainer keycloak = new KeycloakContainer().withRealmImportFile("kc.json");
     @Override

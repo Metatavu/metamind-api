@@ -27,14 +27,16 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
   private AccessTokenProvider accessTokenProvider;
 
   /**
-   * Constructor
+   * Constructor for StoryTestBuilderResource
    *
    * @param testBuilder testBuilder
-   * @param apiClient
+   * @param accessTokenProvider accessTokenProvider
+   * @param apiClient apiClient
    */
-  public StoryTestBuilderResource(AbstractTestBuilder<ApiClient> testBuilder,
-                                  AccessTokenProvider accessTokenProvider,
-                                  ApiClient apiClient) {
+  public StoryTestBuilderResource(
+          AbstractTestBuilder<ApiClient> testBuilder,
+          AccessTokenProvider accessTokenProvider,
+          ApiClient apiClient) {
     super(testBuilder, apiClient);
     this.accessTokenProvider = accessTokenProvider;
   }
@@ -60,11 +62,10 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
    * @param locale locale
    * @param name name
    * @return created story
-  */
+   */
   public Story create(String locale, String name, String hintMessage) throws IOException {
     Story story = new Story(name, locale, null, hintMessage, null, null, null);
     return getApi().createStory(story);
-
   }
 
   /**
@@ -81,7 +82,7 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
    * Updates a story into the API
    * 
    * @param body body payload
-*/
+  */
   public Story updateStory(Story body) {
     return getApi().updateStory(Objects.requireNonNull(body.getId()), body);
   }
@@ -90,7 +91,7 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
    * Deletes a story from the API
    * 
    * @param story story to be deleted
-*/
+  */
   public void delete(Story story) throws IOException {
     getApi().deleteStory(story.getId());  
     removeCloseable(closable -> {
@@ -170,7 +171,6 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
       assertEquals(expectedStatus, e.getStatusCode());
     }
   }
-
 
   /**
    * Asserts delete status fails with given status code
