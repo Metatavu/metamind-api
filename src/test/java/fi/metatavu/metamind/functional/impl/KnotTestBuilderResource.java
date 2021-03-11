@@ -213,6 +213,6 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
 
   @Override
   public void clean(Knot knot) {
-      getApi().deleteKnot(knot.getStoryId(), knot.getId());
+    getApi().deleteKnot(knot.getStoryId(), knot.getId());
   }
 }

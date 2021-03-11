@@ -24,9 +24,9 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
     /**
      * Constructor for VariableTestBuilderResource
      *
-     * @param testBuilder testBuilder
+     * @param testBuilder         testBuilder
      * @param accessTokenProvider accessTokenProvider
-     * @param apiClient apiClient
+     * @param apiClient           apiClient
      */
     public VariableTestBuilderResource(
             AbstractTestBuilder<ApiClient> testBuilder,
@@ -79,7 +79,7 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
      * @return created variable
      */
     public Variable create(UUID storyId, String name, VariableType type, String validationScript) {
-        Variable variable = new Variable(name, type, null, null ,validationScript, null, null);
+        Variable variable = new Variable(name, type, null, null, validationScript, null, null);
 
         Variable createdVariable = getApi().createVariable(storyId, variable);
         return addClosable(createdVariable);

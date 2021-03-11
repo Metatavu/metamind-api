@@ -13,6 +13,7 @@ import java.io.IOException;
 
 /**
  * Abstract base class for API test resource builders
+ *
  * @param <T> resource
  * @param <A> ApiClient for the resource
  */

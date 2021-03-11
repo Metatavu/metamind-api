@@ -23,9 +23,9 @@ public class StoryExportTestBuilderResource extends ApiTestBuilderResource<Expor
     /**
      * Constructor for StoryExportTestBuilderResource
      *
-     * @param testBuilder testBuilder
+     * @param testBuilder         testBuilder
      * @param accessTokenProvider accessTokenProvider
-     * @param apiClient apiClient
+     * @param apiClient           apiClient
      */
     public StoryExportTestBuilderResource(
             AbstractTestBuilder<ApiClient> testBuilder,
@@ -74,7 +74,6 @@ public class StoryExportTestBuilderResource extends ApiTestBuilderResource<Expor
      * Imports a story for testing purposes
      *
      * @param a previously exported story
-     *
      * @return imported story
      */
     public Story importStory(ExportedStory story) {

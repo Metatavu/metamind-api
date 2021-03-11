@@ -23,8 +23,6 @@ public class MysqlResource implements QuarkusTestResourceLifecycleManager {
 
     @Override
     public Map<String, String> start() {
-        final Map<String, String> dbParams = Map.of("character-set-server", "utf8mb4",
-                "collation-server", "utf8mb4_unicode_ci", "lower_case_table_names", "1");
         db.withCommand("--character-set-server=utf8mb4",
                 "--collation-server=utf8mb4_unicode_ci",
                 "--lower_case_table_names=1");
