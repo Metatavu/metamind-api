@@ -82,11 +82,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Inject
     private TrainingMaterialTranslator trainingMaterialTranslator;
 
-
     @Override
     public Response importStory(ExportedStory body) {
 
-        Story story = storyController.importStory(body, getLoggerUserId());
+        Story story = storyController.importStory(body, getLoggedUserId());
         return createOk(storyTranslator.translateStory(story));
 
     }
@@ -104,7 +103,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest("Script name and version are required");
         }
 
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
 
         fi.metatavu.metamind.persistence.models.Script scriptEntity = scriptController.findScriptByNameAndVersion(name, version);
         if (scriptEntity == null) {
@@ -154,7 +153,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createNotFound(String.format("Script %s not found", scriptId));
         }
 
-        UUID loggerUserId = getLoggerUserId();
+        UUID loggerUserId = getLoggedUserId();
 
         return createOk(scriptTranslator.translateScript(scriptController.updateScript(foundScript, script.getContent(), script.getLanguage(), loggerUserId)));
 
@@ -162,7 +161,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response createIntent(UUID storyId, @Valid Intent intent) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
         fi.metatavu.metamind.persistence.models.Knot sourceKnot = intent.getSourceKnotId() != null ? storyController.findKnotById(intent.getSourceKnotId()) : null;
         if (intent.getSourceKnotId() != null && sourceKnot == null) {
             return createBadRequest(String.format("Invalid source knot id %s", intent.getSourceKnotId()));
@@ -178,11 +177,11 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest(String.format("Invalid target knot id %s", intent.getTargetKnotId()));
         }
 
-        if (!isKnotFromStory(targetKnot, story)) {
+        if (!storyController.isKnotFromStory(targetKnot, story)) {
             return createBadRequest(String.format("Target knot %s is not from the story %s", targetKnot.getId(), story.getId()));
         }
 
-        if (sourceKnot != null && !isKnotFromStory(sourceKnot, story)) {
+        if (sourceKnot != null && !storyController.isKnotFromStory(sourceKnot, story)) {
             return createBadRequest(String.format("Source knot %s is not from the story %s", sourceKnot.getId(), story.getId()));
         }
 
@@ -198,22 +197,22 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
         IntentTrainingMaterials intentTrainingMaterials = intent.getTrainingMaterials();
 
-        TrainingMaterial intentOpenNlpDoccatMaterial = findTrainingMaterialById(intentTrainingMaterials.getIntentOpenNlpDoccatId());
+        TrainingMaterial intentOpenNlpDoccatMaterial = trainingMaterialController.findTrainingMaterialById(intentTrainingMaterials.getIntentOpenNlpDoccatId());
         if (intentTrainingMaterials.getIntentOpenNlpDoccatId() != null && intentOpenNlpDoccatMaterial == null) {
             return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getIntentOpenNlpDoccatId()));
         }
 
-        TrainingMaterial variableOpenNlpNerMaterial = findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpNerId());
+        TrainingMaterial variableOpenNlpNerMaterial = trainingMaterialController.findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpNerId());
         if (intentTrainingMaterials.getVariableOpenNlpNerId() != null && variableOpenNlpNerMaterial == null) {
             return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getVariableOpenNlpNerId()));
         }
 
-        TrainingMaterial intentRegexMaterial = findTrainingMaterialById(intentTrainingMaterials.getIntentRegexId());
+        TrainingMaterial intentRegexMaterial = trainingMaterialController.findTrainingMaterialById(intentTrainingMaterials.getIntentRegexId());
         if (intentTrainingMaterials.getIntentRegexId() != null && intentRegexMaterial == null) {
             return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getIntentRegexId()));
         }
 
-        TrainingMaterial variableOpenNlpRegexMaterial = findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpRegex());
+        TrainingMaterial variableOpenNlpRegexMaterial = trainingMaterialController.findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpRegex());
         if (intentTrainingMaterials.getVariableOpenNlpRegex() != null && variableOpenNlpRegexMaterial == null) {
             return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getVariableOpenNlpRegex()));
         }
@@ -228,7 +227,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response createKnot(UUID storyId, @Valid Knot knot) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
 
         Double coordinateX = knot.getCoordinates() != null ? knot.getCoordinates().getX() : null;
         Double coordinateY = knot.getCoordinates() != null ? knot.getCoordinates().getY() : null;
@@ -243,7 +242,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response createMessage(UUID storyId, @Valid Message message) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
         fi.metatavu.metamind.persistence.models.Session session = sessionController.findSessionById(message.getSessionId());
         if (session == null) {
             return createBadRequest("Invalid session id");
@@ -324,7 +323,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response createSession(UUID storyId, fi.metatavu.metamind.api.spec.model.@Valid Session session) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest("Invalid story parameter");
@@ -340,7 +339,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response createStory(fi.metatavu.metamind.api.spec.model.Story body) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
         Locale locale = LocaleUtils.toLocale(body.getLocale());
         fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
 
@@ -349,7 +348,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response createVariable(UUID storyId, @Valid Variable variable) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
 
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
@@ -371,7 +370,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createNotFound(String.format("Intent %s not found", intentId));
         }
 
-        if (!isIntentFromStory(intent, story)) {
+        if (!storyController.isIntentFromStory(intent, story)) {
             return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
         }
 
@@ -392,7 +391,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createNotFound(String.format("Knot %s not found", knotId));
         }
 
-        if (!isKnotFromStory(knot, story)) {
+        if (!storyController.isKnotFromStory(knot, story)) {
             return createNotFound(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
         }
 
@@ -425,7 +424,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest(String.format("Story %s not found", storyId));
         }
 
-        if (!isVariableFromStory(variable, story)) {
+        if (!storyController.isVariableFromStory(variable, story)) {
             return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
         }
 
@@ -446,7 +445,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createNotFound(String.format("Intent %s not found", intentId));
         }
 
-        if (!isIntentFromStory(intent, story)) {
+        if (!storyController.isIntentFromStory(intent, story)) {
             return createNotFound(String.format("Intent %s is not from the story %s", intent.getId(), story.getId()));
         }
 
@@ -465,7 +464,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createNotFound(String.format("Knot %s not found", knotId));
         }
 
-        if (!isKnotFromStory(knot, story)) {
+        if (!storyController.isKnotFromStory(knot, story)) {
             return createNotFound(String.format("Knot %s is not from the story %s", knot.getId(), story.getId()));
         }
 
@@ -494,7 +493,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest(String.format("Story %s not found", storyId));
         }
 
-        if (!isVariableFromStory(variable, story)) {
+        if (!storyController.isVariableFromStory(variable, story)) {
             return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
         }
 
@@ -545,7 +544,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @SuppressWarnings("squid:S3776")
     @Override
     public Response updateIntent(UUID storyId, UUID intentId, @Valid Intent intent) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
         fi.metatavu.metamind.persistence.models.Knot sourceKnot = intent.getSourceKnotId() != null ? storyController.findKnotById(intent.getSourceKnotId()) : null;
         if (intent.getSourceKnotId() != null && sourceKnot == null) {
             return createBadRequest(String.format("Invalid source knot id %s", intent.getSourceKnotId()));
@@ -567,22 +566,22 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
         IntentTrainingMaterials intentTrainingMaterials = intent.getTrainingMaterials();
 
-        TrainingMaterial intentOpenNlpDoccatMaterial = findTrainingMaterialById(intentTrainingMaterials.getIntentOpenNlpDoccatId());
+        TrainingMaterial intentOpenNlpDoccatMaterial = trainingMaterialController.findTrainingMaterialById(intentTrainingMaterials.getIntentOpenNlpDoccatId());
         if (intentTrainingMaterials.getIntentOpenNlpDoccatId() != null && intentOpenNlpDoccatMaterial == null) {
             return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getIntentOpenNlpDoccatId()));
         }
 
-        TrainingMaterial variableOpenNlpNerMaterial = findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpNerId());
+        TrainingMaterial variableOpenNlpNerMaterial = trainingMaterialController.findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpNerId());
         if (intentTrainingMaterials.getVariableOpenNlpNerId() != null && variableOpenNlpNerMaterial == null) {
             return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getVariableOpenNlpNerId()));
         }
 
-        TrainingMaterial intentRegexMaterial = findTrainingMaterialById(intentTrainingMaterials.getIntentRegexId());
+        TrainingMaterial intentRegexMaterial = trainingMaterialController.findTrainingMaterialById(intentTrainingMaterials.getIntentRegexId());
         if (intentTrainingMaterials.getIntentRegexId() != null && intentRegexMaterial == null) {
             return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getIntentRegexId()));
         }
 
-        TrainingMaterial variableOpenNlpRegexMaterial = findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpRegex());
+        TrainingMaterial variableOpenNlpRegexMaterial = trainingMaterialController.findTrainingMaterialById(intentTrainingMaterials.getVariableOpenNlpRegex());
         if (intentTrainingMaterials.getVariableOpenNlpRegex() != null && variableOpenNlpRegexMaterial == null) {
             return createBadRequest(String.format("Invalid training material id %s", intentTrainingMaterials.getVariableOpenNlpRegex()));
         }
@@ -602,7 +601,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response updateKnot(UUID storyId, UUID knotId, @Valid Knot knot) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
 
         Double coordinateX = knot.getCoordinates() != null ? knot.getCoordinates().getX() : null;
         Double coordinateY = knot.getCoordinates() != null ? knot.getCoordinates().getY() : null;
@@ -616,7 +615,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest(String.format("Knot %s not found", knotId));
         }
 
-        if (!isKnotFromStory(foundKnot, story)) {
+        if (!storyController.isKnotFromStory(foundKnot, story)) {
             return createBadRequest(String.format("Knot %s is not from the story %s", foundKnot.getId(), story.getId()));
         }
 
@@ -625,7 +624,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response updateStory(UUID storyId, @Valid fi.metatavu.metamind.api.spec.model.Story story) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
         Locale locale = LocaleUtils.toLocale(story.getLocale());
 
         fi.metatavu.metamind.persistence.models.Story foundStory = storyController.findStoryById(storyId);
@@ -638,7 +637,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response updateVariable(UUID storyId, UUID variableId, @Valid Variable variable) {
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
         fi.metatavu.metamind.persistence.models.Variable foundVasriable = storyController.findVariableById(variableId);
         if (foundVasriable == null) {
             return createBadRequest(String.format("Variable %s not found", variableId));
@@ -649,70 +648,11 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest(String.format("Story %s not found", storyId));
         }
 
-        if (!isVariableFromStory(foundVasriable, story)) {
+        if (!storyController.isVariableFromStory(foundVasriable, story)) {
             return createBadRequest(String.format("Variable %s is not from the story %s", foundVasriable.getId(), story.getId()));
         }
 
         return createOk(variableTranslator.translateVariable(storyController.updateVariable(foundVasriable, variable.getName(), variable.getType(), variable.getValidationScript(), loggedUserId)));
-    }
-
-    /**
-     * Returns whether intent is from given story
-     *
-     * @param intent intent
-     * @param story  story
-     * @return whether intent is from given story
-     */
-    private boolean isIntentFromStory(fi.metatavu.metamind.persistence.models.Intent intent, fi.metatavu.metamind.persistence.models.Story story) {
-        if (intent == null) {
-            return false;
-        }
-
-        return isKnotFromStory(intent.getTargetKnot(), story);
-    }
-
-    /**
-     * Returns whether knot is from given story
-     *
-     * @param knot  knot
-     * @param story story
-     * @return whether knot is from given story
-     */
-    private boolean isKnotFromStory(fi.metatavu.metamind.persistence.models.Knot knot, fi.metatavu.metamind.persistence.models.Story story) {
-        if (knot == null || story == null) {
-            return false;
-        }
-
-        return story.getId().equals(knot.getStory().getId());
-    }
-
-    /**
-     * Returns whether variable is from given story
-     *
-     * @param variable variable
-     * @param story    story
-     * @return whether variable is from given story
-     */
-    private boolean isVariableFromStory(fi.metatavu.metamind.persistence.models.Variable variable, fi.metatavu.metamind.persistence.models.Story story) {
-        if (variable == null || story == null) {
-            return false;
-        }
-
-        return story.getId().equals(variable.getStory().getId());
-    }
-
-    /**
-     * Finds training material by id
-     *
-     * @param id id
-     * @return training material or null if not found
-     */
-    private TrainingMaterial findTrainingMaterialById(UUID id) {
-        if (id == null) {
-            return null;
-        }
-
-        return trainingMaterialController.findTrainingMaterialById(id);
     }
 
     @Override
@@ -734,7 +674,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     public Response createTrainingMaterial(fi.metatavu.metamind.api.spec.model.TrainingMaterial body) {
         // TODO: Permission check
 
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
         UUID storyId = body.getStoryId();
         TrainingMaterialType type = body.getType();
         TrainingMaterialVisibility visibility = body.getVisibility();
@@ -796,7 +736,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createNotFound(String.format("Training material %s not found", trainingMaterialId));
         }
 
-        UUID loggedUserId = getLoggerUserId();
+        UUID loggedUserId = getLoggedUserId();
 
         return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.updateTrainingMaterial(foundTrainingMaterial, trainingMaterial.getName(), trainingMaterial.getText(), loggedUserId, trainingMaterial.getVisibility())));
 

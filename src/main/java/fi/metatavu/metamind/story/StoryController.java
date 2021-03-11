@@ -528,4 +528,49 @@ public class StoryController {
     }
   }
 
+  /**
+   * Returns whether intent is from given story
+   *
+   * @param intent intent
+   * @param story  story
+   * @return whether intent is from given story
+   */
+  public boolean isIntentFromStory(fi.metatavu.metamind.persistence.models.Intent intent, fi.metatavu.metamind.persistence.models.Story story) {
+    if (intent == null) {
+      return false;
+    }
+
+    return isKnotFromStory(intent.getTargetKnot(), story);
+  }
+
+  /**
+   * Returns whether knot is from given story
+   *
+   * @param knot  knot
+   * @param story story
+   * @return whether knot is from given story
+   */
+  public boolean isKnotFromStory(fi.metatavu.metamind.persistence.models.Knot knot, fi.metatavu.metamind.persistence.models.Story story) {
+    if (knot == null || story == null) {
+      return false;
+    }
+
+    return story.getId().equals(knot.getStory().getId());
+  }
+
+  /**
+   * Returns whether variable is from given story
+   *
+   * @param variable variable
+   * @param story    story
+   * @return whether variable is from given story
+   */
+  public boolean isVariableFromStory(fi.metatavu.metamind.persistence.models.Variable variable, fi.metatavu.metamind.persistence.models.Story story) {
+    if (variable == null || story == null) {
+      return false;
+    }
+
+    return story.getId().equals(variable.getStory().getId());
+  }
+
 }

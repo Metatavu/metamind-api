@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
 @QuarkusTestResource.List(value = {
-        @QuarkusTestResource(MysqlResource.class),
-        @QuarkusTestResource(KeycloakResource.class)
+    @QuarkusTestResource(MysqlResource.class),
+    @QuarkusTestResource(KeycloakResource.class)
 })
 public class IntentTestsIT {
 

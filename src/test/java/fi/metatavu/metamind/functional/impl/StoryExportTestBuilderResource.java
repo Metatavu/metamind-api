@@ -28,9 +28,9 @@ public class StoryExportTestBuilderResource extends ApiTestBuilderResource<Expor
      * @param apiClient           apiClient
      */
     public StoryExportTestBuilderResource(
-            AbstractTestBuilder<ApiClient> testBuilder,
-            AccessTokenProvider accessTokenProvider,
-            ApiClient apiClient
+        AbstractTestBuilder<ApiClient> testBuilder,
+        AccessTokenProvider accessTokenProvider,
+        ApiClient apiClient
     ) {
         super(testBuilder, apiClient);
         this.accessTokenProvider = accessTokenProvider;

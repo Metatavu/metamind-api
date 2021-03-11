@@ -88,18 +88,19 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
      * @param variableOpenNlpRegexId UUID
      * @return created intent
      */
-    public Intent create(UUID storyId,
-                         Knot sourceKnot,
-                         Knot targetKnot,
-                         String name,
-                         IntentType type,
-                         boolean global,
-                         String quickResponse,
-                         int quickResponseOrder,
-                         UUID intentOpenNlpDoccatId,
-                         UUID intentRegexId,
-                         UUID variableOpenNlpNerId,
-                         UUID variableOpenNlpRegexId
+    public Intent create(
+        UUID storyId,
+        Knot sourceKnot,
+        Knot targetKnot,
+        String name,
+        IntentType type,
+        boolean global,
+        String quickResponse,
+        int quickResponseOrder,
+        UUID intentOpenNlpDoccatId,
+        UUID intentRegexId,
+        UUID variableOpenNlpNerId,
+        UUID variableOpenNlpRegexId
     ) {
         IntentTrainingMaterials intentTrainingMaterials = new IntentTrainingMaterials(intentOpenNlpDoccatId, intentRegexId, variableOpenNlpNerId, variableOpenNlpRegexId);
         Intent intent = new Intent(quickResponseOrder, type, targetKnot.getId(), global, intentTrainingMaterials, null, name, quickResponse, sourceKnot.getId(), null, null);

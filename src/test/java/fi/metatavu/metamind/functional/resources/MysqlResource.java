@@ -15,17 +15,20 @@ public class MysqlResource implements QuarkusTestResourceLifecycleManager {
     private static final String USERNAME = "user";
     private static final String PASSWORD = "pass";
 
-    static final JdbcDatabaseContainer db = new MySQLContainerProvider().newInstance("5.6")
-            .withDatabaseName(DATABASE)
-            .withUsername(USERNAME)
-            .withPassword(PASSWORD);
+    static final JdbcDatabaseContainer db = new MySQLContainerProvider()
+        .newInstance("5.6")
+        .withDatabaseName(DATABASE)
+        .withUsername(USERNAME)
+        .withPassword(PASSWORD);
 
 
     @Override
     public Map<String, String> start() {
-        db.withCommand("--character-set-server=utf8mb4",
+        db.withCommand(
+                "--character-set-server=utf8mb4",
                 "--collation-server=utf8mb4_unicode_ci",
-                "--lower_case_table_names=1");
+                "--lower_case_table_names=1"
+        );
         db.start();
 
         HashMap config = new HashMap<String, String>();

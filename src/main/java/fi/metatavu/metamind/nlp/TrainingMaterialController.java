@@ -203,6 +203,10 @@ public class TrainingMaterialController {
    * @return found training material or null if not found
    */
   public TrainingMaterial findTrainingMaterialById(UUID trainingMaterialId) {
+    if (trainingMaterialId == null) {
+      return  null;
+    }
+
     return trainingMaterialDAO.findById(trainingMaterialId);
   }
 
@@ -230,7 +234,7 @@ public class TrainingMaterialController {
   /**
    * Exports a training material
    * 
-   * @param training material to be exported
+   * @param trainingMaterial material to be exported
    * @return exported training material
    */
   public ExportedStoryTrainingMaterial exportTrainingMaterial(TrainingMaterial trainingMaterial) {
@@ -412,7 +416,7 @@ public class TrainingMaterialController {
    * Updates intent training material for a knot
    * 
    * @param knot knot
-   * @param lines intent training data
+   * @param lineDatas intent training data
    * @param language language
    */
   private void updateKnotTrainingMaterial(Knot knot, Map<TrainingMaterialType, String> lineDatas, String language) {
@@ -442,8 +446,9 @@ public class TrainingMaterialController {
 
   /**
    * Creates document categorization model from lines
-   * 
-   * @param languageCode language
+   *
+   * @param type type
+   * @param language language
    * @param lines lines
    * @return document categorization data
    * @throws IOException thrown when training data building fails
@@ -543,7 +548,7 @@ public class TrainingMaterialController {
   /**
    * Requests training material updates
    * 
-   * @param trainingMaterial training material
+   * @param intents intents
    */
   private void requestTrainingMaterialUpdates(List<Intent> intents) {
     List<Intent> globalIntents = new ArrayList<>();

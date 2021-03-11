@@ -29,9 +29,9 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
      * @param apiClient           apiClient
      */
     public VariableTestBuilderResource(
-            AbstractTestBuilder<ApiClient> testBuilder,
-            AccessTokenProvider accessTokenProvider,
-            ApiClient apiClient
+        AbstractTestBuilder<ApiClient> testBuilder,
+        AccessTokenProvider accessTokenProvider,
+        ApiClient apiClient
     ) {
         super(testBuilder, apiClient);
         this.accessTokenProvider = accessTokenProvider;
@@ -62,8 +62,11 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
         getApi().deleteVariable(variable.getStoryId(), variable.getId());
     }
 
-    /*
-     * Lists all variables created during testing
+    /**
+     * Lists all variables for the story
+     *
+     * @param story story
+     * @return variable array
      */
     public Variable[] listVariables(Story story) {
         return getApi().listVariables(story.getId());

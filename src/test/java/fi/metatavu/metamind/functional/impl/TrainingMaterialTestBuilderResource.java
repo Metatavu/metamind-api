@@ -37,9 +37,9 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
      * @param apiClient   apiClient
      */
     public TrainingMaterialTestBuilderResource(
-            AbstractTestBuilder<ApiClient> testBuilder,
-            AccessTokenProvider accessTokenProvider,
-            ApiClient apiClient
+        AbstractTestBuilder<ApiClient> testBuilder,
+        AccessTokenProvider accessTokenProvider,
+        ApiClient apiClient
     ) {
         super(testBuilder, apiClient);
         this.accessTokenProvider = accessTokenProvider;
@@ -67,7 +67,7 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
      * @param type    type
      * @param name    training material name
      * @param text    text
-     * @return
+     * @return created training material
      */
     public TrainingMaterial create(UUID storyId, TrainingMaterialType type, String name, String text, TrainingMaterialVisibility visibility) {
         TrainingMaterial trainingMaterial = new TrainingMaterial(text, name, null, type, storyId, visibility, null, null);
@@ -79,7 +79,7 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
      * Finds training material
      *
      * @param trainingMaterial trainingMaterial
-     * @return
+     * @return found training material
      */
     public TrainingMaterial findTrainingMaterial(TrainingMaterial trainingMaterial) {
         return getApi().findTrainingMaterial(trainingMaterial.getId());
@@ -88,7 +88,7 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
     /**
      * List training material
      *
-     * @return
+     * @return training material list
      */
     public TrainingMaterial[] listTrainingMaterial(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
         return getApi().listTrainingMaterials(story.getId(), type, visibility);
@@ -98,7 +98,7 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
      * Updates training material
      *
      * @param trainingMaterial trainingMaterial
-     * @return
+     * @return updated training material
      */
     public TrainingMaterial updateTrainingMaterial(TrainingMaterial trainingMaterial) {
         return getApi().updateTrainingMaterial(trainingMaterial.getId(), trainingMaterial);
@@ -123,11 +123,11 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
     /**
      * Asserts create status fails with given status code
      *
-     * @param expectedStatus
-     * @param storyId
-     * @param type
-     * @param name
-     * @param text
+     * @param expectedStatus expectedStatus
+     * @param storyId storyId
+     * @param type type
+     * @param name type
+     * @param text text
      */
     public void assertCreateFailStatus(int expectedStatus, UUID storyId, TrainingMaterialType type, String name, String text) {
         try {
@@ -142,8 +142,8 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
     /**
      * Asserts find status fails with given status code
      *
-     * @param expectedStatus
-     * @param trainingMaterialId UUID trainingMaterialId
+     * @param expectedStatus expectedStatus
+     * @param trainingMaterialId trainingMaterialId to find
      */
     public void assertFindFailStatus(int expectedStatus, UUID trainingMaterialId) {
         try {
@@ -157,8 +157,8 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
     /**
      * Asserts update status fails with given status code
      *
-     * @param expectedStatus
-     * @param trainingMaterial
+     * @param expectedStatus expectedStatus
+     * @param trainingMaterial trainingMaterial to update
      */
     public void assertUpdateFailStatus(int expectedStatus, TrainingMaterial trainingMaterial) {
         try {
@@ -172,8 +172,8 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
     /**
      * Asserts delete status fails with given status code
      *
-     * @param expectedStatus
-     * @param trainingMaterial
+     * @param expectedStatus expectedStatus
+     * @param trainingMaterial trainingMaterial to delete
      */
     public void assertDeleteFailStatus(int expectedStatus, TrainingMaterial trainingMaterial) {
         try {

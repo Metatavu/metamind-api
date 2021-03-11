@@ -43,7 +43,7 @@ public abstract class AbstractRestApi {
    *
    * @return logged user id
    */
-  protected UUID getLoggerUserId() {
+  protected UUID getLoggedUserId() {
     if (jsonWebToken.getSubject() == null) {
       return ANONYMOUS_USER_ID;
     }

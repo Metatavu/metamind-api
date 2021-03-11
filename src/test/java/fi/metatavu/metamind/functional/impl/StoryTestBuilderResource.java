@@ -34,9 +34,9 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
      * @param apiClient           apiClient
      */
     public StoryTestBuilderResource(
-            AbstractTestBuilder<ApiClient> testBuilder,
-            AccessTokenProvider accessTokenProvider,
-            ApiClient apiClient) {
+        AbstractTestBuilder<ApiClient> testBuilder,
+        AccessTokenProvider accessTokenProvider,
+        ApiClient apiClient) {
         super(testBuilder, apiClient);
         this.accessTokenProvider = accessTokenProvider;
     }
