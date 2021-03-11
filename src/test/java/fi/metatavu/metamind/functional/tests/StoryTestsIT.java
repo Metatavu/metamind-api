@@ -16,8 +16,8 @@ import static org.junit.Assert.assertNotNull;
 
 @QuarkusTest
 @QuarkusTestResource.List(value = {
-        @QuarkusTestResource(MysqlResource.class),
-        @QuarkusTestResource(KeycloakResource.class)
+    @QuarkusTestResource(MysqlResource.class),
+    @QuarkusTestResource(KeycloakResource.class)
 })
 public class StoryTestsIT {
 
