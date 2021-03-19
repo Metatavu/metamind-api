@@ -37,11 +37,6 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
     this.accessTokenProvider = accessTokenProvider;
   }
 
-  /**
-   * Builds API client
-   *
-   * @return API client
-   */
   @Override
   protected VariablesApi getApi() {
     try {
@@ -52,11 +47,6 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
     return new VariablesApi(TestSettings.basePath);
   }
 
-  /**
-   * Cleans given resource
-   *
-   * @param variable resource
-   */
   @Override
   public void clean(Variable variable) {
     getApi().deleteVariable(variable.getStoryId(), variable.getId());

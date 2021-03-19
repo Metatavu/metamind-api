@@ -36,11 +36,6 @@ public class StoryExportTestBuilderResource extends ApiTestBuilderResource<Expor
     this.accessTokenProvider = accessTokenProvider;
   }
 
-  /**
-   * Builds API client
-   *
-   * @return API client
-   */
   @Override
   protected StoryExportApi getApi() {
     try {
@@ -51,11 +46,6 @@ public class StoryExportTestBuilderResource extends ApiTestBuilderResource<Expor
     return new StoryExportApi(TestSettings.basePath);
   }
 
-  /**
-   * Cleans given resource
-   *
-   * @param variable resource
-   */
   @Override
   public void clean(ExportedStory variable) {
   }

@@ -46,11 +46,6 @@ public class TrainingMaterialTestBuilderResource extends ApiTestBuilderResource<
     this.accessTokenProvider = accessTokenProvider;
   }
 
-  /**
-   * Builds API client
-   *
-   * @return API client
-   */
   @Override
   protected TrainingMaterialsApi getApi() {
     try {

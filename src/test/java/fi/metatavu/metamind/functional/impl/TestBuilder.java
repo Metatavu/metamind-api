@@ -57,13 +57,6 @@ public class TestBuilder extends AbstractTestBuilder<ApiClient> {
     return value.orElse(null);
   }
 
-  /**
-   * Creates new authorized test builder authentication
-   *
-   * @param abstractTestBuilder this instance
-   * @param accessTokenProvider access token provider
-   * @return initialized test builder authentication
-   */
   @Override
   public AuthorizedTestBuilderAuthentication<ApiClient> createTestBuilderAuthentication(
     AbstractTestBuilder<ApiClient> abstractTestBuilder,

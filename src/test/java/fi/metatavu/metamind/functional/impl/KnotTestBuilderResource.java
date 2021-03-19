@@ -47,11 +47,6 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
     this.accessTokenProvider = accessTokenProvider;
   }
 
-  /**
-   * Builds API client
-   *
-   * @return API client
-   */
   @Override
   protected KnotsApi getApi() {
     try {
@@ -165,7 +160,6 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
       assertEquals(expectedStatus, e.getStatusCode());
     }
   }
-
   /**
    * Asserts update status fails with given status code
    *

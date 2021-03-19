@@ -55,11 +55,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
     return new IntentsApi(TestSettings.basePath);
   }
 
-  /**
-   * Cleans given resource
-   *
-   * @param intent resource
-   */
   @Override
   public void clean(Intent intent) {
     getApi().deleteIntent(intentStoryMap.get(intent.getId()), intent.getId());

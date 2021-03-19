@@ -41,11 +41,6 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
     this.accessTokenProvider = accessTokenProvider;
   }
 
-  /**
-   * Builds API client
-   *
-   * @return API client
-   */
   @Override
   protected StoriesApi getApi() {
     try {
@@ -104,11 +99,6 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
     });
   }
 
-  /**
-   * Cleans given resource
-   *
-   * @param story resource
-   */
   @Override
   public void clean(Story story) {
     getApi().deleteStory(Objects.requireNonNull(story.getId()));

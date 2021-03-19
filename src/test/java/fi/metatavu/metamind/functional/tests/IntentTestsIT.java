@@ -129,7 +129,7 @@ public class IntentTestsIT {
   */
 
   /**
-   * tests intent deletion
+   * Tests intent deletion
    * @throws Exception exception
    */
   @Test
