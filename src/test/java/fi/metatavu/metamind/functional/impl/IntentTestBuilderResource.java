@@ -45,11 +45,6 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
     this.accessTokenProvider = accessTokenProvider;
   }
 
-  /**
-   * Builds API client
-   *
-   * @return API client
-   */
   @Override
   protected IntentsApi getApi() {
     try {
