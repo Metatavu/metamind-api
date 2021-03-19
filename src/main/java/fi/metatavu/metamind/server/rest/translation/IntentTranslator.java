@@ -72,7 +72,7 @@ public class IntentTranslator {
    * @param jpaIntent JPA intent
    * @param intentOpenNlpDocatTrainingMaterial Docat training material
    * @param variableOpenNlpNerTrainingMaterial OpenNLP training material for NER
-   * @param intentRegexTrainingMaterial  Regex training material
+   * @param intentRegexTrainingMaterial Regex training material
    * @param variableOpenNlpRegexTrainingMaterial OpenNLP training material
    * @return REST intent
    */
