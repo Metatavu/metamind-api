@@ -58,7 +58,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
   /**
    * Lists intents by story
    * 
-   * @param sourceKnot story
+   * @param story story
    * @return List of intents
    */
   public List<Knot> listByStory(Story story) {
@@ -157,7 +157,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
   /**
    * Updates knot coordinates
    * 
-   * @param knot
+   * @param knot knot to update
    * @param coordinateX Integer coordinateX
    * @param coordinateY Integer coordinateY
    * @return updated knot

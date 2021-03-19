@@ -17,8 +17,6 @@ public class KnotTranslator {
    * Translates JPA knot into REST knot
    * 
    * @param jpaKnot JPA knot
-   * @param quickResponses JPA quick responses
-   * @param knotResponses JPA knot responses
    * @return REST knot
    */
   public Knot translateKnot(fi.metatavu.metamind.persistence.models.Knot jpaKnot) {

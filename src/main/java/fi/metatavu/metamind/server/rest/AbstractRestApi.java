@@ -139,7 +139,6 @@ public abstract class AbstractRestApi {
       .build();
   }
 
-
   /**
    * Constructs ok response
    *

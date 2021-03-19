@@ -19,26 +19,26 @@ import java.io.IOException;
  */
 abstract class ApiTestBuilderResource<T, A> extends AbstractApiTestBuilderResource<T, A, ApiClient> {
 
-    private final ApiClient apiClient;
+  private final ApiClient apiClient;
 
-    /**
-     * Returns API client
-     *
-     * @return API client
-     */
-    @Override
-    protected ApiClient getApiClient() {
-        return apiClient;
-    }
+  /**
+   * Returns API client
+   *
+   * @return API client
+   */
+  @Override
+  protected ApiClient getApiClient() {
+    return apiClient;
+  }
 
-    /**
-     * Constructor
-     *
-     * @param testBuilder testBuilder
-     */
-    public ApiTestBuilderResource(AbstractTestBuilder<ApiClient> testBuilder, ApiClient apiClient) {
-        super(testBuilder);
-        this.apiClient = apiClient;
-    }
+  /**
+   * Constructor
+   *
+   * @param testBuilder testBuilder
+   */
+  public ApiTestBuilderResource(AbstractTestBuilder<ApiClient> testBuilder, ApiClient apiClient) {
+    super(testBuilder);
+    this.apiClient = apiClient;
+  }
 
 }

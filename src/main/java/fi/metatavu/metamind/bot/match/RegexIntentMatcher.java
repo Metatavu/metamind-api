@@ -21,7 +21,8 @@ public class RegexIntentMatcher implements IntentMatcher {
   /**
    * Constructor
    * 
-   * @param model A pattern for matching
+   * @param patterns A pattern for matching
+   * @param tokenizer tokenizer
    */
   public RegexIntentMatcher(Map<UUID, List<Pattern>> patterns, Tokenizer tokenizer) {
     super();

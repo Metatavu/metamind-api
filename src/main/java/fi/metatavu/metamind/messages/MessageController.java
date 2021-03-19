@@ -103,7 +103,7 @@ public class MessageController {
    * 
    * @param message message
    * @param quickReplies quick replies
-   * @return
+   * @return list of updated quick responses
    */
   public List<QuickResponse> updateMessageQuickResponses(Message message, List<String> quickReplies) {
     if (quickReplies == null || quickReplies.isEmpty()) {

@@ -16,8 +16,6 @@ public class TrainingMaterialTranslator {
    * Translates JPA trainingMaterial into REST trainingMaterial
    * 
    * @param jpaTrainingMaterial JPA trainingMaterial
-   * @param quickResponses JPA quick responses
-   * @param trainingMaterialResponses JPA trainingMaterial responses
    * @return REST trainingMaterial
    */
   public TrainingMaterial translateTrainingMaterial(fi.metatavu.metamind.persistence.models.TrainingMaterial jpaTrainingMaterial) {

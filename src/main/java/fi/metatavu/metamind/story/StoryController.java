@@ -29,6 +29,7 @@ public class StoryController {
 
   @Inject
   private KnotIntentModelDAO knotIntentModelDAO;
+
   @Inject
   private StoryDAO storyDAO;
 
@@ -176,7 +177,7 @@ public class StoryController {
    * Lists intents by story
    * 
    * @param story story
-   * @return intents
+   * @return intents list
    */
   public List<Intent> listIntentsByStory(Story story) {
     return intentDAO.listByStory(story);
@@ -186,7 +187,7 @@ public class StoryController {
    * Lists knots by story
    * 
    * @param story story
-   * @return knots
+   * @return knots list
    */
   public List<Knot> listKnotsByStory(Story story) {
     return knotDAO.listByStory(story);
@@ -196,7 +197,7 @@ public class StoryController {
    * List variables by story
    * 
    * @param story story
-   * @return variables
+   * @return variables list
    */
   public List<Variable> listVariablesByStory(Story story) {
     return variableDAO.listByStory(story);
@@ -206,7 +207,7 @@ public class StoryController {
    * Lists quick responses by source knot
    * 
    * @param sourceKnot source knot
-   * @return quick responses
+   * @return quick responses list
    */
   public List<String> listKnotQuickResponses(Knot sourceKnot) {
     return intentDAO.listQuickResponsesBySourceKnot(sourceKnot);
@@ -532,7 +533,7 @@ public class StoryController {
    * Returns whether intent is from given story
    *
    * @param intent intent
-   * @param story  story
+   * @param story story
    * @return whether intent is from given story
    */
   public boolean isIntentFromStory(fi.metatavu.metamind.persistence.models.Intent intent, fi.metatavu.metamind.persistence.models.Story story) {
@@ -546,7 +547,7 @@ public class StoryController {
   /**
    * Returns whether knot is from given story
    *
-   * @param knot  knot
+   * @param knot knot
    * @param story story
    * @return whether knot is from given story
    */
@@ -562,7 +563,7 @@ public class StoryController {
    * Returns whether variable is from given story
    *
    * @param variable variable
-   * @param story    story
+   * @param story story
    * @return whether variable is from given story
    */
   public boolean isVariableFromStory(fi.metatavu.metamind.persistence.models.Variable variable, fi.metatavu.metamind.persistence.models.Story story) {

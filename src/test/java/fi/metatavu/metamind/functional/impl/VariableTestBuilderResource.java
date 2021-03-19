@@ -19,72 +19,72 @@ import java.util.UUID;
  */
 public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable, VariablesApi> {
 
-    private AccessTokenProvider accessTokenProvider;
+  private AccessTokenProvider accessTokenProvider;
 
-    /**
-     * Constructor for VariableTestBuilderResource
-     *
-     * @param testBuilder         testBuilder
-     * @param accessTokenProvider accessTokenProvider
-     * @param apiClient           apiClient
-     */
-    public VariableTestBuilderResource(
-        AbstractTestBuilder<ApiClient> testBuilder,
-        AccessTokenProvider accessTokenProvider,
-        ApiClient apiClient
-    ) {
-        super(testBuilder, apiClient);
-        this.accessTokenProvider = accessTokenProvider;
+  /**
+   * Constructor for VariableTestBuilderResource
+   *
+   * @param testBuilder         testBuilder
+   * @param accessTokenProvider accessTokenProvider
+   * @param apiClient           apiClient
+   */
+  public VariableTestBuilderResource(
+    AbstractTestBuilder<ApiClient> testBuilder,
+    AccessTokenProvider accessTokenProvider,
+    ApiClient apiClient
+  ) {
+    super(testBuilder, apiClient);
+    this.accessTokenProvider = accessTokenProvider;
+  }
+
+  /**
+   * Builds API client
+   *
+   * @return API client
+   */
+  @Override
+  protected VariablesApi getApi() {
+    try {
+      ApiClient.Companion.setAccessToken(accessTokenProvider.getAccessToken());
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+    return new VariablesApi(TestSettings.basePath);
+  }
 
-    /**
-     * Builds API client
-     *
-     * @return API client
-     */
-    @Override
-    protected VariablesApi getApi() {
-        try {
-            ApiClient.Companion.setAccessToken(accessTokenProvider.getAccessToken());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new VariablesApi(TestSettings.basePath);
-    }
+  /**
+   * Cleans given resource
+   *
+   * @param variable resource
+   */
+  @Override
+  public void clean(Variable variable) {
+    getApi().deleteVariable(variable.getStoryId(), variable.getId());
+  }
 
-    /**
-     * Cleans given resource
-     *
-     * @param variable resource
-     */
-    @Override
-    public void clean(Variable variable) {
-        getApi().deleteVariable(variable.getStoryId(), variable.getId());
-    }
+  /**
+   * Lists all variables for the story
+   *
+   * @param story story
+   * @return variable array
+   */
+  public Variable[] listVariables(Story story) {
+    return getApi().listVariables(story.getId());
+  }
 
-    /**
-     * Lists all variables for the story
-     *
-     * @param story story
-     * @return variable array
-     */
-    public Variable[] listVariables(Story story) {
-        return getApi().listVariables(story.getId());
-    }
+  /*
+   * Creates a variable for testing purposes
+   *
+   * @param id of the story
+   * @param name of the variable
+   * @param type of the variable
+   * @param validation script of the variable
+   * @return created variable
+   */
+  public Variable create(UUID storyId, String name, VariableType type, String validationScript) {
+    Variable variable = new Variable(name, type, null, null, validationScript, null, null);
 
-    /*
-     * Creates a variable for testing purposes
-     *
-     * @param id of the story
-     * @param name of the variable
-     * @param type of the variable
-     * @param validation script of the variable
-     * @return created variable
-     */
-    public Variable create(UUID storyId, String name, VariableType type, String validationScript) {
-        Variable variable = new Variable(name, type, null, null, validationScript, null, null);
-
-        Variable createdVariable = getApi().createVariable(storyId, variable);
-        return addClosable(createdVariable);
-    }
+    Variable createdVariable = getApi().createVariable(storyId, variable);
+    return addClosable(createdVariable);
+  }
 }

@@ -7,6 +7,6 @@ package fi.metatavu.metamind.functional;
  */
 public class TestSettings {
 
-    public static String basePath = "http://localhost:8081";
+  public static String basePath = "http://localhost:8081";
 
 }

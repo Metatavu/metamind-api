@@ -43,8 +43,8 @@ public class StoryDAO extends AbstractDAO<Story> {
   /**
    * Find slot model by name
    * 
-   * @param session session
-   * @return List of messages
+   * @param name name
+   * @return found story
    */
   public Story findByName(String name) {
     EntityManager entityManager = getEntityManager();

@@ -28,8 +28,8 @@ public class SlotModelDAO extends AbstractDAO<SlotModel> {
   /**
    * Find slot model by name
    * 
-   * @param session session
-   * @return List of messages
+   * @param name slot model name
+   * @return Found slot model
    */
   public SlotModel findByName(String name) {
     EntityManager entityManager = getEntityManager();

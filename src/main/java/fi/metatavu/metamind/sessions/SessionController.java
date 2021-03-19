@@ -39,8 +39,8 @@ public class SessionController {
   /**
    * Finds a session by an id
    * 
-   * @param id 
-   * @return
+   * @param id session id
+   * @return found session
    */
   public Session findSessionById(UUID id) {
     if (id == null) {
@@ -72,7 +72,6 @@ public class SessionController {
    * @param session session
    * @param variable variable
    * @param value value
-   * @return updated session variable value as null if removed
    */
   public void setSessionVariableValue(Session session, Variable variable, String value) {
     SessionVariableValue sessionVariableValue = sessionVariableValueDAO.findBySessionAndVariable(session, variable);

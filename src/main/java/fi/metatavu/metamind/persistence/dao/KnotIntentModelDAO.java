@@ -62,7 +62,7 @@ public class KnotIntentModelDAO extends AbstractDAO<KnotIntentModel> {
   /**
    * Find knot intent model
    * 
-   * @param knot
+   * @param knot knot
    * @return found knot intent model or null if not found
    */
   public KnotIntentModel findByKnot(Knot knot) {

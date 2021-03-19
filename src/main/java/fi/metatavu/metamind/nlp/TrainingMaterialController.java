@@ -281,7 +281,7 @@ public class TrainingMaterialController {
    * @param story story
    * @param intents intents
    * @param type type
-   * @return
+   * @return variable openNLP NER training material lines
    */
   private String getVarialeOpenNlpNerTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
     Map<String, String> variableMap = new HashMap<>();
@@ -315,7 +315,7 @@ public class TrainingMaterialController {
    * @param story story
    * @param intents intents
    * @param type type
-   * @return
+   * @return variable OpenNLP Regex training material lines
    */
   private String getVarialeOpenNlpRegexTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
     Map<String, String> variableMap = new HashMap<>();
@@ -548,7 +548,7 @@ public class TrainingMaterialController {
   /**
    * Requests training material updates
    * 
-   * @param intents intents
+   * @param intents intents list
    */
   private void requestTrainingMaterialUpdates(List<Intent> intents) {
     List<Intent> globalIntents = new ArrayList<>();

@@ -19,7 +19,7 @@ public class IntentTranslator {
   /**
    * Translates JPA intent into REST intent
    * 
-   * @param jpaIntent JPA intent
+   * @param intent JPA intent
    * @param trainingMaterials intent training materials
    * @return REST intent
    */
@@ -65,14 +65,15 @@ public class IntentTranslator {
       variableOpenNlpRegexTrainingMaterial != null ? variableOpenNlpRegexTrainingMaterial.getTrainingMaterial() : null
     );
   }
-  
+
   /**
    * Translates JPA intent into REST intent
-   * 
+   *
    * @param jpaIntent JPA intent
+   * @param intentOpenNlpDocatTrainingMaterial Docat training material
    * @param variableOpenNlpNerTrainingMaterial OpenNLP training material for NER
-   * @param intentOpenNlpDocatTrainingMaterial OpenNLP training material for Doccat
-   * @param regexTrainingMaterial Regex training material
+   * @param intentRegexTrainingMaterial  Regex training material
+   * @param variableOpenNlpRegexTrainingMaterial OpenNLP training material
    * @return REST intent
    */
   public Intent translateIntent(fi.metatavu.metamind.persistence.models.Intent jpaIntent, TrainingMaterial intentOpenNlpDocatTrainingMaterial, TrainingMaterial variableOpenNlpNerTrainingMaterial, TrainingMaterial intentRegexTrainingMaterial, TrainingMaterial variableOpenNlpRegexTrainingMaterial) {
