@@ -1,7 +1,10 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import java.util.List;
-import java.util.UUID;
+import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.Knot_;
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.api.spec.model.KnotType;
+import fi.metatavu.metamind.api.spec.model.TokenizerType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -9,12 +12,8 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.Knot;
-import fi.metatavu.metamind.persistence.models.Knot_;
-import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.rest.model.KnotType;
-import fi.metatavu.metamind.rest.model.TokenizerType;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * DAO class for Knot
@@ -59,7 +58,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
   /**
    * Lists intents by story
    * 
-   * @param sourceKnot story
+   * @param story story
    * @return List of intents
    */
   public List<Knot> listByStory(Story story) {
@@ -158,7 +157,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
   /**
    * Updates knot coordinates
    * 
-   * @param knot
+   * @param knot knot to update
    * @param coordinateX Integer coordinateX
    * @param coordinateY Integer coordinateY
    * @return updated knot

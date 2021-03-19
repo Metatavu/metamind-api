@@ -1,9 +1,9 @@
 package fi.metatavu.metamind.bot.script;
 
+import fi.metatavu.metamind.email.EmailProvider;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import fi.metatavu.metamind.email.EmailProvider;
 
 /**
  * Bot script binding for email service

@@ -1,11 +1,6 @@
 package fi.metatavu.metamind.weka;
 
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-
 /**
  * Class for recommendation items
  * 

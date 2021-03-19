@@ -1,32 +1,6 @@
 package fi.metatavu.metamind.bot;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.UUID;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.RandomUtils;
-import org.slf4j.Logger;
-
-import fi.metatavu.metamind.bot.match.AnyIntentMatcher;
-import fi.metatavu.metamind.bot.match.IntentMatch;
-import fi.metatavu.metamind.bot.match.IntentMatcher;
-import fi.metatavu.metamind.bot.match.OpenNlpDoccatIntentMatcher;
-import fi.metatavu.metamind.bot.match.RegexIntentMatcher;
+import fi.metatavu.metamind.bot.match.*;
 import fi.metatavu.metamind.bot.tokenization.Tokenizer;
 import fi.metatavu.metamind.bot.tokenization.TokenizerFactory;
 import fi.metatavu.metamind.bot.variables.OpenNlpNerVariableFinder;
@@ -35,17 +9,25 @@ import fi.metatavu.metamind.bot.variables.VariableFinder;
 import fi.metatavu.metamind.persistence.dao.IntentDAO;
 import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
 import fi.metatavu.metamind.persistence.dao.StoryGlobalIntentModelDAO;
-import fi.metatavu.metamind.persistence.models.Intent;
-import fi.metatavu.metamind.persistence.models.Knot;
-import fi.metatavu.metamind.persistence.models.KnotIntentModel;
-import fi.metatavu.metamind.persistence.models.Session;
-import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
-import fi.metatavu.metamind.rest.model.IntentType;
-import fi.metatavu.metamind.rest.model.TokenizerType;
-import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import fi.metatavu.metamind.persistence.models.*;
+import fi.metatavu.metamind.api.spec.model.IntentType;
+import fi.metatavu.metamind.api.spec.model.TokenizerType;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
 import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.namefind.TokenNameFinderModel;
+import org.apache.commons.lang3.RandomUtils;
+import org.slf4j.Logger;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Bot controller
@@ -152,7 +134,7 @@ public class BotController {
   /**
    * Lists intent matchers for story
    * 
-   * @param sourceKnot source knot
+   * @param story source knot
    * @return list of intent matchers
    */
   private List<IntentMatcher> getStoryGlobalIntentMatches(Story story) {

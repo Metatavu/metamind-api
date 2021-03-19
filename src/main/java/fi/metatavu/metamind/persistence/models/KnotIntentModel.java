@@ -1,20 +1,10 @@
 package fi.metatavu.metamind.persistence.models;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import javax.persistence.*;
 
 @Entity
 @Cacheable

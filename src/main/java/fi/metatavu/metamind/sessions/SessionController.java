@@ -1,20 +1,14 @@
 package fi.metatavu.metamind.sessions;
 
-import java.util.List;
-import java.util.UUID;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import fi.metatavu.metamind.persistence.dao.MessageDAO;
 import fi.metatavu.metamind.persistence.dao.SessionDAO;
 import fi.metatavu.metamind.persistence.dao.SessionVariableValueDAO;
-import fi.metatavu.metamind.persistence.models.Knot;
-import fi.metatavu.metamind.persistence.models.Message;
-import fi.metatavu.metamind.persistence.models.Session;
-import fi.metatavu.metamind.persistence.models.SessionVariableValue;
-import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.persistence.models.Variable;
+import fi.metatavu.metamind.persistence.models.*;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class SessionController {
@@ -45,8 +39,8 @@ public class SessionController {
   /**
    * Finds a session by an id
    * 
-   * @param id 
-   * @return
+   * @param id session id
+   * @return found session
    */
   public Session findSessionById(UUID id) {
     if (id == null) {
@@ -78,7 +72,6 @@ public class SessionController {
    * @param session session
    * @param variable variable
    * @param value value
-   * @return updated session variable value as null if removed
    */
   public void setSessionVariableValue(Session session, Variable variable, String value) {
     SessionVariableValue sessionVariableValue = sessionVariableValueDAO.findBySessionAndVariable(session, variable);

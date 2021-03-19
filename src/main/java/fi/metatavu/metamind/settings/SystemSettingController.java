@@ -1,19 +1,17 @@
 package fi.metatavu.metamind.settings;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
+import fi.metatavu.metamind.persistence.dao.SystemSettingDAO;
+import fi.metatavu.metamind.persistence.models.SystemSetting;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 
-import fi.metatavu.metamind.persistence.dao.SystemSettingDAO;
-import fi.metatavu.metamind.persistence.models.SystemSetting;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controller for system settings.

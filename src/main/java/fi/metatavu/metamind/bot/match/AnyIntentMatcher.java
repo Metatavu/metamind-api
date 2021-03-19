@@ -1,9 +1,9 @@
 package fi.metatavu.metamind.bot.match;
 
+import org.apache.commons.lang3.RandomUtils;
+
 import java.util.List;
 import java.util.UUID;
-
-import org.apache.commons.lang3.RandomUtils;
 
 /**
  * Intent matcher that matches random intent in given set of intents

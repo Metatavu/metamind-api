@@ -1,7 +1,7 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import java.util.List;
-import java.util.UUID;
+import fi.metatavu.metamind.persistence.models.*;
+import fi.metatavu.metamind.api.spec.model.IntentType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -10,9 +10,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.*;
-import fi.metatavu.metamind.rest.model.IntentType;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * DAO class for Intent

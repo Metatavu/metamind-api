@@ -1,13 +1,13 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import fi.metatavu.metamind.persistence.models.SlotModel;
+import fi.metatavu.metamind.persistence.models.SlotModel_;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.SlotModel;
-import fi.metatavu.metamind.persistence.models.SlotModel_;
 
 /**
  * DAO for slot models
@@ -28,8 +28,8 @@ public class SlotModelDAO extends AbstractDAO<SlotModel> {
   /**
    * Find slot model by name
    * 
-   * @param session session
-   * @return List of messages
+   * @param name slot model name
+   * @return Found slot model
    */
   public SlotModel findByName(String name) {
     EntityManager entityManager = getEntityManager();

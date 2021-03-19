@@ -1,18 +1,17 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import java.util.List;
-import java.util.UUID;
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.Variable;
+import fi.metatavu.metamind.persistence.models.Variable_;
+import fi.metatavu.metamind.api.spec.model.VariableType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.persistence.models.Variable;
-import fi.metatavu.metamind.persistence.models.Variable_;
-import fi.metatavu.metamind.rest.model.VariableType;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * DAO class for Variable

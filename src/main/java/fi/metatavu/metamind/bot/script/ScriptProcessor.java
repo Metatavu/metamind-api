@@ -1,29 +1,22 @@
 package fi.metatavu.metamind.bot.script;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
-import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Source;
-import org.graalvm.polyglot.Value;
-import org.slf4j.Logger;
-
 import fi.metatavu.metamind.bot.BotRuntimeContext;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Script;
 import fi.metatavu.metamind.polyglot.XMLHttpRequest;
 import fi.metatavu.metamind.scripts.ScriptController;
 import fi.metatavu.metamind.utils.RegexUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.Value;
+import org.slf4j.Logger;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Script processor 

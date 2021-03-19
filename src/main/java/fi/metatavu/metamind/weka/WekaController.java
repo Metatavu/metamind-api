@@ -1,14 +1,13 @@
 package fi.metatavu.metamind.weka;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
 
 
 /**
@@ -16,6 +15,7 @@ import weka.core.Instance;
  * 
  * @author Simeon Platonov
  */
+@ApplicationScoped
 public class WekaController {
   @Inject 
   private Logger logger;

@@ -1,9 +1,9 @@
 package fi.metatavu.metamind.nlp;
 
+import opennlp.tools.util.InputStreamFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import opennlp.tools.util.InputStreamFactory;
 
 /**
  * Default implementation for input stream factory

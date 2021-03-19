@@ -1,9 +1,9 @@
 package fi.metatavu.metamind.server.rest.translation;
 
-import javax.enterprise.context.ApplicationScoped;
+import fi.metatavu.metamind.api.spec.model.Coordinates;
+import fi.metatavu.metamind.api.spec.model.Knot;
 
-import fi.metatavu.metamind.rest.model.Coordinates;
-import fi.metatavu.metamind.rest.model.Knot;
+import javax.enterprise.context.ApplicationScoped;
 
 /**
  * Translator for translating JPA knot entities into REST entities
@@ -17,8 +17,6 @@ public class KnotTranslator {
    * Translates JPA knot into REST knot
    * 
    * @param jpaKnot JPA knot
-   * @param quickResponses JPA quick responses
-   * @param knotResponses JPA knot responses
    * @return REST knot
    */
   public Knot translateKnot(fi.metatavu.metamind.persistence.models.Knot jpaKnot) {

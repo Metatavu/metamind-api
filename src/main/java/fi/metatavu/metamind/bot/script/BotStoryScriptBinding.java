@@ -1,9 +1,9 @@
 package fi.metatavu.metamind.bot.script;
 
+import fi.metatavu.metamind.persistence.models.Knot;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import fi.metatavu.metamind.persistence.models.Knot;
 
 /**
  * Bot script binding for story related operations

@@ -1,18 +1,17 @@
 package fi.metatavu.metamind.bot.script;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
-import java.io.IOException;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import org.graalvm.polyglot.Value;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.metatavu.metamind.weka.WekaController;
 import fi.metatavu.metamind.weka.WekaRecommendationItem;
+import org.graalvm.polyglot.Value;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Bot script binding for Weka service

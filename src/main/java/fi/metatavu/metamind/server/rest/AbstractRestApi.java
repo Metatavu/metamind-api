@@ -1,5 +1,18 @@
 package fi.metatavu.metamind.server.rest;
 
+import fi.metatavu.metamind.api.spec.model.ErrorResponse;
+import io.vertx.core.http.HttpServerRequest;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.resteasy.spi.HttpRequest;
+import org.slf4j.Logger;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,63 +20,35 @@ import java.io.OutputStream;
 import java.util.Locale;
 import java.util.UUID;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
-
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.slf4j.Logger;
-
-import fi.metatavu.metamind.rest.model.ErrorResponse;
-
 /**
  * Abstract base class for rest services
  * 
  * @author Heikki Kurhinen
  * @author Antti Leppä
  */
+@RequestScoped
 public abstract class AbstractRestApi {
 
   private static final UUID ANONYMOUS_USER_ID = new UUID(0L, 0L);
   private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
   private static final String FAILED_TO_STREAM_DATA_TO_CLIENT = "Failed to stream data to client";
   
-  @Inject
   private Logger logger;
+
+  @Inject
+  private JsonWebToken jsonWebToken;
 
   /**
    * Returns logged user id
-   * 
+   *
    * @return logged user id
    */
-  protected UUID getLoggerUserId() { 
-    HttpServletRequest httpServletRequest = getHttpServletRequest();
-    String remoteUser = httpServletRequest.getRemoteUser();
-    if (remoteUser == null) {
+  protected UUID getLoggedUserId() {
+    if (jsonWebToken.getSubject() == null) {
       return ANONYMOUS_USER_ID;
     }
-    return UUID.fromString(remoteUser);
-  }
 
-  /**
-   * Returns request locale
-   * 
-   * @return request locale
-   */
-  protected Locale getLocale() {
-    return getHttpServletRequest().getLocale();
-  }
-  
-  /**
-   * Return current HttpServletRequest
-   * 
-   * @return current http servlet request
-   */
-  protected HttpServletRequest getHttpServletRequest() {
-    return ResteasyProviderFactory.getContextData(HttpServletRequest.class);
+    return UUID.fromString(jsonWebToken.getSubject());
   }
 
   /**
@@ -74,14 +59,14 @@ public abstract class AbstractRestApi {
    */
   protected Response createOk(Object entity) {
     return Response
-      .status(Response.Status.OK)
+      .status(Status.OK)
       .entity(entity)
       .build();
   }
-  
+
   /**
    * Constructs not found response
-   * 
+   *
    * @param message message
    * @return response
    */
@@ -89,14 +74,14 @@ public abstract class AbstractRestApi {
     ErrorResponse entity = new ErrorResponse();
     entity.setMessage(message);
     return Response
-      .status(Response.Status.NOT_FOUND)
+      .status(Status.NOT_FOUND)
       .entity(entity)
       .build();
   }
-  
+
   /**
    * Constructs forbidden response
-   * 
+   *
    * @param message message
    * @return response
    */
@@ -104,14 +89,14 @@ public abstract class AbstractRestApi {
     ErrorResponse entity = new ErrorResponse();
     entity.setMessage(message);
     return Response
-      .status(Response.Status.FORBIDDEN)
+      .status(Status.FORBIDDEN)
       .entity(entity)
       .build();
   }
-  
+
   /**
    * Constructs unauthorized response
-   * 
+   *
    * @param message message
    * @return response
    */
@@ -119,14 +104,14 @@ public abstract class AbstractRestApi {
     ErrorResponse entity = new ErrorResponse();
     entity.setMessage(message);
     return Response
-      .status(Response.Status.UNAUTHORIZED)
+      .status(Status.UNAUTHORIZED)
       .entity(entity)
       .build();
   }
-  
+
   /**
    * Constructs bad request response
-   * 
+   *
    * @param message message
    * @return response
    */
@@ -134,14 +119,14 @@ public abstract class AbstractRestApi {
     ErrorResponse entity = new ErrorResponse();
     entity.setMessage(message);
     return Response
-      .status(Response.Status.BAD_REQUEST)
+      .status(Status.BAD_REQUEST)
       .entity(entity)
       .build();
   }
-  
+
   /**
    * Constructs internal server error response
-   * 
+   *
    * @param message message
    * @return response
    */
@@ -149,35 +134,34 @@ public abstract class AbstractRestApi {
     ErrorResponse entity = new ErrorResponse();
     entity.setMessage(message);
     return Response
-      .status(Response.Status.INTERNAL_SERVER_ERROR)
+      .status(Status.INTERNAL_SERVER_ERROR)
       .entity(entity)
       .build();
   }
-  
-  
+
   /**
    * Constructs ok response
-   * 
+   *
    * @param entity payload
    * @param totalHits total hits
    * @return response
    */
   protected Response createOk(Object entity, Long totalHits) {
     return Response
-      .status(Response.Status.OK)
+      .status(Status.OK)
       .entity(entity)
       .header("Total-Results", totalHits)
       .build();
   }
-  
+
   /**
    * Constructs no content response
-   * 
+   *
    * @return response
    */
   protected Response createNoContent() {
     return Response
-      .status(Response.Status.NO_CONTENT)
+      .status(Status.NO_CONTENT)
       .build();
   }
   

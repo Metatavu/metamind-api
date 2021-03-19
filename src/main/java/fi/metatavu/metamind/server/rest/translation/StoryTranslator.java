@@ -1,28 +1,26 @@
 package fi.metatavu.metamind.server.rest.translation;
 
+import fi.metatavu.metamind.api.spec.model.Story;
+import fi.metatavu.metamind.story.StoryController;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import fi.metatavu.metamind.rest.model.Story;
-import fi.metatavu.metamind.story.StoryController;
-
 /**
  * Translator for translating JPA story entities into REST entities
- * 
+ *
  * @author Antti Leppä
  */
 @ApplicationScoped
 public class StoryTranslator {
-  
+
   @Inject
   private StoryController storyController;
 
   /**
    * Translates JPA story into REST story
-   * 
+   *
    * @param jpaStory JPA story
-   * @param quickResponses JPA quick responses
-   * @param storyResponses JPA story responses
    * @return REST story
    */
   public Story translateStory(fi.metatavu.metamind.persistence.models.Story jpaStory) {
@@ -38,7 +36,7 @@ public class StoryTranslator {
     result.setDafaultHint(jpaStory.getDefaultHint());
     result.setLocale(jpaStory.getLocale() != null ? jpaStory.getLocale().getLanguage() : null);
     result.setQuickResponses(storyController.listStoryGlobalQuickResponses(jpaStory));
-    
+
     return result;
   }
 

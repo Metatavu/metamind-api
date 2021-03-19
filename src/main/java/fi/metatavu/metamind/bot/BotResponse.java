@@ -1,9 +1,9 @@
 package fi.metatavu.metamind.bot;
 
+import fi.metatavu.metamind.persistence.models.Intent;
+
 import java.util.Map;
 import java.util.UUID;
-
-import fi.metatavu.metamind.persistence.models.Intent;
 
 /**
  * Match result from bot

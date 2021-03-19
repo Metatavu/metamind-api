@@ -1,6 +1,8 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import java.util.List;
+import fi.metatavu.metamind.persistence.models.Message;
+import fi.metatavu.metamind.persistence.models.QuickResponse;
+import fi.metatavu.metamind.persistence.models.QuickResponse_;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -8,10 +10,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.Message;
-import fi.metatavu.metamind.persistence.models.QuickResponse;
-import fi.metatavu.metamind.persistence.models.QuickResponse_;
+import java.util.List;
 
 /**
  * DAO for quick responses

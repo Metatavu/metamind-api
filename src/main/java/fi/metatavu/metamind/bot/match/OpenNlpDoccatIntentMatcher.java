@@ -1,14 +1,14 @@
 package fi.metatavu.metamind.bot.match;
 
+import fi.metatavu.metamind.bot.tokenization.Tokenizer;
+import opennlp.tools.doccat.DoccatModel;
+import opennlp.tools.doccat.DocumentCategorizerME;
+
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import fi.metatavu.metamind.bot.tokenization.Tokenizer;
-import opennlp.tools.doccat.DoccatModel;
-import opennlp.tools.doccat.DocumentCategorizerME;
 
 /**
  * Intent matcher that users OpenNPL

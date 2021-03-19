@@ -1,7 +1,8 @@
 package fi.metatavu.metamind.bot;
 
-import java.io.IOException;
-import java.util.UUID;
+import fi.metatavu.metamind.nlp.TrainingMaterialController;
+import fi.metatavu.metamind.story.StoryController;
+import org.slf4j.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -9,11 +10,8 @@ import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
-
-import org.slf4j.Logger;
-
-import fi.metatavu.metamind.nlp.TrainingMaterialController;
-import fi.metatavu.metamind.story.StoryController;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * CDI event training material update listener

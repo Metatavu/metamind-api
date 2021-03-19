@@ -1,14 +1,5 @@
 package fi.metatavu.metamind.polyglot;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -26,8 +17,13 @@ import org.graalvm.polyglot.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
- * Class to use with polyglot javascripts to provide XMLHttpRequest
+ * Class to use with fi.metatavu.metamind.polyglot javascripts to provide XMLHttpRequest
  *
  * @author Heikki Kurhinen
  */

@@ -1,13 +1,12 @@
 package fi.metatavu.metamind.server.rest.translation;
 
+import fi.metatavu.metamind.persistence.models.MessageResponse;
+import fi.metatavu.metamind.api.spec.model.Message;
+
+import javax.enterprise.context.ApplicationScoped;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.enterprise.context.ApplicationScoped;
-
-import fi.metatavu.metamind.persistence.models.MessageResponse;
-import fi.metatavu.metamind.rest.model.Message;
 
 /**
  * Translator for translating JPA message entities into REST entities

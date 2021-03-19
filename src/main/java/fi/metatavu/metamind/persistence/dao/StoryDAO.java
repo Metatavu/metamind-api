@@ -1,15 +1,15 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import java.util.Locale;
-import java.util.UUID;
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.Story_;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.*;
+import java.util.Locale;
+import java.util.UUID;
 
 /**
  * DAO class for Story
@@ -43,8 +43,8 @@ public class StoryDAO extends AbstractDAO<Story> {
   /**
    * Find slot model by name
    * 
-   * @param session session
-   * @return List of messages
+   * @param name name
+   * @return found story
    */
   public Story findByName(String name) {
     EntityManager entityManager = getEntityManager();

@@ -1,6 +1,7 @@
 package fi.metatavu.metamind.persistence.dao;
 
-import java.util.List;
+import fi.metatavu.metamind.persistence.models.*;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -8,9 +9,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.*;
-import fi.metatavu.metamind.rest.model.TrainingMaterialType;
+import java.util.List;
 
 /**
  * DAO class for IntentTrainingMaterial

@@ -1,14 +1,5 @@
 package fi.metatavu.metamind.bot.script;
 
-import java.util.Map;
-import java.util.UUID;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
 import fi.metatavu.metamind.bot.BotRuntimeContext;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Session;
@@ -16,6 +7,13 @@ import fi.metatavu.metamind.persistence.models.Story;
 import fi.metatavu.metamind.persistence.models.Variable;
 import fi.metatavu.metamind.sessions.SessionController;
 import fi.metatavu.metamind.story.StoryController;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Bot script binding for session related operations

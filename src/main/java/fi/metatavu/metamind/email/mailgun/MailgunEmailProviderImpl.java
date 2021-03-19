@@ -1,15 +1,14 @@
 package fi.metatavu.metamind.email.mailgun;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
 import fi.metatavu.metamind.email.EmailProvider;
 import fi.metatavu.metamind.settings.SystemSettingController;
 import net.sargue.mailgun.Configuration;
 import net.sargue.mailgun.Mail;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 /**
  * Mailgun email provider implementation

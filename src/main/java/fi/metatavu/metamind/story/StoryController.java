@@ -1,44 +1,23 @@
 package fi.metatavu.metamind.story;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import fi.metatavu.metamind.bot.KnotTrainingMaterialUpdateRequestEvent;
+import fi.metatavu.metamind.messages.MessageController;
+import fi.metatavu.metamind.nlp.TrainingMaterialController;
+import fi.metatavu.metamind.persistence.dao.*;
+import fi.metatavu.metamind.persistence.models.*;
+import fi.metatavu.metamind.api.spec.model.*;
+import fi.metatavu.metamind.persistence.models.Intent;
+import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.TrainingMaterial;
+import fi.metatavu.metamind.persistence.models.Variable;
+import jersey.repackaged.com.google.common.base.Objects;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-
-import fi.metatavu.metamind.bot.KnotTrainingMaterialUpdateRequestEvent;
-import fi.metatavu.metamind.messages.MessageController;
-import fi.metatavu.metamind.nlp.TrainingMaterialController;
-import fi.metatavu.metamind.persistence.dao.IntentDAO;
-import fi.metatavu.metamind.persistence.dao.IntentTrainingMaterialDAO;
-import fi.metatavu.metamind.persistence.dao.KnotDAO;
-import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
-import fi.metatavu.metamind.persistence.dao.StoryDAO;
-import fi.metatavu.metamind.persistence.dao.VariableDAO;
-import fi.metatavu.metamind.persistence.models.Intent;
-import fi.metatavu.metamind.persistence.models.Knot;
-import fi.metatavu.metamind.persistence.models.KnotIntentModel;
-import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.persistence.models.TrainingMaterial;
-import fi.metatavu.metamind.persistence.models.Variable;
-import fi.metatavu.metamind.rest.model.Coordinates;
-import fi.metatavu.metamind.rest.model.ExportedStory;
-import fi.metatavu.metamind.rest.model.ExportedStoryIntent;
-import fi.metatavu.metamind.rest.model.ExportedStoryKnot;
-import fi.metatavu.metamind.rest.model.ExportedStoryTrainingMaterial;
-import fi.metatavu.metamind.rest.model.ExportedStoryVariable;
-import fi.metatavu.metamind.rest.model.IntentType;
-import fi.metatavu.metamind.rest.model.KnotType;
-import fi.metatavu.metamind.rest.model.TokenizerType;
-import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
-import fi.metatavu.metamind.rest.model.VariableType;
-import jersey.repackaged.com.google.common.base.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Story controller
@@ -47,8 +26,10 @@ import jersey.repackaged.com.google.common.base.Objects;
  */
 @ApplicationScoped
 public class StoryController {
+
   @Inject
   private KnotIntentModelDAO knotIntentModelDAO;
+
   @Inject
   private StoryDAO storyDAO;
 
@@ -196,7 +177,7 @@ public class StoryController {
    * Lists intents by story
    * 
    * @param story story
-   * @return intents
+   * @return intents list
    */
   public List<Intent> listIntentsByStory(Story story) {
     return intentDAO.listByStory(story);
@@ -206,7 +187,7 @@ public class StoryController {
    * Lists knots by story
    * 
    * @param story story
-   * @return knots
+   * @return knots list
    */
   public List<Knot> listKnotsByStory(Story story) {
     return knotDAO.listByStory(story);
@@ -216,7 +197,7 @@ public class StoryController {
    * List variables by story
    * 
    * @param story story
-   * @return variables
+   * @return variables list
    */
   public List<Variable> listVariablesByStory(Story story) {
     return variableDAO.listByStory(story);
@@ -226,7 +207,7 @@ public class StoryController {
    * Lists quick responses by source knot
    * 
    * @param sourceKnot source knot
-   * @return quick responses
+   * @return quick responses list
    */
   public List<String> listKnotQuickResponses(Knot sourceKnot) {
     return intentDAO.listQuickResponsesBySourceKnot(sourceKnot);
@@ -260,8 +241,7 @@ public class StoryController {
    * @param name name
    * @param sourceKnot source knot
    * @param targetKnot target knot
-   * @param trainingMaterial training material
-   * @param global wheter intent is a global one
+   * @param global whether intent is a global one
    * @param lastModifierId last modifier's id
    * @return updated intent
    */
@@ -415,8 +395,8 @@ public class StoryController {
   /**
    * Imports a story
    * 
-   * @param story that was previously exported
-   * @param id of user doing the import
+   * @param body that was previously exported
+   * @param userId of user doing the import
    * @return imported story
    */
   public Story importStory(ExportedStory body, UUID userId) {
@@ -518,10 +498,10 @@ public class StoryController {
   /**
    * Imports an intent from a previously exported story
    * 
-   * @param an intent from previously exported story
-   * @param id of the user doing the import
-   * @param map with original knot ids and imported knots
-   * @param map with original training material ids and imported training materials
+   * @param intentToCreate intent from previously exported story
+   * @param userId of the user doing the import
+   * @param originalKnotIds with original knot ids and imported knots
+   * @param originalTrainingMaterialIds with original training material ids and imported training materials
    */
   private void importIntent(ExportedStoryIntent intentToCreate, UUID userId, Map<UUID, Knot> originalKnotIds, Map<UUID, TrainingMaterial> originalTrainingMaterialIds) {
     Knot sourceKnot = null;
@@ -535,7 +515,7 @@ public class StoryController {
     }
     
     if (targetKnot != null) {
-      Intent intent = createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.isisGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), userId);
+      Intent intent = createIntent(intentToCreate.getType(), intentToCreate.getName(), sourceKnot, targetKnot, intentToCreate.getGlobal(), intentToCreate.getQuickResponse(), intentToCreate.getQuickResponseOrder(), userId);
       
       List<TrainingMaterial> intentTrainingMaterials = intentToCreate.getTrainingMaterialIds().stream().map(id -> {
         return originalTrainingMaterialIds.get(id);
@@ -547,6 +527,51 @@ public class StoryController {
         }
       });
     }
+  }
+
+  /**
+   * Returns whether intent is from given story
+   *
+   * @param intent intent
+   * @param story story
+   * @return whether intent is from given story
+   */
+  public boolean isIntentFromStory(fi.metatavu.metamind.persistence.models.Intent intent, fi.metatavu.metamind.persistence.models.Story story) {
+    if (intent == null) {
+      return false;
+    }
+
+    return isKnotFromStory(intent.getTargetKnot(), story);
+  }
+
+  /**
+   * Returns whether knot is from given story
+   *
+   * @param knot knot
+   * @param story story
+   * @return whether knot is from given story
+   */
+  public boolean isKnotFromStory(fi.metatavu.metamind.persistence.models.Knot knot, fi.metatavu.metamind.persistence.models.Story story) {
+    if (knot == null || story == null) {
+      return false;
+    }
+
+    return story.getId().equals(knot.getStory().getId());
+  }
+
+  /**
+   * Returns whether variable is from given story
+   *
+   * @param variable variable
+   * @param story story
+   * @return whether variable is from given story
+   */
+  public boolean isVariableFromStory(fi.metatavu.metamind.persistence.models.Variable variable, fi.metatavu.metamind.persistence.models.Story story) {
+    if (variable == null || story == null) {
+      return false;
+    }
+
+    return story.getId().equals(variable.getStory().getId());
   }
 
 }

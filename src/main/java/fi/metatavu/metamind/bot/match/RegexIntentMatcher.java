@@ -1,12 +1,12 @@
 package fi.metatavu.metamind.bot.match;
 
+import fi.metatavu.metamind.bot.tokenization.Tokenizer;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
-import fi.metatavu.metamind.bot.tokenization.Tokenizer;
 
 /**
  * Intent matcher that uses Regex patterns for matching
@@ -21,7 +21,8 @@ public class RegexIntentMatcher implements IntentMatcher {
   /**
    * Constructor
    * 
-   * @param model A pattern for matching
+   * @param patterns A pattern for matching
+   * @param tokenizer tokenizer
    */
   public RegexIntentMatcher(Map<UUID, List<Pattern>> patterns, Tokenizer tokenizer) {
     super();

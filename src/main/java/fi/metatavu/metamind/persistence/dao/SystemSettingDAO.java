@@ -1,13 +1,13 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import fi.metatavu.metamind.persistence.models.SystemSetting;
+import fi.metatavu.metamind.persistence.models.SystemSetting_;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.SystemSetting;
-import fi.metatavu.metamind.persistence.models.SystemSetting_;
 
 /**
  * DAO class for SystemSetting entity

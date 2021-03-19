@@ -1,11 +1,11 @@
 package fi.metatavu.metamind.weka;
 
-import java.util.ArrayList;
-
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+
+import java.util.ArrayList;
 
 /**
  * Helper class for converting data

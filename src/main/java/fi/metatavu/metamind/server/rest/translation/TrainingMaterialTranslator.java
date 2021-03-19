@@ -1,8 +1,8 @@
 package fi.metatavu.metamind.server.rest.translation;
 
-import javax.enterprise.context.ApplicationScoped;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterial;
 
-import fi.metatavu.metamind.rest.model.TrainingMaterial;
+import javax.enterprise.context.ApplicationScoped;
 
 /**
  * Translator for translating JPA trainingMaterial entities into REST entities
@@ -16,8 +16,6 @@ public class TrainingMaterialTranslator {
    * Translates JPA trainingMaterial into REST trainingMaterial
    * 
    * @param jpaTrainingMaterial JPA trainingMaterial
-   * @param quickResponses JPA quick responses
-   * @param trainingMaterialResponses JPA trainingMaterial responses
    * @return REST trainingMaterial
    */
   public TrainingMaterial translateTrainingMaterial(fi.metatavu.metamind.persistence.models.TrainingMaterial jpaTrainingMaterial) {

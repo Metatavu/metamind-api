@@ -1,8 +1,11 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.Story;
+
 import javax.enterprise.context.ApplicationScoped;
 import java.util.UUID;
-import fi.metatavu.metamind.persistence.models.*;
 
 /**
  * DAO class for Session

@@ -1,18 +1,20 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.TrainingMaterial;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialVisibility;
+import fi.metatavu.metamind.persistence.models.TrainingMaterial_;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import fi.metatavu.metamind.persistence.models.*;
-import fi.metatavu.metamind.rest.model.TrainingMaterialType;
-import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
 
 /**
  * DAO class for TrainingMaterial

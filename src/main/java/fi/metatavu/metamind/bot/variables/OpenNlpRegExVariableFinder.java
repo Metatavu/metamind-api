@@ -1,10 +1,10 @@
 package fi.metatavu.metamind.bot.variables;
 
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import fi.metatavu.metamind.bot.tokenization.Tokenizer;
 import opennlp.tools.namefind.RegexNameFinder;
+
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Variable finder using OpenNLP token name finder

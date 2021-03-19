@@ -1,16 +1,15 @@
 package fi.metatavu.metamind.bot;
 
+import fi.metatavu.metamind.persistence.models.Intent;
+import fi.metatavu.metamind.persistence.models.Knot;
+import fi.metatavu.metamind.persistence.models.Session;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.RequestScoped;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
-
-import fi.metatavu.metamind.persistence.models.Intent;
-import fi.metatavu.metamind.persistence.models.Knot;
-import fi.metatavu.metamind.persistence.models.Session;
 
 /**
  * Bot runtime context for holding state within single request

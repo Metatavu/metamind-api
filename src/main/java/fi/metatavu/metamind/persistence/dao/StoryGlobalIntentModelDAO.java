@@ -1,13 +1,15 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
+import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel_;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.*;
-import fi.metatavu.metamind.rest.model.TrainingMaterialType;
 
 /**
  * DAO class for StoryGlobalIntentModel

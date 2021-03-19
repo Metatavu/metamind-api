@@ -1,14 +1,13 @@
 package fi.metatavu.metamind.bot.variables;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
-
 import fi.metatavu.metamind.bot.tokenization.Tokenizer;
 import opennlp.tools.namefind.TokenNameFinder;
 import opennlp.tools.util.Span;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Abstract base class for OpenNLP variable finders

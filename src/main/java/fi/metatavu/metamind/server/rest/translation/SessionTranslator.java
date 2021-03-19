@@ -1,8 +1,8 @@
 package fi.metatavu.metamind.server.rest.translation;
 
-import javax.enterprise.context.ApplicationScoped;
+import fi.metatavu.metamind.api.spec.model.Session;
 
-import fi.metatavu.metamind.rest.model.Session;
+import javax.enterprise.context.ApplicationScoped;
 
 /**
  * Translator for translating JPA entities into REST entities

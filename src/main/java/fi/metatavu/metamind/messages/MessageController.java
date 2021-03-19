@@ -1,23 +1,17 @@
 package fi.metatavu.metamind.messages;
 
+import fi.metatavu.metamind.persistence.dao.MessageDAO;
+import fi.metatavu.metamind.persistence.dao.MessageResponseDAO;
+import fi.metatavu.metamind.persistence.dao.QuickResponseDAO;
+import fi.metatavu.metamind.persistence.models.*;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import fi.metatavu.metamind.persistence.dao.MessageDAO;
-import fi.metatavu.metamind.persistence.dao.MessageResponseDAO;
-import fi.metatavu.metamind.persistence.dao.QuickResponseDAO;
-import fi.metatavu.metamind.persistence.models.Intent;
-import fi.metatavu.metamind.persistence.models.Knot;
-import fi.metatavu.metamind.persistence.models.Message;
-import fi.metatavu.metamind.persistence.models.MessageResponse;
-import fi.metatavu.metamind.persistence.models.QuickResponse;
-import fi.metatavu.metamind.persistence.models.Session;
 
 /**
  * Controller for messages
@@ -109,9 +103,9 @@ public class MessageController {
    * 
    * @param message message
    * @param quickReplies quick replies
-   * @return
+   * @return list of updated quick responses
    */
-  public List<QuickResponse> updateMessageQuickResponses(fi.metatavu.metamind.persistence.models.Message message, List<String> quickReplies) {
+  public List<QuickResponse> updateMessageQuickResponses(Message message, List<String> quickReplies) {
     if (quickReplies == null || quickReplies.isEmpty()) {
       return Collections.emptyList();
     }

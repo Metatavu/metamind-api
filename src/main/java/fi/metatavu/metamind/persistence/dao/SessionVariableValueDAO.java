@@ -1,15 +1,15 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import fi.metatavu.metamind.persistence.models.Session;
+import fi.metatavu.metamind.persistence.models.SessionVariableValue;
+import fi.metatavu.metamind.persistence.models.SessionVariableValue_;
+import fi.metatavu.metamind.persistence.models.Variable;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import fi.metatavu.metamind.persistence.models.Session;
-import fi.metatavu.metamind.persistence.models.SessionVariableValue;
-import fi.metatavu.metamind.persistence.models.SessionVariableValue_;
-import fi.metatavu.metamind.persistence.models.Variable;
 
 /**
  * DAO class for SessionVariableValue

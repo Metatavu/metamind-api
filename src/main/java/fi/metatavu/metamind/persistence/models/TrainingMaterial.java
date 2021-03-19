@@ -1,26 +1,15 @@
 package fi.metatavu.metamind.persistence.models;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialVisibility;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import fi.metatavu.metamind.rest.model.TrainingMaterialType;
-import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Cacheable

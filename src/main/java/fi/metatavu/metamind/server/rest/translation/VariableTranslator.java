@@ -1,8 +1,8 @@
 package fi.metatavu.metamind.server.rest.translation;
 
-import javax.enterprise.context.ApplicationScoped;
+import fi.metatavu.metamind.api.spec.model.Variable;
 
-import fi.metatavu.metamind.rest.model.Variable;
+import javax.enterprise.context.ApplicationScoped;
 
 /**
  * Translator for translating JPA variable entities into REST entities

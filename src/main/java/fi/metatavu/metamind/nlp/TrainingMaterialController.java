@@ -1,70 +1,36 @@
 package fi.metatavu.metamind.nlp;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-
 import fi.metatavu.metamind.bot.KnotTrainingMaterialUpdateRequestEvent;
 import fi.metatavu.metamind.bot.StoryGlobalTrainingMaterialUpdateRequestEvent;
-import fi.metatavu.metamind.persistence.dao.IntentDAO;
-import fi.metatavu.metamind.persistence.dao.IntentTrainingMaterialDAO;
-import fi.metatavu.metamind.persistence.dao.KnotDAO;
-import fi.metatavu.metamind.persistence.dao.KnotIntentModelDAO;
-import fi.metatavu.metamind.persistence.dao.StoryGlobalIntentModelDAO;
-import fi.metatavu.metamind.persistence.dao.TrainingMaterialDAO;
-import fi.metatavu.metamind.persistence.dao.VariableDAO;
-import fi.metatavu.metamind.persistence.models.Intent;
-import fi.metatavu.metamind.persistence.models.IntentTrainingMaterial;
-import fi.metatavu.metamind.persistence.models.Knot;
-import fi.metatavu.metamind.persistence.models.KnotIntentModel;
-import fi.metatavu.metamind.persistence.models.Story;
-import fi.metatavu.metamind.persistence.models.StoryGlobalIntentModel;
-import fi.metatavu.metamind.persistence.models.TrainingMaterial;
-import fi.metatavu.metamind.persistence.models.Variable;
-import fi.metatavu.metamind.rest.model.ExportedStoryTrainingMaterial;
-import fi.metatavu.metamind.rest.model.TrainingMaterialType;
-import fi.metatavu.metamind.rest.model.TrainingMaterialVisibility;
+import fi.metatavu.metamind.persistence.dao.*;
+import fi.metatavu.metamind.persistence.models.*;
+import fi.metatavu.metamind.api.spec.model.ExportedStoryTrainingMaterial;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
+import fi.metatavu.metamind.api.spec.model.TrainingMaterialVisibility;
 import fi.metatavu.metamind.utils.RegexUtils;
 import one.util.streamex.StreamEx;
-import opennlp.tools.doccat.BagOfWordsFeatureGenerator;
-import opennlp.tools.doccat.DoccatFactory;
-import opennlp.tools.doccat.DoccatModel;
-import opennlp.tools.doccat.DocumentCategorizerME;
-import opennlp.tools.doccat.DocumentSample;
-import opennlp.tools.doccat.DocumentSampleStream;
-import opennlp.tools.doccat.FeatureGenerator;
+import opennlp.tools.doccat.*;
 import opennlp.tools.namefind.BioCodec;
 import opennlp.tools.namefind.NameSampleDataStream;
 import opennlp.tools.namefind.TokenNameFinderFactory;
 import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.util.InputStreamFactory;
-import opennlp.tools.util.InsufficientTrainingDataException;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.PlainTextByLineStream;
-import opennlp.tools.util.SequenceCodec;
-import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.util.*;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Training material controller
@@ -237,6 +203,10 @@ public class TrainingMaterialController {
    * @return found training material or null if not found
    */
   public TrainingMaterial findTrainingMaterialById(UUID trainingMaterialId) {
+    if (trainingMaterialId == null) {
+      return  null;
+    }
+
     return trainingMaterialDAO.findById(trainingMaterialId);
   }
 
@@ -264,7 +234,7 @@ public class TrainingMaterialController {
   /**
    * Exports a training material
    * 
-   * @param training material to be exported
+   * @param trainingMaterial material to be exported
    * @return exported training material
    */
   public ExportedStoryTrainingMaterial exportTrainingMaterial(TrainingMaterial trainingMaterial) {
@@ -311,7 +281,7 @@ public class TrainingMaterialController {
    * @param story story
    * @param intents intents
    * @param type type
-   * @return
+   * @return variable openNLP NER training material lines
    */
   private String getVarialeOpenNlpNerTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
     Map<String, String> variableMap = new HashMap<>();
@@ -345,7 +315,7 @@ public class TrainingMaterialController {
    * @param story story
    * @param intents intents
    * @param type type
-   * @return
+   * @return variable OpenNLP Regex training material lines
    */
   private String getVarialeOpenNlpRegexTrainingMaterialLines(Story story, List<Intent> intents, TrainingMaterialType type) {
     Map<String, String> variableMap = new HashMap<>();
@@ -446,7 +416,7 @@ public class TrainingMaterialController {
    * Updates intent training material for a knot
    * 
    * @param knot knot
-   * @param lines intent training data
+   * @param lineDatas intent training data
    * @param language language
    */
   private void updateKnotTrainingMaterial(Knot knot, Map<TrainingMaterialType, String> lineDatas, String language) {
@@ -476,8 +446,9 @@ public class TrainingMaterialController {
 
   /**
    * Creates document categorization model from lines
-   * 
-   * @param languageCode language
+   *
+   * @param type type
+   * @param language language
    * @param lines lines
    * @return document categorization data
    * @throws IOException thrown when training data building fails
@@ -577,9 +548,9 @@ public class TrainingMaterialController {
   /**
    * Requests training material updates
    * 
-   * @param trainingMaterial training material
+   * @param intents intents list
    */
-  private void requestTrainingMaterialUpdates(List<fi.metatavu.metamind.persistence.models.Intent> intents) {
+  private void requestTrainingMaterialUpdates(List<Intent> intents) {
     List<Intent> globalIntents = new ArrayList<>();
     List<Intent> localIntents = new ArrayList<>();
     
@@ -612,40 +583,40 @@ public class TrainingMaterialController {
    * 
    * @param trainingMaterial training material
    */
-  private void requestTrainingMaterialUpdates(fi.metatavu.metamind.persistence.models.TrainingMaterial trainingMaterial) {
+  private void requestTrainingMaterialUpdates(TrainingMaterial trainingMaterial) {
     requestKnotsTrainingMaterialUpdate(trainingMaterial);
     requestStoryGlobalTrainingMaterialUpdate(trainingMaterial);
   }
-  
+
   /**
    * Requests training material update for knots related to a training material
-   * 
+   *
    * @param trainingMaterial training material
    */
-  private void requestKnotsTrainingMaterialUpdate(fi.metatavu.metamind.persistence.models.TrainingMaterial trainingMaterial) {
+  private void requestKnotsTrainingMaterialUpdate(TrainingMaterial trainingMaterial) {
     List<Story> stories = intentTrainingMaterialDAO.listStoriesByTrainingMaterialAndGlobal(trainingMaterial, Boolean.TRUE);
     if (stories.isEmpty()) {
       // Material is not attached into global intents, no need to update everything
-      
+
       for (Knot knot : intentTrainingMaterialDAO.listByTargetIntentTrainingMaterial(trainingMaterial)) {
         requestKnotTrainingMaterialUpdate(knot);
-      }      
+      }
     } else {
       // Material is attached into global intents, we need to update all knots in related stories
-      
+
       List<Knot> knots = stories.stream().map(story -> knotDAO.listByStory(story)).flatMap(List::stream).collect(Collectors.toList());
       for (Knot knot : knots) {
         requestKnotTrainingMaterialUpdate(knot);
       }
     }
   }
-  
+
   /**
    * Requests training material update for knots related to a training material
-   * 
+   *
    * @param trainingMaterial training material
    */
-  private void requestStoryGlobalTrainingMaterialUpdate(fi.metatavu.metamind.persistence.models.TrainingMaterial trainingMaterial) {
+  private void requestStoryGlobalTrainingMaterialUpdate(TrainingMaterial trainingMaterial) {
     List<Story> stories = intentTrainingMaterialDAO.listStoriesByTrainingMaterialAndGlobal(trainingMaterial, Boolean.TRUE);
     for (Story story : stories) {
       requestStoryTrainingMaterialUpdate(story);

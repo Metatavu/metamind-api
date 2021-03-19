@@ -1,13 +1,9 @@
 package fi.metatavu.metamind.server.rest;
 
-import javax.ejb.Stateful;
-import javax.enterprise.context.RequestScoped;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,10 +14,6 @@ import javax.ws.rs.core.Response;
  *
  */
 @Path("/system")
-@Consumes({ "application/json;charset=utf-8" })
-@Produces({ "application/json;charset=utf-8" })
-@RequestScoped
-@Stateful
 public class SystemApi extends AbstractRestApi {
 
   /**
@@ -32,7 +24,7 @@ public class SystemApi extends AbstractRestApi {
   @GET
   @Path ("/ping")
   @Produces (MediaType.TEXT_PLAIN)
-  public Response getPing(@Context HttpServletRequest request) {
+  public Response getPing() {
     return Response.ok("pong").build();
   }
   

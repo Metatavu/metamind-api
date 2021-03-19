@@ -1,13 +1,12 @@
 package fi.metatavu.metamind.scripts;
 
-import java.util.List;
-import java.util.UUID;
+import fi.metatavu.metamind.persistence.dao.ScriptDAO;
+import fi.metatavu.metamind.persistence.models.Script;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import fi.metatavu.metamind.persistence.dao.ScriptDAO;
-import fi.metatavu.metamind.persistence.models.Script;
+import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class ScriptController {
