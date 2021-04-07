@@ -38,7 +38,7 @@ steps:
       - '-c'
       - |
         if [ -n "${_DEPLOYMENT}" ]; then
-          docker build -t ${_DOCKER_REPO_URL}:$(echo ${BUILD_ID} | cut -b 1-8) .
+          docker build -t ${_DOCKER_REPO_URL}:$(echo ${BUILD_ID} | cut -b 1-8) src/main/docker/Dockerfile.native
         fi
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
