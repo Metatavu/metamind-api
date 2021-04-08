@@ -68,12 +68,3 @@ steps:
         aws eks update-kubeconfig --name ${_CLUSTER} --region=${_AWS_DEFAULT_REGION} &&
         kubectl -n ${_NAMESPACE} set image deployment/${_DEPLOYMENT} ${_DEPLOYMENT}=${_DOCKER_REPO_URL}:$(echo ${BUILD_ID} | cut -b 1-8)
       fi
-  - name: 'openjdk:11.0.10-jdk'
-    entrypoint: 'bash'
-    timeout: 1200s
-    args:
-      - '-c'
-      - |
-        if [ -n "${_TEST}" ]; then
-          ./gradlew test
-        fi
