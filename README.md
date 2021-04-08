@@ -1,4 +1,6 @@
-# code-with-quarkus project
+# Metamind API
+
+## code-with-quarkus project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
