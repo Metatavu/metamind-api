@@ -5,14 +5,9 @@ import fi.metatavu.jaxrs.test.functional.builder.auth.*;
 import fi.metatavu.metamind.api.client.infrastructure.ApiClient;
 import fi.metatavu.metamind.functional.auth.TestBuilderAuthentication;
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.keycloak.Config;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Test builder class
@@ -22,8 +17,16 @@ import java.util.stream.Collectors;
 public class TestBuilder extends AbstractTestBuilder<ApiClient> {
 
   private TestBuilderAuthentication admin;
+  private TestBuilderAuthentication test1;
+  private TestBuilderAuthentication test2;
   private TestBuilderAuthentication invalid;
   private TestBuilderAuthentication anonymous;
+
+  private String serverUrl = ConfigProvider.getConfig().getValue("metamind.keycloak.admin.host", String.class);
+  private String realm = ConfigProvider.getConfig().getValue("metamind.keycloak.admin.realm", String.class);
+  private String api_client_id = "api";
+  private String apiSecret = "1be749de-2023-4ebf-aba0-90679ffab56b";
+
 
   /**
    * Returns admin authenticated authentication resource
@@ -36,26 +39,41 @@ public class TestBuilder extends AbstractTestBuilder<ApiClient> {
       return admin;
     }
 
-    Optional<String> serverUrl = ConfigProvider.getConfig().getOptionalValue("metamind.keycloak.admin.host", String.class);
-    Optional<String> REALM = ConfigProvider.getConfig().getOptionalValue("metamind.keycloak.admin.realm", String.class);
-    Optional<String> CLIENT_ID = ConfigProvider.getConfig().getOptionalValue("quarkus.oidc.client-id", String.class);
-    Optional<String> ADMIN_USER = ConfigProvider.getConfig().getOptionalValue("metamind.keycloak.admin.user", String.class);
-    Optional<String> ADMIN_PASSWORD = ConfigProvider.getConfig().getOptionalValue("metamind.keycloak.admin.password", String.class);
-    Optional<String> CLIENT_SECRET = ConfigProvider.getConfig().getOptionalValue("metamind.keycloak.admin.secret", String.class);
-
-    return admin = new TestBuilderAuthentication(this, new KeycloakAccessTokenProvider(getOptional(serverUrl), getOptional(REALM),
-      getOptional(CLIENT_ID), getOptional(ADMIN_USER), getOptional(ADMIN_PASSWORD), getOptional(CLIENT_SECRET)));
+    return admin = new TestBuilderAuthentication(this, new KeycloakAccessTokenProvider(serverUrl, realm,
+      api_client_id, "admin@example.com", "admin", apiSecret));
   }
 
   /**
-   * Gets value or null if empty
+   * Gets authenticated test1 user (belongs to group1)
    *
-   * @param value value
-   * @return value optional value
+   * @return authenticated test1 resource
+   * @throws IOException io exception
    */
-  private String getOptional(Optional<String> value) {
-    return value.orElse(null);
+  public TestBuilderAuthentication test1() throws IOException {
+    if (test1 != null) {
+      return test1;
+    }
+
+    KeycloakAccessTokenProvider keycloakAccessTokenProvider = new KeycloakAccessTokenProvider(serverUrl, "metamind", api_client_id,
+      "test1", "test", apiSecret);
+    return test1 = new TestBuilderAuthentication(this, keycloakAccessTokenProvider);
   }
+
+  /**
+   * Gets authenticated test2 user (belongs to group2)
+   *
+   * @return authenticated test2 resource
+   * @throws IOException io exception
+   */
+  public TestBuilderAuthentication test2() throws IOException {
+    if (test2 != null) {
+      return test2;
+    }
+
+    return test2 = new TestBuilderAuthentication(this, new KeycloakAccessTokenProvider(serverUrl, realm, api_client_id,
+      "test2", "test", "1be749de-2023-4ebf-aba0-90679ffab56b"));
+  }
+
 
   @Override
   public AuthorizedTestBuilderAuthentication<ApiClient> createTestBuilderAuthentication(

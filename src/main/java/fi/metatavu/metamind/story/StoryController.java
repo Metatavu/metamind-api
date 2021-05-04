@@ -94,7 +94,17 @@ public class StoryController {
   public List<Story> listStories() {
     return storyDAO.listAll();
   }
-  
+
+  /**
+   * Lists stories based on permitted creator IDs
+   *
+   * @param creatorIds all the permitted ids
+   * @return stories
+   */
+  public List<Story> listStoriesByCreatorIds(List<UUID> creatorIds) {
+    return storyDAO.listStoriesByCreatorIds(creatorIds);
+  }
+
   /**
    * Creates new Knot
    * 

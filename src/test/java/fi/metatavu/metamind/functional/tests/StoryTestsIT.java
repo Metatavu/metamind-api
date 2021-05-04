@@ -33,19 +33,16 @@ public class StoryTestsIT {
       assertNotNull(builder.admin().stories().create("en", "test story", "Enter your answer"));
     }
   }
-/*
+
   @Test
   public void testCreateStoryPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
-      builder.invalid().stories().assertCreateFailStatus(403, "en", "test story", "Enter your answer");
+      builder.invalid().stories().assertCreateFailStatus(401, "en", "test story", "Enter your answer");
       builder.anonymous().stories().assertCreateFailStatus(401, "en", "test story", "Enter your answer");
     }
-  }*/
+  }
 
-  /**
-   * Tests story search by id
-   * @throws Exception exceptin
-   */
+
   @Test
   public void testFindStory() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
@@ -55,7 +52,7 @@ public class StoryTestsIT {
       builder.admin().stories().assertStoriesEqual(createdStory, foundStory);
     }
   }
-/*
+
   @Test
   public void testFindStoryPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
@@ -63,11 +60,13 @@ public class StoryTestsIT {
 
       assertNotNull(builder.admin().stories().findStory(createdStory.getId()));
 
-      builder.invalid().stories().assertFindFailStatus(403, createdStory.getId());
+      builder.invalid().stories().assertFindFailStatus(401, createdStory.getId());
       builder.anonymous().stories().assertFindFailStatus(401, createdStory.getId());
 
+      Story testStoryGroup1 = builder.admin().stories().create("en", "test story", "Enter your answer");
+      builder.test2().stories().assertFindFailStatus(403, testStoryGroup1.getId());
     }
-  }*/
+  }
 
   /**
    * Tests story update
@@ -91,16 +90,18 @@ public class StoryTestsIT {
     }
   }
 
-/*
+
   @Test
   public void testUpdateStoryPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story testStory = builder.admin().stories().create("en", "test story", "Enter your answer");
       builder.anonymous().stories().assertUpdateFailStatus(401, testStory);
-      builder.invalid().stories().assertUpdateFailStatus(403, testStory);
+      builder.invalid().stories().assertUpdateFailStatus(401, testStory);
 
+      Story testStoryGroup1 = builder.admin().stories().create("en", "test story", "Enter your answer");
+      builder.test2().stories().assertUpdateFailStatus(403, testStoryGroup1);
     }
-  }*/
+  }
 
   /**
    * Tests story deletion
@@ -116,15 +117,38 @@ public class StoryTestsIT {
       builder.admin().stories().assertDeleteFailStatus(404, createdStory);
     }
   }
-/*
+
   @Test
   public void testDeleteStoryPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story createdStory = builder.admin().stories().create("en", "test story", "Enter your answer");
       builder.anonymous().stories().assertDeleteFailStatus(401, createdStory);
-      builder.invalid().stories().assertDeleteFailStatus(403, createdStory);
+      builder.invalid().stories().assertDeleteFailStatus(401, createdStory);
+      builder.admin().stories().delete(createdStory);
+
+      Story createdStoryGroup1 = builder.test1().stories().create("en", "test story1", "Enter your answer");
+      builder.test2().stories().assertDeleteFailStatus(403, createdStoryGroup1);
+      builder.test1().stories().delete(createdStoryGroup1);
     }
-  }*/
+  }
+
+  /*
+  Tests listing stories with various access rights
+   */
+  @Test
+  public void testListStoriesPermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      builder.admin().stories().create("en", "test story1", "Enter your answer");
+      builder.test1().stories().create("en", "test story1", "Enter your answer");
+      builder.test2().stories().create("en", "test story2", "Enter your answer");
+      builder.test2().stories().create("en", "test story3", "Enter your answer");
+
+      assertEquals(1, builder.test1().stories().listStories().length);
+      assertEquals(2, builder.test2().stories().listStories().length);
+      assertEquals(4, builder.admin().stories().listStories().length);
+
+    }
+  }
 
   /**
    * Tests story exporting and importing
@@ -142,7 +166,7 @@ public class StoryTestsIT {
 
       ExportedStory exportedStory = builder.admin().storyExport().exportStory(story.getId());
       assertNotNull(exportedStory);
-      Story importedStory = builder.admin().storyExport().importStory(exportedStory);
+      Story importedStory = builder.admin().stories().addClosable(builder.admin().storyExport().importStory(exportedStory));
       assertNotNull(importedStory);
       assertNotNull(builder.admin().stories().findStory(importedStory.getId()));
       assertEquals(story.getName(), importedStory.getName());
@@ -186,6 +210,13 @@ public class StoryTestsIT {
       assertEquals(variable.getName(), importedVariable.getName());
       assertEquals(variable.getType(), importedVariable.getType());
       assertEquals(variable.getValidationScript(), importedVariable.getValidationScript());
+
+      //delete knots and intents dependable on imported story
+      builder.admin().intents().delete(importedStory, importedIntents[0]);
+      builder.admin().knots().delete(importedStory, importedKnots[0]);
+      builder.admin().knots().delete(importedStory, importedKnots[1]);
+      builder.admin().variables().delete(importedStory, importedVariables[0]);
+      builder.admin().trainingMaterial().delete(importedMaterials[0]);
     }
   }
 }
