@@ -27,7 +27,6 @@ public class TestBuilder extends AbstractTestBuilder<ApiClient> {
   private String api_client_id = "api";
   private String apiSecret = "1be749de-2023-4ebf-aba0-90679ffab56b";
 
-
   /**
    * Returns admin authenticated authentication resource
    *

@@ -132,8 +132,8 @@ public class StoryTestsIT {
     }
   }
 
-  /*
-  Tests listing stories with various access rights
+  /**
+   * Tests listing stories with various access rights
    */
   @Test
   public void testListStoriesPermissions() throws Exception {

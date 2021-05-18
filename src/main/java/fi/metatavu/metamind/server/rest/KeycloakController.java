@@ -65,7 +65,6 @@ public class KeycloakController {
       List<String> user2Groups = userResource2.groups().stream().map(GroupRepresentation::getId).collect(Collectors.toList());
       return Collections.disjoint(user1Groups, user2Groups);
 
-
   }
 
   /**
