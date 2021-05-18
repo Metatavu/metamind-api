@@ -1,9 +1,7 @@
 package fi.metatavu.metamind.server.rest;
 
 import fi.metatavu.metamind.api.spec.model.ErrorResponse;
-import io.vertx.core.http.HttpServerRequest;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.slf4j.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -12,12 +10,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -29,7 +27,6 @@ import java.util.UUID;
 @RequestScoped
 public abstract class AbstractRestApi {
 
-  private static final UUID ANONYMOUS_USER_ID = new UUID(0L, 0L);
   private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
   private static final String FAILED_TO_STREAM_DATA_TO_CLIENT = "Failed to stream data to client";
   
@@ -38,6 +35,12 @@ public abstract class AbstractRestApi {
   @Inject
   private JsonWebToken jsonWebToken;
 
+  @Context
+  private SecurityContext securityContext;
+
+  @Inject
+  private KeycloakController keycloakController;
+
   /**
    * Returns logged user id
    *
@@ -45,10 +48,30 @@ public abstract class AbstractRestApi {
    */
   protected UUID getLoggedUserId() {
     if (jsonWebToken.getSubject() == null) {
-      return ANONYMOUS_USER_ID;
+      return null;
     }
 
     return UUID.fromString(jsonWebToken.getSubject());
+  }
+
+  /**
+   * Checks if current user is admin
+   *
+   * @return if user is admin
+   */
+  protected boolean isAdmin() {
+    return securityContext.isUserInRole("admin");
+  }
+
+  /**
+   * Checks if user1 and user2 belong to different keycloak groups
+   *
+   * @param user1 user 1 uuid
+   * @param user2 user 2 uuid
+   * @return true if different group
+   */
+  protected boolean isDifferentGroups(UUID user1, UUID user2) {
+    return keycloakController.usersShareNoGroups(user1, user2);
   }
 
   /**

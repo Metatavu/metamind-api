@@ -16,6 +16,7 @@ import fi.metatavu.metamind.scripts.ScriptController;
 import fi.metatavu.metamind.server.rest.translation.*;
 import fi.metatavu.metamind.sessions.SessionController;
 import fi.metatavu.metamind.story.StoryController;
+import io.quarkus.security.identity.SecurityIdentity;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,13 +24,18 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @RequestScoped
 @Transactional
 public class V2ApiImpl extends AbstractRestApi implements V2Api {
+
+    private static final String UNAUTHORIZED = "Unauthorized";
+
     private static final int MAX_KNOT_REDIRECTS = 50;
 
     private static final String STORY_NAME_TEMPLATE = "story-%s";
@@ -81,6 +87,9 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Inject
     private TrainingMaterialTranslator trainingMaterialTranslator;
+
+    @Inject
+    private KeycloakController keycloakController;
 
     @Override
     public Response importStory(ExportedStory body) {
@@ -340,6 +349,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response createStory(fi.metatavu.metamind.api.spec.model.Story body) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         Locale locale = LocaleUtils.toLocale(body.getLocale());
         fi.metatavu.metamind.persistence.models.Story story = storyController.createStory(locale, body.getName(), body.getDafaultHint(), loggedUserId);
 
@@ -402,9 +415,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response deleteStory(UUID storyId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createNotFound(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         storyController.deleteStory(story);
@@ -473,9 +495,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response findStory(UUID storyId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+          return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createNotFound(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         return createOk(storyTranslator.translateStory(story));
@@ -526,7 +557,20 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response listStories() {
-        return createOk(storyController.listStories().stream().map(storyTranslator::translateStory).collect(Collectors.toList()));
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
+        List<Story> foundStories;
+        if (isAdmin()) {
+            foundStories = storyController.listStories();
+        } else {
+            List<UUID> usersFromSameGroup = keycloakController.listSameGroupUsers(loggedUserId);
+            foundStories = storyController.listStoriesByCreatorIds(usersFromSameGroup);
+        }
+
+        return createOk(foundStories.stream().map(storyTranslator::translateStory).collect(Collectors.toList()));
     }
 
     @Override
@@ -625,11 +669,19 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response updateStory(UUID storyId, @Valid fi.metatavu.metamind.api.spec.model.Story story) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         Locale locale = LocaleUtils.toLocale(story.getLocale());
 
         fi.metatavu.metamind.persistence.models.Story foundStory = storyController.findStoryById(storyId);
         if (foundStory == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(foundStory.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         return createOk(storyTranslator.translateStory(storyController.updateStory(foundStory, locale, story.getName(), story.getDafaultHint(), loggedUserId)));

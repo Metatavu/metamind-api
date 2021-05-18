@@ -60,7 +60,7 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
    */
   public Story create(String locale, String name, String hintMessage) throws IOException {
     Story story = new Story(name, locale, null, hintMessage, null, null, null);
-    return getApi().createStory(story);
+    return addClosable(getApi().createStory(story));
   }
 
   /**
@@ -178,4 +178,12 @@ public class StoryTestBuilderResource extends ApiTestBuilderResource<Story, Stor
     }
   }
 
+  /**
+   * Lists all stories
+   *
+   * @return stories array
+   */
+  public Story[] listStories() {
+    return getApi().listStories();
+  }
 }

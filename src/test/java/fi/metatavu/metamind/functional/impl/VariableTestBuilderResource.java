@@ -77,4 +77,21 @@ public class VariableTestBuilderResource extends ApiTestBuilderResource<Variable
     Variable createdVariable = getApi().createVariable(storyId, variable);
     return addClosable(createdVariable);
   }
+
+  /**
+   * Deletes variable
+   *
+   * @param story variable story
+   * @param variable variable
+   */
+  public void delete(Story story, Variable variable) {
+    getApi().deleteVariable(story.getId(), variable.getId());
+    removeCloseable(closable -> {
+      if (closable instanceof Variable) {
+        return ((Variable) closable).getId().equals(variable.getId());
+      }
+
+      return false;
+    });
+  }
 }
