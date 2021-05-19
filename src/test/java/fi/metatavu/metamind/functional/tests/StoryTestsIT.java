@@ -146,7 +146,6 @@ public class StoryTestsIT {
       assertEquals(1, builder.test1().stories().listStories().length);
       assertEquals(2, builder.test2().stories().listStories().length);
       assertEquals(4, builder.admin().stories().listStories().length);
-
     }
   }
 

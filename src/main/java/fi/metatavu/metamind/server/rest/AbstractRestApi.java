@@ -29,7 +29,10 @@ public abstract class AbstractRestApi {
 
   private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
   private static final String FAILED_TO_STREAM_DATA_TO_CLIENT = "Failed to stream data to client";
-  
+  protected static final String TRAINING_MATERIAL_GROUP_ERROR = "Training material belongs to different group";
+  protected static final String STORY_GROUP_ERROR = "Story belongs to different group";
+  protected static final String SCRIPT_GROUP_ERROR = "Script belongs to different group";
+
   private Logger logger;
 
   @Inject
@@ -222,7 +225,7 @@ public abstract class AbstractRestApi {
     
     return responseBuilder.build();
   }
-  
+
   private class Stream implements StreamingOutput {
     
     private InputStream inputStream;

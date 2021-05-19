@@ -81,5 +81,14 @@ public class ScriptController {
   public void deleteScript(Script script) {
     scriptDAO.delete(script);
   }
-  
+
+  /**
+   * Lists scripts based on permitted creator IDs
+   *
+   * @param creatorIds creator IDs
+   * @return scripts
+   */
+  public List<Script> listScriptsByCreatorIds(List<UUID> creatorIds) {
+    return scriptDAO.listScriptsByCreatorIds(creatorIds);
+  }
 }

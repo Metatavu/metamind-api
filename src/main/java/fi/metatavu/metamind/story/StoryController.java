@@ -391,7 +391,7 @@ public class StoryController {
     
     List<Knot> knotsToExport = listKnotsByStory(story);
     List<Intent> intentsToExport = listIntentsByStory(story);
-    List<TrainingMaterial> trainingMaterialsToExport = trainingMaterialController.listTrainingMaterials(story, null, null);
+    List<TrainingMaterial> trainingMaterialsToExport = trainingMaterialController.listTrainingMaterials(story, null, null, null);
     List<Variable> variablesToExport = listVariablesByStory(story);
     
     exportedStory.setKnots(knotsToExport.stream().map(knot -> exportKnot(knot)).collect(Collectors.toList()));
