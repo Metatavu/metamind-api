@@ -93,8 +93,16 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response importStory(ExportedStory body) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
 
         Story story = storyController.importStory(body, getLoggedUserId());
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
+        }
         return createOk(storyTranslator.translateStory(story));
 
     }
@@ -171,6 +179,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response createIntent(UUID storyId, @Valid Intent intent) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Knot sourceKnot = intent.getSourceKnotId() != null ? storyController.findKnotById(intent.getSourceKnotId()) : null;
         if (intent.getSourceKnotId() != null && sourceKnot == null) {
             return createBadRequest(String.format("Invalid source knot id %s", intent.getSourceKnotId()));
@@ -179,6 +191,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         fi.metatavu.metamind.persistence.models.Knot targetKnot = storyController.findKnotById(intent.getTargetKnotId());
@@ -237,6 +253,9 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response createKnot(UUID storyId, @Valid Knot knot) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
 
         Double coordinateX = knot.getCoordinates() != null ? knot.getCoordinates().getX() : null;
         Double coordinateY = knot.getCoordinates() != null ? knot.getCoordinates().getY() : null;
@@ -246,12 +265,20 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest(String.format("Story %s not found", storyId));
         }
 
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
+        }
+
         return createOk(knotTranslator.translateKnot(storyController.createKnot(knot.getType(), knot.getTokenizer(), knot.getName(), knot.getContent(), knot.getHint(), story, loggedUserId, coordinateX, coordinateY)));
     }
 
     @Override
     public Response createMessage(UUID storyId, @Valid Message message) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Session session = sessionController.findSessionById(message.getSessionId());
         if (session == null) {
             return createBadRequest("Invalid session id");
@@ -265,6 +292,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         if (!story.getId().equals(session.getStory().getId())) {
@@ -333,9 +364,17 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response createSession(UUID storyId, fi.metatavu.metamind.api.spec.model.@Valid Session session) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest("Invalid story parameter");
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         String locale = session.getLocale();
@@ -362,10 +401,17 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response createVariable(UUID storyId, @Valid Variable variable) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
 
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         return createOk(variableTranslator.translateVariable(storyController.createVariable(variable.getType(), story, variable.getName(), variable.getValidationScript(), loggedUserId)));
@@ -373,9 +419,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response deleteIntent(UUID storyId, UUID intentId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createNotFound(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         fi.metatavu.metamind.persistence.models.Intent intent = storyController.findIntentById(intentId);
@@ -394,9 +449,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response deleteKnot(UUID storyId, UUID knotId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createNotFound(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         fi.metatavu.metamind.persistence.models.Knot knot = storyController.findKnotById(knotId);
@@ -436,6 +500,11 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response deleteVariable(UUID storyId, UUID variableId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
         if (variable == null) {
             return createBadRequest(String.format("Variable %s not found", variableId));
@@ -450,6 +519,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest(String.format("Variable %s is not from the story %s", variable.getId(), story.getId()));
         }
 
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
+        }
+
         storyController.deleteVariable(variable);
 
         return createNoContent();
@@ -457,9 +530,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response findIntent(UUID storyId, UUID intentId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createNotFound(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         fi.metatavu.metamind.persistence.models.Intent intent = storyController.findIntentById(intentId);
@@ -476,9 +558,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response findKnot(UUID storyId, UUID knotId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createNotFound(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         fi.metatavu.metamind.persistence.models.Knot knot = storyController.findKnotById(knotId);
@@ -514,6 +605,11 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response findVariable(UUID storyId, UUID variableId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Variable variable = storyController.findVariableById(variableId);
         if (variable == null) {
             return createBadRequest(String.format("Variable %s not found", variableId));
@@ -522,6 +618,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         if (!storyController.isVariableFromStory(variable, story)) {
@@ -533,9 +633,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response listIntents(UUID storyId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         return createOk(storyController.listIntentsByStory(story).stream()
@@ -545,9 +654,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response listKnots(UUID storyId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         return createOk(storyController.listKnotsByStory(story).stream()
@@ -575,9 +693,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response listVariables(UUID storyId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         return createOk(storyController.listVariablesByStory(story).stream()
@@ -589,6 +716,18 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response updateIntent(UUID storyId, UUID intentId, @Valid Intent intent) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
+        fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
+        if (story == null) {
+            return createBadRequest(String.format("Story %s not found", storyId));
+        }
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
+        }
+
         fi.metatavu.metamind.persistence.models.Knot sourceKnot = intent.getSourceKnotId() != null ? storyController.findKnotById(intent.getSourceKnotId()) : null;
         if (intent.getSourceKnotId() != null && sourceKnot == null) {
             return createBadRequest(String.format("Invalid source knot id %s", intent.getSourceKnotId()));
@@ -646,12 +785,19 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response updateKnot(UUID storyId, UUID knotId, @Valid Knot knot) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
 
         Double coordinateX = knot.getCoordinates() != null ? knot.getCoordinates().getX() : null;
         Double coordinateY = knot.getCoordinates() != null ? knot.getCoordinates().getY() : null;
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         fi.metatavu.metamind.persistence.models.Knot foundKnot = storyController.findKnotById(knotId);
@@ -690,6 +836,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
     @Override
     public Response updateVariable(UUID storyId, UUID variableId, @Valid Variable variable) {
         UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
+
         fi.metatavu.metamind.persistence.models.Variable foundVasriable = storyController.findVariableById(variableId);
         if (foundVasriable == null) {
             return createBadRequest(String.format("Variable %s not found", variableId));
@@ -698,6 +848,10 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
         fi.metatavu.metamind.persistence.models.Story story = storyController.findStoryById(storyId);
         if (story == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(story.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         if (!storyController.isVariableFromStory(foundVasriable, story)) {
@@ -709,11 +863,19 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
 
     @Override
     public Response exportStory(UUID storyId) {
+        UUID loggedUserId = getLoggedUserId();
+        if (loggedUserId == null) {
+            return createUnauthorized(UNAUTHORIZED);
+        }
 
         Story storyToExport = storyController.findStoryById(storyId);
 
         if (storyToExport == null) {
             return createBadRequest(String.format("Story %s not found", storyId));
+        }
+
+        if (!isAdmin() && isDifferentGroups(storyToExport.getCreatorId(), loggedUserId)) {
+            return createForbidden("Story belongs to different group");
         }
 
         ExportedStory exportedStory = storyController.exportStory(storyToExport);
