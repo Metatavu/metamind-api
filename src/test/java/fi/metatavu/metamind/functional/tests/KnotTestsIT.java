@@ -39,16 +39,17 @@ public class KnotTestsIT {
     }
   }
 
-  /*
-    @Test
-    public void testCreateKnotPermissions() throws Exception {
-      try (TestBuilder builder = new TestBuilder()) {
-        Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-        builder.invalid().knots().assertCreateFailStatus(403, "Content", "Test", story);
-        builder.anonymous().knots().assertCreateFailStatus(401, "Content", "Test", story);
-      }
+  /**
+   * Test that not logged in users cannot create knots
+   */
+  @Test
+  public void testCreateKnotPermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
+      builder.invalid().knots().assertCreateFailStatus(401, "Content", "Test", story);
+      builder.anonymous().knots().assertCreateFailStatus(401, "Content", "Test", story);
     }
-  */
+  }
 
   /**
    * Tests searching for knot by id
@@ -69,18 +70,16 @@ public class KnotTestsIT {
     }
   }
 
-  /*
   @Test
   public void testFindKnotPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       Knot createdKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test", "Content", 10.0, 20.0);
       assertNotNull(builder.admin().knots().findKnot(story, createdKnot));
-      builder.invalid().knots().assertFindFailStatus(story.getId(), 403, createdKnot.getId());
+      builder.invalid().knots().assertFindFailStatus(story.getId(), 401, createdKnot.getId());
       builder.anonymous().knots().assertFindFailStatus(story.getId(), 401, createdKnot.getId());
     }
   }
-*/
 
   /**
    * Tests intent updates
@@ -109,18 +108,20 @@ public class KnotTestsIT {
     }
   }
 
-  /*
-    @Test
-    public void testUpdateKnotPermissions() throws Exception {
-      try (TestBuilder builder = new TestBuilder()) {
-        Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-        Knot createdKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test", "Content", 10.0, 20.0);
+  /**
+   * Tests that not logged in users cannot update knots
+   * @throws Exception
+   */
+  @Test
+  public void testUpdateKnotPermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
+      Knot createdKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test", "Content", 10.0, 20.0);
 
-        builder.anonymous().knots().assertUpdateFailStatus(story, 401, createdKnot);
-        builder.invalid().knots().assertUpdateFailStatus(story, 403, createdKnot);
-      }
+      builder.anonymous().knots().assertUpdateFailStatus(story, 401, createdKnot);
+      builder.invalid().knots().assertUpdateFailStatus(story, 401, createdKnot);
     }
-  */
+  }
 
   /**
    * Tests intent deletion
@@ -139,15 +140,15 @@ public class KnotTestsIT {
     }
   }
 
-/*
+
   @Test
   public void testDeleteKnotPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       Knot createdKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test", "Content", 10.0, 20.0);
       builder.anonymous().knots().assertDeleteFailStatus(story, 401, createdKnot);
-      builder.invalid().knots().assertDeleteFailStatus(story, 403, createdKnot);
+      builder.invalid().knots().assertDeleteFailStatus(story, 401, createdKnot);
     }
   }
-*/
+
 }

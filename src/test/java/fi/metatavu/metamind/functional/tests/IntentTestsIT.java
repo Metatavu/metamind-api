@@ -38,18 +38,17 @@ public class IntentTestsIT {
     }
   }
 
-  /*
    @Test
    public void testCreateIntentPermissions() throws Exception {
      try (TestBuilder builder = new TestBuilder()) {
        Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
        Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
        Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
-       builder.invalid().intents().assertCreateFailStatus(403, "Test Intent", sourceKnot, targetKnot, story);
-       builder.anonymous().intents().assertCreateFailStatus(401, "Test Intent", sourceKnot, targetKnot, story);
+
+       builder.invalid().intents().assertCreateFailStatus(401, story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
+       builder.anonymous().intents().assertCreateFailStatus(401, story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
      }
    }
- */
 
   /**
    * Tests intent search by id
@@ -70,7 +69,6 @@ public class IntentTestsIT {
     }
   }
 
-  /*
   @Test
   public void testFindIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
@@ -80,10 +78,10 @@ public class IntentTestsIT {
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1,  null, null, null, null);
       
       assertNotNull(builder.admin().intents().findIntent(story, createdIntent));
-      builder.invalid().intents().assertFindFailStatus(story.getId(), 403, createdIntent.getId());
+      builder.invalid().intents().assertFindFailStatus(story.getId(), 401, createdIntent.getId());
       builder.anonymous().intents().assertFindFailStatus(story.getId(), 401, createdIntent.getId());
     }
-  }*/
+  }
 
   /**
    * Tests intent updates
@@ -113,20 +111,22 @@ public class IntentTestsIT {
     }
   }
 
-  /*
-    @Test
-    public void testUpdateIntentPermissions() throws Exception {
-      try (TestBuilder builder = new TestBuilder()) {
-        Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-        Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-        Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
-        Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1,  null, null, null, null);
+  /**
+   * Tests that noy logged in users cannot update intents
+   * @throws Exception
+   */
+  @Test
+  public void testUpdateIntentPermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
+      Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+      Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1,  null, null, null, null);
 
-        builder.anonymous().intents().assertUpdateFailStatus(story, 401, createdIntent);
-        builder.invalid().intents().assertUpdateFailStatus(story, 403, createdIntent);
-      }
+      builder.anonymous().intents().assertUpdateFailStatus(story, 401, createdIntent);
+      builder.invalid().intents().assertUpdateFailStatus(story, 401, createdIntent);
     }
-  */
+  }
 
   /**
    * Tests intent deletion
@@ -145,8 +145,7 @@ public class IntentTestsIT {
       builder.admin().intents().assertDeleteFailStatus(story, 404, createdIntent);
     }
   }
- 
-/*
+
   @Test
   public void testDeleteIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
@@ -156,8 +155,7 @@ public class IntentTestsIT {
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
 
       builder.anonymous().intents().assertDeleteFailStatus(story, 401, createdIntent);
-      builder.invalid().intents().assertDeleteFailStatus(story, 403, createdIntent);
+      builder.invalid().intents().assertDeleteFailStatus(story, 401, createdIntent);
     }
-  }*/
-
+  }
 }

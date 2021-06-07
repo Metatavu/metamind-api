@@ -38,17 +38,16 @@ public class TrainingMaterialTestsIT {
       assertNotNull(builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY));
     }
   }
-  
- /*
+
   @Test
   public void testCreateTrainingMaterialPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
       
-      builder.invalid().trainingMaterial().assertCreateFailStatus(403, story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test");
+      builder.invalid().trainingMaterial().assertCreateFailStatus(401, story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test");
       builder.anonymous().trainingMaterial().assertCreateFailStatus(401, story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test");
     }
-  }*/
+  }
 
   /**
    * Tests finding training material
@@ -67,7 +66,6 @@ public class TrainingMaterialTestsIT {
     }
   }
 
-  /*
   @Test
   public void testFindTrainingMaterialPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
@@ -75,10 +73,10 @@ public class TrainingMaterialTestsIT {
       TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY);
       
       assertNotNull(builder.admin().trainingMaterial().findTrainingMaterial(createdTrainingMaterial));
-      builder.invalid().trainingMaterial().assertFindFailStatus(403, createdTrainingMaterial.getId());
+      builder.invalid().trainingMaterial().assertFindFailStatus(401, createdTrainingMaterial.getId());
       builder.anonymous().trainingMaterial().assertFindFailStatus(401, createdTrainingMaterial.getId());
     }
-  }*/
+  }
 
   /**
    * Tests updating training material
@@ -108,18 +106,20 @@ public class TrainingMaterialTestsIT {
     }
   }
 
-  /*
-   @Test
-    public void testUpdateIntentPermissions() throws Exception {
-      try (TestBuilder builder = new TestBuilder()) {
-        Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-        TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY);
+  /**
+   * Tests that not logged in users cannot update training materials
+   * @throws Exception
+   */
+ @Test
+  public void testUpdateIntentPermissions() throws Exception {
+    try (TestBuilder builder = new TestBuilder()) {
+      Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
+      TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY);
 
-        builder.anonymous().trainingMaterial().assertUpdateFailStatus(401, createdTrainingMaterial);
-        builder.invalid().trainingMaterial().assertUpdateFailStatus(403, createdTrainingMaterial);
-      }
+      builder.anonymous().trainingMaterial().assertUpdateFailStatus(401, createdTrainingMaterial);
+      builder.invalid().trainingMaterial().assertUpdateFailStatus(401, createdTrainingMaterial);
     }
-  */
+  }
 
   /**
    * Tests deleting training material
@@ -139,7 +139,6 @@ public class TrainingMaterialTestsIT {
     }
   }
 
-/*
   @Test
   public void testDeleteIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
@@ -147,9 +146,8 @@ public class TrainingMaterialTestsIT {
       TrainingMaterial createdTrainingMaterial = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY);
       
       builder.anonymous().trainingMaterial().assertDeleteFailStatus(401, createdTrainingMaterial);
-      builder.invalid().trainingMaterial().assertDeleteFailStatus(403, createdTrainingMaterial);
+      builder.invalid().trainingMaterial().assertDeleteFailStatus(401, createdTrainingMaterial);
     }
   }
-*/
 
 }

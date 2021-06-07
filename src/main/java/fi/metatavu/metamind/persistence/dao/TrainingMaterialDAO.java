@@ -1,6 +1,7 @@
 package fi.metatavu.metamind.persistence.dao;
 
 import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.Story_;
 import fi.metatavu.metamind.persistence.models.TrainingMaterial;
 import fi.metatavu.metamind.api.spec.model.TrainingMaterialType;
 import fi.metatavu.metamind.api.spec.model.TrainingMaterialVisibility;
@@ -8,10 +9,7 @@ import fi.metatavu.metamind.persistence.models.TrainingMaterial_;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,10 +55,16 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
    * @param includeNullStories whether to include stories with null story
    * @param story story include also stories
    * @param type filter by type
-   * 
+   * @param creatorIds list of accepted creator IDs
    * @return found training materials
    */
-  public List<TrainingMaterial> list(boolean includeNullStories, Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
+  public List<TrainingMaterial> list(
+    boolean includeNullStories,
+    Story story,
+    TrainingMaterialType type,
+    TrainingMaterialVisibility visibility,
+    List<UUID> creatorIds
+  ) {
     EntityManager entityManager = getEntityManager();
 
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -86,6 +90,12 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
     
     if (visibility != null) {
       restrictions.add(criteriaBuilder.equal(root.get(TrainingMaterial_.visibility), visibility));
+    }
+
+    if (creatorIds != null) {
+      Expression<UUID> creatorExpression = root.get(TrainingMaterial_.creatorId);
+      Predicate creatorRestriction = creatorExpression.in(creatorIds);
+      restrictions.add(creatorRestriction);
     }
 
     criteria.where(restrictions.toArray(new Predicate[0]));

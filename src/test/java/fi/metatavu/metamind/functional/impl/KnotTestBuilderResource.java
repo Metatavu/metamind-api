@@ -136,7 +136,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
    */
   public void assertCreateFailStatus(int expectedStatus, String content, String name, Story story) {
     try {
-      Knot knot = new Knot(null, null, name, content, null, null, null, null, null, null);
+      Knot knot = new Knot(KnotType.tEXT, fi.metatavu.metamind.api.client.models.TokenizerType.wHITESPACE, name, content, null, null, null, null, null, null);
       getApi().createKnot(Objects.requireNonNull(story.getId()), knot);
       fail(String.format("Expected create to fail with status %d", expectedStatus));
     } catch (ClientException e) {

@@ -2,12 +2,13 @@ package fi.metatavu.metamind.persistence.dao;
 
 import fi.metatavu.metamind.persistence.models.Script;
 import fi.metatavu.metamind.persistence.models.Script_;
+import fi.metatavu.metamind.persistence.models.Story;
+import fi.metatavu.metamind.persistence.models.Story_;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -118,4 +119,23 @@ public class ScriptDAO extends AbstractDAO<Script> {
     return persist(script);
   }
 
+  /**
+   * Queries scripts by creator IDs
+   *
+   * @param creatorIds list of allowed creator IDs
+   * @return list of scripts
+   */
+  public List<Script> listScriptsByCreatorIds(List<UUID> creatorIds) {
+    EntityManager entityManager = getEntityManager();
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Script> criteria = criteriaBuilder.createQuery(Script.class);
+    Root<Script> root = criteria.from(Script.class);
+    criteria.select(root);
+
+    Expression<UUID> creatorExpression = root.get(Script_.creatorId);
+    Predicate creatorRestriction = creatorExpression.in(creatorIds);
+    criteria.where(creatorRestriction);
+
+    return entityManager.createQuery(criteria).getResultList();
+  }
 }

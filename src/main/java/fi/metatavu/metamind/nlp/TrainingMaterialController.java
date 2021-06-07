@@ -216,10 +216,16 @@ public class TrainingMaterialController {
    * @param story filter materials by story
    * @param type type
    * @param visibility TrainingMaterialVisibility
+   * @param creatorIds creator IDs
    * @return training materials
    */
-  public List<TrainingMaterial> listTrainingMaterials(Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility) {
-    return trainingMaterialDAO.list(true, story, type, visibility);
+  public List<TrainingMaterial> listTrainingMaterials(
+    Story story,
+    TrainingMaterialType type,
+    TrainingMaterialVisibility visibility,
+    List<UUID> creatorIds
+  ) {
+    return trainingMaterialDAO.list(true, story, type, visibility, creatorIds);
   }
   
   /**

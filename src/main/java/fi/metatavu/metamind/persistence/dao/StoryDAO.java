@@ -6,9 +6,7 @@ import fi.metatavu.metamind.persistence.models.Story_;
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -73,9 +71,10 @@ public class StoryDAO extends AbstractDAO<Story> {
     CriteriaQuery<Story> criteria = criteriaBuilder.createQuery(Story.class);
     Root<Story> root = criteria.from(Story.class);
     criteria.select(root);
-    for (UUID creatorId : creatorIds) {
-      criteria.where(criteriaBuilder.equal(root.get(Story_.creatorId), creatorId));
-    }
+
+    Expression<UUID> creatorExpression = root.get(Story_.creatorId);
+    Predicate creatorRestriction = creatorExpression.in(creatorIds);
+    criteria.where(creatorRestriction);
 
     return entityManager.createQuery(criteria).getResultList();
   }
