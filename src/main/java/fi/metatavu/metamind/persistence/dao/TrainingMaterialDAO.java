@@ -55,10 +55,16 @@ public class TrainingMaterialDAO extends AbstractDAO<TrainingMaterial> {
    * @param includeNullStories whether to include stories with null story
    * @param story story include also stories
    * @param type filter by type
-   * @param creatorIds list of accepted creator IDs   *
+   * @param creatorIds list of accepted creator IDs
    * @return found training materials
    */
-  public List<TrainingMaterial> list(boolean includeNullStories, Story story, TrainingMaterialType type, TrainingMaterialVisibility visibility, List<UUID> creatorIds) {
+  public List<TrainingMaterial> list(
+    boolean includeNullStories,
+    Story story,
+    TrainingMaterialType type,
+    TrainingMaterialVisibility visibility,
+    List<UUID> creatorIds
+  ) {
     EntityManager entityManager = getEntityManager();
 
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

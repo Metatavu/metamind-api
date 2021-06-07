@@ -39,6 +39,9 @@ public class KnotTestsIT {
     }
   }
 
+  /**
+   * Test that not logged in users cannot create knots
+   */
   @Test
   public void testCreateKnotPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
@@ -105,6 +108,10 @@ public class KnotTestsIT {
     }
   }
 
+  /**
+   * Tests that not logged in users cannot update knots
+   * @throws Exception
+   */
   @Test
   public void testUpdateKnotPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {

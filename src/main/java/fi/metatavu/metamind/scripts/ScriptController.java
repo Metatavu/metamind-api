@@ -86,7 +86,7 @@ public class ScriptController {
    * Lists scripts based on permitted creator IDs
    *
    * @param creatorIds creator IDs
-   * @return scripts
+   * @return list of scripts
    */
   public List<Script> listScriptsByCreatorIds(List<UUID> creatorIds) {
     return scriptDAO.listScriptsByCreatorIds(creatorIds);
