@@ -123,7 +123,7 @@ public class ScriptDAO extends AbstractDAO<Script> {
    * Queries scripts by creator IDs
    *
    * @param creatorIds list of allowed creator IDs
-   * @return scripts
+   * @return list of scripts
    */
   public List<Script> listScriptsByCreatorIds(List<UUID> creatorIds) {
     EntityManager entityManager = getEntityManager();

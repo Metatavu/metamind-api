@@ -111,6 +111,10 @@ public class IntentTestsIT {
     }
   }
 
+  /**
+   * Tests that noy logged in users cannot update intents
+   * @throws Exception
+   */
   @Test
   public void testUpdateIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {

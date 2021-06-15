@@ -54,17 +54,16 @@ public class KeycloakController {
    * @return if they have no common groups or if one of the users is missing
    */
   public boolean usersShareNoGroups(UUID user1, UUID user2) {
-      UserResource userResource1 = getUserResource(user1);
-      UserResource userResource2 = getUserResource(user2);
+    UserResource userResource1 = getUserResource(user1);
+    UserResource userResource2 = getUserResource(user2);
 
-      if (userResource1 == null || userResource2 == null) {
-        return true;
-      }
+    if (userResource1 == null || userResource2 == null) {
+      return true;
+    }
 
-      List<String> user1Groups = userResource1.groups().stream().map(GroupRepresentation::getId).collect(Collectors.toList());
-      List<String> user2Groups = userResource2.groups().stream().map(GroupRepresentation::getId).collect(Collectors.toList());
-      return Collections.disjoint(user1Groups, user2Groups);
-
+    List<String> user1Groups = userResource1.groups().stream().map(GroupRepresentation::getId).collect(Collectors.toList());
+    List<String> user2Groups = userResource2.groups().stream().map(GroupRepresentation::getId).collect(Collectors.toList());
+    return Collections.disjoint(user1Groups, user2Groups);
   }
 
   /**

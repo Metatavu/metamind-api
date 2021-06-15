@@ -106,6 +106,10 @@ public class TrainingMaterialTestsIT {
     }
   }
 
+  /**
+   * Tests that not logged in users cannot update training materials
+   * @throws Exception
+   */
  @Test
   public void testUpdateIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {

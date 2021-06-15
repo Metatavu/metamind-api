@@ -152,21 +152,35 @@ public class IntentTestBuilderResource extends ApiTestBuilderResource<Intent, In
   /**
    * Asserts create status fails with given status code
    *
-   *
+   * @param expectedStatus status
+   * @param storyId story id
+   * @param sourceKnot source knot
+   * @param targetKnot target knot
+   * @param name intent name
+   * @param type intent type
+   * @param global global intent
+   * @param quickResponse quick response
+   * @param quickResponseOrder quick response order
+   * @param intentOpenNlpDoccatId intent training material openNlp doccatId
+   * @param intentRegexId intent training material regex id
+   * @param variableOpenNlpNerId intent training material openNlp NerId
+   * @param variableOpenNlpRegexId intent training material openNlp RegexId
    */
-  public void assertCreateFailStatus(int expectedStatus,
-                                     UUID storyId,
-                                     Knot sourceKnot,
-                                     Knot targetKnot,
-                                     String name,
-                                     IntentType type,
-                                     boolean global,
-                                     String quickResponse,
-                                     int quickResponseOrder,
-                                     UUID intentOpenNlpDoccatId,
-                                     UUID intentRegexId,
-                                     UUID variableOpenNlpNerId,
-                                     UUID variableOpenNlpRegexId) {
+  public void assertCreateFailStatus(
+    int expectedStatus,
+    UUID storyId,
+    Knot sourceKnot,
+    Knot targetKnot,
+    String name,
+    IntentType type,
+    boolean global,
+    String quickResponse,
+    int quickResponseOrder,
+    UUID intentOpenNlpDoccatId,
+    UUID intentRegexId,
+    UUID variableOpenNlpNerId,
+    UUID variableOpenNlpRegexId
+  ) {
     try {
       IntentTrainingMaterials intentTrainingMaterials = new IntentTrainingMaterials(intentOpenNlpDoccatId, intentRegexId, variableOpenNlpNerId, variableOpenNlpRegexId);
       Intent intent = new Intent(quickResponseOrder, type, targetKnot.getId(), global, intentTrainingMaterials, null, name, quickResponse, sourceKnot.getId(), null, null);
