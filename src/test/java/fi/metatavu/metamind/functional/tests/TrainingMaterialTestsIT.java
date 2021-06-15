@@ -34,8 +34,8 @@ public class TrainingMaterialTestsIT {
   public void testCreateTrainingMaterial() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-
-      assertNotNull(builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY));
+      TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY);
+      assertNotNull(material);
     }
   }
 

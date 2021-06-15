@@ -937,8 +937,8 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
                 return createForbidden(SCRIPT_GROUP_ERROR);
             }
         }
-
-        return createOk(trainingMaterialTranslator.translateTrainingMaterial(trainingMaterialController.createTrainingMaterial(type, body.getName(), body.getText(), story, loggedUserId, visibility)));
+        TrainingMaterial createdMaterial = trainingMaterialController.createTrainingMaterial(type, body.getName(), body.getText(), story, loggedUserId, visibility);
+        return createOk(trainingMaterialTranslator.translateTrainingMaterial(createdMaterial));
     }
 
     @Override
