@@ -31,8 +31,8 @@ public class IntentTestsIT {
   public void testCreateIntent() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-      Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+      Knot sourceKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot targetKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
 
       assertNotNull(builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null));
     }
@@ -42,8 +42,8 @@ public class IntentTestsIT {
    public void testCreateIntentPermissions() throws Exception {
      try (TestBuilder builder = new TestBuilder()) {
        Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-       Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-       Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+       Knot sourceKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+       Knot targetKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
 
        builder.invalid().intents().assertCreateFailStatus(401, story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
        builder.anonymous().intents().assertCreateFailStatus(401, story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
@@ -58,8 +58,8 @@ public class IntentTestsIT {
   public void testFindIntent() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-      Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+      Knot sourceKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot targetKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
 
       builder.admin().intents().assertFindFailStatus(story.getId(), 404, UUID.randomUUID());
@@ -73,8 +73,8 @@ public class IntentTestsIT {
   public void testFindIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-      Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+      Knot sourceKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot targetKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1,  null, null, null, null);
       
       assertNotNull(builder.admin().intents().findIntent(story, createdIntent));
@@ -91,8 +91,8 @@ public class IntentTestsIT {
   public void testUpdateIntent() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-      Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+      Knot sourceKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot targetKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
 
       Intent updateIntent = new Intent(2, IntentType.cONFUSED, createdIntent.getTargetKnotId(), false,
@@ -119,8 +119,8 @@ public class IntentTestsIT {
   public void testUpdateIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-      Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+      Knot sourceKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot targetKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1,  null, null, null, null);
 
       builder.anonymous().intents().assertUpdateFailStatus(story, 401, createdIntent);
@@ -136,8 +136,8 @@ public class IntentTestsIT {
   public void testDeleteIntent() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-      Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+      Knot sourceKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot targetKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
       Intent foundIntent = builder.admin().intents().findIntent(story, createdIntent);
       assertEquals(createdIntent.getId(), foundIntent.getId());
@@ -150,8 +150,8 @@ public class IntentTestsIT {
   public void testDeleteIntentPermissions() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot sourceKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-      Knot targetKnot = builder.admin().knots().create(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
+      Knot sourceKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot targetKnot = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test2", "Content", 20.0, 40.0);
       Intent createdIntent = builder.admin().intents().create(story.getId(), sourceKnot, targetKnot, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, null, null, null, null);
 
       builder.anonymous().intents().assertDeleteFailStatus(story, 401, createdIntent);

@@ -6,10 +6,7 @@ import fi.metatavu.metamind.api.client.apis.KnotsApi;
 import fi.metatavu.metamind.api.client.apis.StoriesApi;
 import fi.metatavu.metamind.api.client.infrastructure.ApiClient;
 import fi.metatavu.metamind.api.client.infrastructure.ClientException;
-import fi.metatavu.metamind.api.client.models.Coordinates;
-import fi.metatavu.metamind.api.client.models.Knot;
-import fi.metatavu.metamind.api.client.models.KnotType;
-import fi.metatavu.metamind.api.client.models.Story;
+import fi.metatavu.metamind.api.client.models.*;
 import fi.metatavu.metamind.api.spec.model.TokenizerType;
 import fi.metatavu.metamind.functional.TestSettings;
 import org.json.JSONException;
@@ -68,11 +65,11 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
    * @param coordinateY Double coordinate
    * @return created knot
    */
-  public Knot create(Story story, KnotType type, String name, String content, Double coordinateX, Double coordinateY) {
+  public Knot createBasicKnot(Story story, KnotType type, String name, String content, Double coordinateX, Double coordinateY) {
     Coordinates coordinates = new Coordinates(coordinateX, coordinateY);
 
     Knot knot = new Knot(type, fi.metatavu.metamind.api.client.models.TokenizerType.wHITESPACE, name,
-      content, null, "hint", null, coordinates, null, null);
+      content, null, "hint", null, coordinates, null, null, KnotScope.basic);
 
     return addClosable(getApi().createKnot(story.getId(), knot));
   }
@@ -136,7 +133,7 @@ public class KnotTestBuilderResource extends ApiTestBuilderResource<Knot, KnotsA
    */
   public void assertCreateFailStatus(int expectedStatus, String content, String name, Story story) {
     try {
-      Knot knot = new Knot(KnotType.tEXT, fi.metatavu.metamind.api.client.models.TokenizerType.wHITESPACE, name, content, null, null, null, null, null, null);
+      Knot knot = new Knot(KnotType.tEXT, fi.metatavu.metamind.api.client.models.TokenizerType.wHITESPACE, name, content, null, null, null, null, null, null, KnotScope.basic);
       getApi().createKnot(Objects.requireNonNull(story.getId()), knot);
       fail(String.format("Expected create to fail with status %d", expectedStatus));
     } catch (ClientException e) {
