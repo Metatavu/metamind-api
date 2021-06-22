@@ -426,7 +426,6 @@ public class StoryController {
     
     Map <UUID, Knot> originalKnotIds = new HashMap<>();
     knotsToCreate.forEach(knotToCreate -> {
-      System.out.println("Creating knot " + knotToCreate + " with scope "+knotToCreate.getScope());
       Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY(), knotToCreate.getScope());
       originalKnotIds.put(knotToCreate.getId(), knot);
     });
