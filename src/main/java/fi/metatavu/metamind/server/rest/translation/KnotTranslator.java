@@ -38,6 +38,7 @@ public class KnotTranslator {
     result.setCoordinates(coordinates);
     result.setHint(jpaKnot.getHint());
     result.setTokenizer(jpaKnot.getTokenizerType());
+    result.setScope(jpaKnot.getScope());
       
     return result;
   }

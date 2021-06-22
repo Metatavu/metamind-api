@@ -117,10 +117,11 @@ public class StoryController {
    * @param creatorId creator's id
    * @param coordinateX Double coordinate
    * @param coordinateY Double coordinate
+   * @param scope scope
    * @return created knot
    */
-  public Knot createKnot(KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, Double coordinateX, Double coordinateY) {
-    return knotDAO.create(UUID.randomUUID(), type, tokenizerType, name, content, hint, story, creatorId, creatorId, coordinateX, coordinateY);
+  public Knot createKnot(KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, Double coordinateX, Double coordinateY, KnotScope scope) {
+    return knotDAO.create(UUID.randomUUID(), type, tokenizerType, name, content, hint, story, creatorId, creatorId, coordinateX, coordinateY, scope);
   }
   
   /**
@@ -289,15 +290,17 @@ public class StoryController {
    * @param lastModifierId last modifier's id
    * @param coordinateX Double coordinate
    * @param coordinateY Double coordinate
+   * @param scope scope
    * @return updated knot
    */
-  public Knot updateKnot(Knot knot, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, UUID lastModifierId, Double coordinateX, Double coordinateY) {
+  public Knot updateKnot(Knot knot, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, UUID lastModifierId, Double coordinateX, Double coordinateY, KnotScope scope) {
     knot = knotDAO.updateContent(knot, content, lastModifierId);
     knot = knotDAO.updateName(knot, name, lastModifierId);
     knot = knotDAO.updateType(knot, type, lastModifierId);
     knot = knotDAO.updateTokenizerType(knot, tokenizerType, lastModifierId);
     knot = knotDAO.updateHint(knot, hint, lastModifierId);
     knot = knotDAO.updateCoordinates(knot, coordinateX, coordinateY);
+    knot = knotDAO.updateScope(knot, scope, lastModifierId);
     return knot;
   }
 
@@ -423,7 +426,7 @@ public class StoryController {
     
     Map <UUID, Knot> originalKnotIds = new HashMap<>();
     knotsToCreate.forEach(knotToCreate -> {
-      Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY());
+      Knot knot = createKnot(knotToCreate.getType(), knotToCreate.getTokenizer(), knotToCreate.getName(), knotToCreate.getContent(), knotToCreate.getHint(), story, userId, knotToCreate.getCoordinates().getX(), knotToCreate.getCoordinates().getY(), knotToCreate.getScope());
       originalKnotIds.put(knotToCreate.getId(), knot);
     });
     
@@ -456,6 +459,7 @@ public class StoryController {
     exportedKnot.setTokenizer(knot.getTokenizerType());
     exportedKnot.setName(knot.getName());
     exportedKnot.setHint(knot.getHint());
+    exportedKnot.setScope(knot.getScope());
     return exportedKnot;
   }
   

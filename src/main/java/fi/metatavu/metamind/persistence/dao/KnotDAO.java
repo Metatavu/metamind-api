@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.persistence.dao;
 
+import fi.metatavu.metamind.api.spec.model.KnotScope;
 import fi.metatavu.metamind.persistence.models.Knot;
 import fi.metatavu.metamind.persistence.models.Knot_;
 import fi.metatavu.metamind.persistence.models.Story;
@@ -37,9 +38,10 @@ public class KnotDAO extends AbstractDAO<Knot> {
    * @param lastModifierId last modifier's id
    * @param coordinateX Double coordinate
    * @param coordinateY Double coordinate
+   * @param scope scope
    * @return created knot
    */
-  public Knot create(UUID id, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, UUID lastModifierId, Double coordinateX, Double coordinateY) {
+  public Knot create(UUID id, KnotType type, TokenizerType tokenizerType, String name, String content, String hint, Story story, UUID creatorId, UUID lastModifierId, Double coordinateX, Double coordinateY, KnotScope scope) {
     Knot knot = new Knot();
     knot.setType(type);
     knot.setTokenizerType(tokenizerType);
@@ -50,6 +52,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
     knot.setId(id);
     knot.setCoordinateX(coordinateX);
     knot.setCoordinateY(coordinateY);
+    knot.setScope(scope);
     knot.setCreatorId(creatorId);
     knot.setLastModifierId(lastModifierId);
     return persist(knot);
@@ -79,6 +82,7 @@ public class KnotDAO extends AbstractDAO<Knot> {
   /**
    * Updates type
    *
+   * @param knot knot to update
    * @param type type
    * @param lastModifierId last modifier's id
    * @return updated knot
@@ -86,6 +90,20 @@ public class KnotDAO extends AbstractDAO<Knot> {
   public Knot updateType(Knot knot, KnotType type, UUID lastModifierId) {
     knot.setLastModifierId(lastModifierId);
     knot.setType(type);
+    return persist(knot);
+  }
+
+  /**
+   * Updates scope
+   *
+   * @param knot knot to update
+   * @param scope new scope
+   * @param lastModifierId last modifier id
+   * @return updated knot
+   */
+  public Knot updateScope(Knot knot, KnotScope scope, UUID lastModifierId) {
+    knot.setLastModifierId(lastModifierId);
+    knot.setScope(scope);
     return persist(knot);
   }
   

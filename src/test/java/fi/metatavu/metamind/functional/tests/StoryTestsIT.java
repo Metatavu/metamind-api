@@ -157,8 +157,8 @@ public class StoryTestsIT {
   public void testExportImportStory() throws Exception {
     try (TestBuilder builder = new TestBuilder()) {
       Story story = builder.admin().stories().create("en", "test story", "Enter your answer");
-      Knot knot1 = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
-      Knot knot2 = builder.admin().knots().create(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot knot1 = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
+      Knot knot2 = builder.admin().knots().createBasicKnot(story, KnotType.tEXT, "Test1", "Content", 10.0, 20.0);
       TrainingMaterial material = builder.admin().trainingMaterial().create(story.getId(), TrainingMaterialType.iNTENTOPENNLPDOCCAT, "Test material", "Test", TrainingMaterialVisibility.sTORY);
       Intent intent = builder.admin().intents().create(story.getId(), knot1, knot2, "Test Intent", IntentType.dEFAULT, false, "quickresponse", 1, material.getId(), null, null, null);
       fi.metatavu.metamind.api.client.models.Variable variable = builder.admin().variables().create(story.getId(), "Test variable", VariableType.sTRING, "");

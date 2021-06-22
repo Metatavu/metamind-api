@@ -1,5 +1,6 @@
 package fi.metatavu.metamind.persistence.models;
 
+import fi.metatavu.metamind.api.spec.model.KnotScope;
 import fi.metatavu.metamind.api.spec.model.KnotType;
 import fi.metatavu.metamind.api.spec.model.TokenizerType;
 import org.hibernate.annotations.Cache;
@@ -22,6 +23,10 @@ public class Knot {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private KnotType type;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private KnotScope scope;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -165,6 +170,14 @@ public class Knot {
 
   public void setModifiedAt(OffsetDateTime modifiedAt) {
     this.modifiedAt = modifiedAt;
+  }
+
+  public KnotScope getScope() {
+    return scope;
+  }
+
+  public void setScope(KnotScope scope) {
+    this.scope = scope;
   }
 
   @PrePersist

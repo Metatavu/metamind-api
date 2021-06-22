@@ -433,5 +433,13 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet id="knot-scope" author="Katja Danilova">
+    <addColumn tableName="knot">
+      <column name="scope" type="varchar(191)">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
   
 </databaseChangeLog>

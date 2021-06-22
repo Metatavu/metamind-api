@@ -301,7 +301,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createForbidden(STORY_GROUP_ERROR);
         }
 
-        return createOk(knotTranslator.translateKnot(storyController.createKnot(knot.getType(), knot.getTokenizer(), knot.getName(), knot.getContent(), knot.getHint(), story, loggedUserId, coordinateX, coordinateY)));
+        return createOk(knotTranslator.translateKnot(storyController.createKnot(knot.getType(), knot.getTokenizer(), knot.getName(), knot.getContent(), knot.getHint(), story, loggedUserId, coordinateX, coordinateY, knot.getScope())));
     }
 
     @Override
@@ -841,7 +841,7 @@ public class V2ApiImpl extends AbstractRestApi implements V2Api {
             return createBadRequest(String.format("Knot %s is not from the story %s", foundKnot.getId(), story.getId()));
         }
 
-        return createOk(knotTranslator.translateKnot(storyController.updateKnot(foundKnot, knot.getType(), knot.getTokenizer(), knot.getName(), knot.getContent(), knot.getHint(), loggedUserId, coordinateX, coordinateY)));
+        return createOk(knotTranslator.translateKnot(storyController.updateKnot(foundKnot, knot.getType(), knot.getTokenizer(), knot.getName(), knot.getContent(), knot.getHint(), loggedUserId, coordinateX, coordinateY, knot.getScope())));
     }
 
     @Override
